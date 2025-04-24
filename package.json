@@ -9,10 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "framer-motion": "^12.7.4",
     "next": "15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+=======
+    "next": "^15.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+>>>>>>> f182c199fccf9359a4e58477c7f41aefbfbc8dfa
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
