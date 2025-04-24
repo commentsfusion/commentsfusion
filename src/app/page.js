@@ -2,19 +2,22 @@
 "use client";
 
 import Navbar from "./components/Navbar";
-import Logo from "./components/Logo";
 import HeroText from "./components/HeroText";
 import Reviews from "./components/Reviews";
 import DecorativeBirds from "./components/DecorativeBirds";
+import FeaturesSection from "./components/FeaturesSection";
 
-export default function HeroSection() {
+export default function HomePage() {
   return (
-    <section className="min-h-screen flex flex-col justify-center items-center text-white bg-gradient-to-b from-[#0f0f3e] to-[#070720] p-6 relative overflow-hidden">
-      <Logo />
+    <main>
       <Navbar />
-      <HeroText />
-      <DecorativeBirds />
-      <Reviews />
-    </section>
+      <section className="min-h-screen flex flex-col justify-center items-center text-white bg-gradient-to-b from-[#0f0f3e] to-[#070720] relative overflow-hidden">
+        <HeroText />
+        <DecorativeBirds />
+        <Reviews />
+      </section>
+      <FeaturesSection />
+
+    </main>
   );
 }
