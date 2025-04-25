@@ -1,11 +1,13 @@
 // app/components/HeroSection.js
 "use client";
 
-import Navbar from "./components/Navbar";
-import HeroText from "./components/HeroText";
-import Reviews from "./components/Reviews";
-import DecorativeBirds from "./components/DecorativeBirds";
-import FeaturesSection from "./components/FeaturesSection";
+import Navbar from "./components/landingPage_components/Navbar";
+import HeroText from "./components/landingPage_components/HeroText";
+import Reviews from "./components/landingPage_components/Reviews";
+import DecorativeBirds from "./components/landingPage_components/DecorativeBirds";
+import FeaturesSection from "./components/landingPage_components/FeaturesSection";
+import LeadConversionFlow from "./components/landingPage_components/LeadConversionFlow";
+import ThreeSteps from "./components/landingPage_components/ThreeSteps";
 
 export default function HomePage() {
   return (
@@ -17,7 +19,8 @@ export default function HomePage() {
         <Reviews />
       </section>
       <FeaturesSection />
-
+      <LeadConversionFlow />
+      <ThreeSteps/>
     </main>
   );
 }
