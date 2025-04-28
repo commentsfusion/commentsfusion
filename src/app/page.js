@@ -9,6 +9,7 @@ import FeaturesSection from "./components/landingPage_components/FeaturesSection
 import LeadConversionFlow from "./components/landingPage_components/LeadConversionFlow";
 import ThreeSteps from "./components/landingPage_components/ThreeSteps";
 import OneClickCommenting from "./components/landingPage_components/OneClickCommenting";
+import AIGeneratedSmartComments from "./components/landingPage_components/AIGeneratedSmartComments";
 
 export default function HomePage() {
   return (
@@ -23,6 +24,7 @@ export default function HomePage() {
       <LeadConversionFlow />
       <ThreeSteps/>
       <OneClickCommenting/>
+      <AIGeneratedSmartComments/>
     </main>
   );
 }

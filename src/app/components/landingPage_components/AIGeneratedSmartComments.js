@@ -1,0 +1,77 @@
+"use client";
+import Image from "next/image";
+import { motion } from "framer-motion";
+
+export default function AIGeneratedSmartComments() {
+  return (
+    <section className="bg-[#070720] text-white py-20 px-6">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+        
+        {/* Left Side - Text */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-left w-full lg:w-1/2"
+        >
+          <h2 className="text-white text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3">
+            <span className="text-cyan-400 text-4xl">➞</span> 
+            AI-Generated Smart Comments
+          </h2>
+          <p className="text-gray-300 text-lg mb-6 leading-relaxed">
+            Turn conversations into opportunities with AI-powered, personal comments on LinkedIn!
+          </p>
+          <ul className="text-gray-300 space-y-4 mb-8 pl-4">
+            <li className="flex items-start">
+              <span className="text-cyan-400 mr-3 mt-1">●</span>
+              <span>Effortless Engagement - Instantly generated relevant responses</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-cyan-400 mr-3 mt-1">●</span>
+              <span>Customizable Tones - Match your brand voice (Professional, Witty, Friendly, etc.)</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-cyan-400 mr-3 mt-1">●</span>
+              <span>Boost Visibility - Increase reach & credibility with meaningful interactions</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-cyan-400 mr-3 mt-1">●</span>
+              <span>Drive Conversations - Build relationships and convert prospects seamlessly</span>
+            </li>
+          </ul>
+          <p className="text-gray-300 text-lg mb-6 leading-relaxed">
+            Click, Comment, Convert! Let AI handle engagement while you focus on growth.
+          </p>
+
+          {/* Button */}
+          <motion.a
+            href="#"
+            className="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-md hover:scale-105 transition-transform"
+            whileHover={{ scale: 1.05 }}
+          >
+            Download Free Chrome Extension
+          </motion.a>
+        </motion.div>
+
+        {/* Right Side - Image */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="w-full lg:w-1/2"
+        >
+          <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 bg-blue">
+            <Image 
+              src="/images/AI-generatedSmartComments.gif" 
+              alt="AI Generated Smart Comments Demo" 
+              width={600} 
+              height={600} 
+              className="w-full h-auto object-contain rounded-xl"
+            />
+          </div>
+        </motion.div>
+
+      </div>
+    </section>
+  );
+}
