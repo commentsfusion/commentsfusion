@@ -33,7 +33,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Image
-                  src="/images/followersIcon.svg"
+                  src="/images/main_dashboard/followersIcon.svg"
                   alt="Followers"
                   width={24}
                   height={24}
@@ -52,7 +52,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Image
-                  src="/images/connectionsIcon.svg"
+                  src="/images/main_dashboard/connectionsIcon.svg"
                   alt="Connections"
                   width={24}
                   height={24}
@@ -71,7 +71,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Image
-                  src="/images/commentsIcon.svg"
+                  src="/images/main_dashboard/commentsIcon.svg"
                   alt="Comments"
                   width={24}
                   height={24}
@@ -126,7 +126,7 @@ export default function Home() {
                   <span>{String(i + 1).padStart(2, "0")}</span>
                   <div className="flex items-center space-x-3">
                     <img
-                      src={`/images/userIcon.svg`}
+                      src={`/images/main_dashboard/userIcon.svg`}
                       alt={user.name}
                       className="w-8 h-8 rounded-full"
                     />

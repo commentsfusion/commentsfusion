@@ -1,5 +1,6 @@
-import Sidebar from './sidenav';
-import Topbar from './topBar';
+import Sidebar from "./sidenav";
+import Topbar from "./topBar";
+import Image from "next/image";
 
 export default function Layout({ children }) {
   return (
@@ -14,17 +15,23 @@ export default function Layout({ children }) {
         space-y-4
       "
     >
-      {/* Full-width Topbar */}
       <header className="w-full">
         <Topbar />
       </header>
 
-      {/* Content area below: Sidebar and main content */}
       <div className="flex flex-1">
         <Sidebar />
         <main className="flex-1 p-6 overflow-auto bg-transparent">
           {children}
         </main>
+        <button className="fixed bottom-2 right-4 text-white p-3 rounded-full transition-colors animate-bounce">
+          <Image
+            src="/images/chatBotIcon.svg"
+            alt="Comments"
+            width={90}
+            height={90}
+          />
+        </button>
       </div>
     </div>
   );

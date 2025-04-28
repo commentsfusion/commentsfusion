@@ -5,24 +5,28 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 const navItems = [
-  { name: "Dashboard", href: "/", iconPath: "/images/dashboardIcon.svg" },
-  { name: "Activity", href: "/activity", iconPath: "/images/activityIcon.svg" },
+  {
+    name: "Dashboard",
+    href: "/main_dashboard",
+    iconPath: "/images/side_nav/dashboardIcon.svg",
+  },
+  { name: "Activity", href: "/activity", iconPath: "/images/side_nav/activityIcon.svg" },
   {
     name: "Customise AI",
     href: "/customiseAI",
-    iconPath: "/images/customiseAIIcon.svg",
+    iconPath: "/images/side_nav/customiseAIIcon.svg",
   },
   {
     name: "Subscription Plans",
     href: "/plans",
-    iconPath: "/images/subscriptionPlansIcon.svg",
+    iconPath: "/images/side_nav/subscriptionPlansIcon.svg",
   },
   {
     name: "Affiliate Programs",
     href: "/affiliate",
-    iconPath: "/images/affiliateProgramIcon.svg",
+    iconPath: "/images/side_nav/affiliateProgramIcon.svg",
   },
-  { name: "Help", href: "/help", iconPath: "/images/helpIcon.svg" },
+  { name: "Help", href: "/help", iconPath: "/images/side_nav/helpIcon.svg" },
 ];
 
 const moreFeatures = [
@@ -63,7 +67,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="relative z-10 mb-5 flex items-center justify-center space-x-2">
         <img
-          src="/images/linkedIcon.svg"
+          src="/images/side_nav/linkedIcon.svg"
           alt="LinkedIn icon"
           className="h-10"
         />
@@ -103,14 +107,14 @@ export default function Sidebar() {
             More features!
           </h3>
           <p className="text-[12px] text-white/80 text-center">
-            Supercharge Your Growth with Comments Fusion by engaging
-            smarter, not just more.
+            Supercharge Your Growth with Comments Fusion by engaging smarter,
+            not just more.
           </p>
           <ul className="space-y-1">
             {moreFeatures.map((feat) => (
               <li key={feat} className="flex items-center space-x-2 text-white">
                 <Image
-                  src="/images/checkIcon.svg"
+                  src="/images/side_nav/checkIcon.svg"
                   alt="check"
                   width={20}
                   height={20}
@@ -121,7 +125,7 @@ export default function Sidebar() {
           </ul>
           <button className="w-full mt-2 flex items-center justify-center px-0 py-1 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition">
             <img
-              src="/images/upgradeIcon.svg"
+              src="/images/side_nav/upgradeIcon.svg"
               alt="Upgrade"
               className="w-5 h-5 mr-2"
             />
