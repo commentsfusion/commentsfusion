@@ -10,6 +10,7 @@ export default function Navbar() {
       animate={{ y: 0 }}
       className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/30 to-black/10 backdrop-blur-md border-b border-white/30 shadow-[0_0_30px_rgba(255,255,255,0.2),0_0_12px_rgba(255,255,255,0.3),0_0_4px_rgba(255,255,255,0.4)]"
     >
+      {/* Standardized container width and alignment for consistency */}
       <nav className="container mx-auto flex justify-between items-center py-4 px-6">
         <Link href="/" className="flex items-center">
           <Image 

@@ -8,6 +8,7 @@ import DecorativeBirds from "./components/landingPage_components/DecorativeBirds
 import FeaturesSection from "./components/landingPage_components/FeaturesSection";
 import LeadConversionFlow from "./components/landingPage_components/LeadConversionFlow";
 import ThreeSteps from "./components/landingPage_components/ThreeSteps";
+import OneClickCommenting from "./components/landingPage_components/OneClickCommenting";
 
 export default function HomePage() {
   return (
@@ -21,6 +22,7 @@ export default function HomePage() {
       <FeaturesSection />
       <LeadConversionFlow />
       <ThreeSteps/>
+      <OneClickCommenting/>
     </main>
   );
 }
