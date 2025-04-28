@@ -9,7 +9,7 @@ const navItems = [
   { name: "Activity", href: "/activity", iconPath: "/images/activityIcon.svg" },
   {
     name: "Customise AI",
-    href: "/customise_AI",
+    href: "/customiseAI",
     iconPath: "/images/customiseAIIcon.svg",
   },
   {
@@ -61,7 +61,7 @@ export default function Sidebar() {
       />
 
       {/* Logo */}
-      <div className="relative z-10 mb-10 flex items-center justify-center space-x-2">
+      <div className="relative z-10 mb-5 flex items-center justify-center space-x-2">
         <img
           src="/images/linkedIcon.svg"
           alt="LinkedIn icon"
