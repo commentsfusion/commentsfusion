@@ -5,24 +5,24 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 const navItems = [
-  { name: "Dashboard", href: "/", iconPath: "/images/dashboardIcon.svg" },
-  { name: "Activity", href: "/activity", iconPath: "/images/activityIcon.svg" },
+  { name: "Dashboard", href: "/main_dashboard", iconPath: "/images/sidebar/dashboardIcon.svg" },
+  { name: "Activity", href: "/activity", iconPath: "/images/sidebar/activityIcon.svg" },
   {
     name: "Customise AI",
     href: "/customiseAI",
-    iconPath: "/images/customiseAIIcon.svg",
+    iconPath: "/images/sidebar/customiseAIIcon.svg",
   },
   {
     name: "Subscription Plans",
     href: "/plans",
-    iconPath: "/images/subscriptionPlansIcon.svg",
+    iconPath: "/images/sidebar/subscriptionPlansIcon.svg",
   },
   {
     name: "Affiliate Programs",
     href: "/affiliate",
-    iconPath: "/images/affiliateProgramIcon.svg",
+    iconPath: "/images/sidebar/affiliateProgramIcon.svg",
   },
-  { name: "Help", href: "/help", iconPath: "/images/helpIcon.svg" },
+  { name: "Help", href: "/help", iconPath: "/images/sidebar/helpIcon.svg" },
 ];
 
 const moreFeatures = [
@@ -63,7 +63,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="relative z-10 mb-5 flex items-center justify-center space-x-2">
         <img
-          src="/images/linkedIcon.svg"
+          src="/images/sidebar/linkedIcon.svg"
           alt="LinkedIn icon"
           className="h-10"
         />
@@ -110,7 +110,7 @@ export default function Sidebar() {
             {moreFeatures.map((feat) => (
               <li key={feat} className="flex items-center space-x-2 text-white">
                 <Image
-                  src="/images/checkIcon.svg"
+                  src="/images/sidebar/checkIcon.svg"
                   alt="check"
                   width={20}
                   height={20}
@@ -121,7 +121,7 @@ export default function Sidebar() {
           </ul>
           <button className="w-full mt-2 flex items-center justify-center px-0 py-1 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition">
             <img
-              src="/images/upgradeIcon.svg"
+              src="/images/sidebar/upgradeIcon.svg"
               alt="Upgrade"
               className="w-5 h-5 mr-2"
             />

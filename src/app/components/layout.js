@@ -1,5 +1,6 @@
 import Sidebar from './sidenav';
 import Topbar from './topBar';
+import Image from 'next/image';
 
 export default function Layout({ children }) {
   return (
@@ -25,6 +26,14 @@ export default function Layout({ children }) {
         <main className="flex-1 p-6 overflow-auto bg-transparent">
           {children}
         </main>
+        <button className="fixed bottom-2 right-4 text-white p-3 rounded-full transition-colors animate-bounce">
+          <Image
+            src="/images/chatBotIcon.svg"
+            alt="Comments"
+            width={80}
+            height={80}
+          />
+        </button>
       </div>
     </div>
   );

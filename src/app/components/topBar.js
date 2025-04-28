@@ -28,7 +28,7 @@ export default function Topbar() {
       <div className="relative z-10 flex items-center">
         <div className="flex flex-col items-center gap-1">
           <Image
-            src="/images/logo.svg"
+            src="/images/topbar/logo.svg"
             alt="COMMENTS'USION Logo"
             width={200}
             height={40}
@@ -53,7 +53,7 @@ export default function Topbar() {
             <span className="text-[12px]">Free</span>
           </div>
           <Image
-            src="/images/userIcon.svg"
+            src="/images/topbar/userIcon.svg"
             alt="COMMENTS'USION Logo"
             width={30}
             height={30}
