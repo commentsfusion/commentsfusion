@@ -62,7 +62,7 @@ export default function AIGeneratedSmartComments() {
         >
           <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 bg-blue">
             <Image 
-              src="/images/AI-generatedSmartComments.gif" 
+              src="/images/landing-page/AI-generatedSmartComments.gif" 
               alt="AI Generated Smart Comments Demo" 
               width={600} 
               height={600} 

@@ -63,7 +63,7 @@ export default function OneClickSmartCommenting() {
         >
           <div className="rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-white/5 p-2">
             <img 
-              src="/images/oneClick-smartCommenting.gif" 
+              src="/images/landing-page/oneClick-smartCommenting.gif" 
               alt="One Click Smart Commenting Demo" 
               className="w-full h-auto object-contain rounded-xl"
             />

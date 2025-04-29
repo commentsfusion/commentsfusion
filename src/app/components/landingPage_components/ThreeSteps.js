@@ -65,7 +65,7 @@ export default function ThreeSteps() {
           >
             <div className="rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-white/5 p-2">
               <Image
-                src="/images/smart-commenting.gif" 
+                src="/images/landing-page/smart-commenting.gif" 
                 alt="Smart Commenting Demo"
                 width={600}
                 height={400}

@@ -25,7 +25,7 @@ return (
           transition={{ duration: 1, ease: "easeInOut" }}
         >
           <Image
-            src="/images/lead.svg"
+            src="/images/landing-page/lead.svg"
             alt="Lead Conversion Flow"
             fill
             className="object-contain"

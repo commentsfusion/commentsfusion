@@ -10,6 +10,7 @@ import LeadConversionFlow from "./components/landingPage_components/LeadConversi
 import ThreeSteps from "./components/landingPage_components/ThreeSteps";
 import OneClickCommenting from "./components/landingPage_components/OneClickCommenting";
 import AIGeneratedSmartComments from "./components/landingPage_components/AIGeneratedSmartComments";
+import MonitorEngagement from "./components/landingPage_components/MonitorEngagement";
 
 export default function HomePage() {
   return (
@@ -25,6 +26,7 @@ export default function HomePage() {
       <ThreeSteps/>
       <OneClickCommenting/>
       <AIGeneratedSmartComments/>
+      {/* <MonitorEngagement/> */}
     </main>
   );
 }
