@@ -28,7 +28,7 @@ export default function MonitorEngagement() {
         {/* Button */}
         <a
           href="#"
-          className="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-md hover:scale-105 transition-transform"
+          className="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-md hover:scale-105 transition-transform mt-10"
         >
           Download Free Chrome Extension
         </a>

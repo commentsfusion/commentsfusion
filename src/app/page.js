@@ -11,6 +11,7 @@ import ThreeSteps from "./components/landingPage_components/ThreeSteps";
 import OneClickCommenting from "./components/landingPage_components/OneClickCommenting";
 import AIGeneratedSmartComments from "./components/landingPage_components/AIGeneratedSmartComments";
 import MonitorEngagement from "./components/landingPage_components/MonitorEngagement";
+import FAQSection from "./components/landingPage_components/FAQSection";
 
 export default function HomePage() {
   return (
@@ -27,6 +28,7 @@ export default function HomePage() {
       <OneClickCommenting/>
       <AIGeneratedSmartComments/>
       <MonitorEngagement/>
+      <FAQSection/>
     </main>
   );
 }
