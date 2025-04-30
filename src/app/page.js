@@ -26,7 +26,7 @@ export default function HomePage() {
       <ThreeSteps/>
       <OneClickCommenting/>
       <AIGeneratedSmartComments/>
-      {/* <MonitorEngagement/> */}
+      <MonitorEngagement/>
     </main>
   );
 }

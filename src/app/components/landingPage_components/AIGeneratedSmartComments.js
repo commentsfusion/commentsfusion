@@ -60,12 +60,12 @@ export default function AIGeneratedSmartComments() {
           transition={{ duration: 0.8 }}
           className="w-full lg:w-1/2"
         >
-          <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 bg-blue">
+          <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2">
             <Image 
               src="/images/landing-page/AI-generatedSmartComments.gif" 
               alt="AI Generated Smart Comments Demo" 
               width={600} 
-              height={600} 
+              height={400} 
               className="w-full h-auto object-contain rounded-xl"
             />
           </div>

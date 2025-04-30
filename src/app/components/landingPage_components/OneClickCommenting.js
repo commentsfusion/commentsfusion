@@ -61,7 +61,7 @@ export default function OneClickSmartCommenting() {
           transition={{ duration: 0.8 }}
           className="w-full lg:w-1/2"
         >
-          <div className="rounded-3xl overflow-hidden shadow-xl border border-white/10 bg-white/5 p-2">
+          <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 ">
             <img 
               src="/images/landing-page/oneClick-smartCommenting.gif" 
               alt="One Click Smart Commenting Demo" 
