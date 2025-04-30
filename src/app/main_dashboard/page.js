@@ -3,6 +3,7 @@
 import Layout from "../components/layout";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useState } from "react";
 
 const FollowersChart = dynamic(
   () => import("../components/charts/FollowersChart"),
@@ -18,18 +19,41 @@ const CommentsDotPlot = dynamic(
 );
 
 export default function Home() {
-  // Example metrics (replace with real data or props)
   const followersCount = "1.4K";
   const connectionsCount = "900";
   const commentsCount = "35";
 
+  const filters = [
+    { label: "7d", value: "7d" },
+    { label: "15d", value: "15d" },
+    { label: "30d", value: "30d" },
+  ];
+
+  const [selectedFilter, setSelectedFilter] = useState(filters[0].value);
+
   return (
     <Layout>
       <div className="h-full p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-min gap-6">
+        <div className="flex justify-end space-x-2 mb-4">
+          {filters.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setSelectedFilter(f.value)}
+              className={
+                `px-3 py-1 rounded-lg border border-white/20 transition-colors duration-200 ` +
+                (selectedFilter === f.value
+                  ? "bg-white/30"
+                  : "bg-white/10 hover:bg-white/20")
+              }
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
 
+        <div className="grid grid-cols-3 auto-rows-min gap-6">
           {/* Followers */}
-          <div className="flex flex-col bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4">
+          <div className="w-full flex flex-col bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Image
@@ -42,13 +66,13 @@ export default function Home() {
               </div>
               <span className="text-lg">{followersCount}</span>
             </div>
-            <div className="flex-1 h-48 flex items-center justify-center">
+            <div className="relative w-full h-48">
               <FollowersChart />
             </div>
           </div>
 
           {/* Connections */}
-          <div className="flex flex-col bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4">
+          <div className="w-full flex flex-col bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Image
@@ -61,13 +85,13 @@ export default function Home() {
               </div>
               <span className="text-lg">{connectionsCount}</span>
             </div>
-            <div className="flex-1 h-48 flex items-center justify-center">
+            <div className="relative w-full h-48">
               <ConnectionsChart />
             </div>
           </div>
 
           {/* Comments */}
-          <div className="flex flex-col bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4">
+          <div className="w-full flex flex-col bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <Image
@@ -80,7 +104,7 @@ export default function Home() {
               </div>
               <span className="text-lg">{commentsCount}</span>
             </div>
-            <div className="flex-1 h-48 flex items-center justify-center">
+            <div className="relative w-full h-48">
               <CommentsDotPlot />
             </div>
           </div>

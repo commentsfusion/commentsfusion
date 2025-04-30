@@ -1,7 +1,7 @@
 "use client";
 
 import Layout from "../components/layout";
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 
 // Sample data
@@ -41,6 +41,7 @@ const rows = [
 const headers = ["Sn #", "Post", "Comment", "Status", "Shared on"];
 
 export default function Activity() {
+
   return (
     <Layout>
       <div className="h-full p-4 flex flex-col space-y-4">
