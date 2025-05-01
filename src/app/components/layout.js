@@ -1,6 +1,8 @@
 import Sidebar from './sidenav';
 import Topbar from './topBar';
 import Image from 'next/image';
+import "../../../styles/globals.css";
+
 
 export default function Layout({ children }) {
   return (
@@ -10,7 +12,6 @@ export default function Layout({ children }) {
         bg-[linear-gradient(to_bottom,#000000,#33C6F4)]
         bg-cover bg-center max-h-screen
         overflow-y-auto
-
         p-4
         space-y-4
       "
