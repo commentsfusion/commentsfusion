@@ -12,6 +12,7 @@ import OneClickCommenting from "./components/landingPage_components/OneClickComm
 import AIGeneratedSmartComments from "./components/landingPage_components/AIGeneratedSmartComments";
 import MonitorEngagement from "./components/landingPage_components/MonitorEngagement";
 import FAQSection from "./components/landingPage_components/FAQSection";
+import Footer from "./components/landingPage_components/Footer";
 
 export default function HomePage() {
   return (
@@ -29,6 +30,7 @@ export default function HomePage() {
       <AIGeneratedSmartComments/>
       <MonitorEngagement/>
       <FAQSection/>
+      <Footer/>
     </main>
   );
 }
