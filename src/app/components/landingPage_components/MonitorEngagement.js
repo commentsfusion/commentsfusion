@@ -17,10 +17,10 @@ export default function MonitorEngagement() {
         {/* Image with hover animation only */}
         <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 transition-transform duration-500 hover:scale-105 hover:-translate-y-1">
           <Image
-            src="images/landing-page/dashboard.svg"
+            src="/images/landing-page/dashboard.png"
             alt="Monitor Engagement"
-            width={600}
-            height={400}
+            width={900}
+            height={900}
             className="w-full h-auto object-contain rounded-xl"
           />
         </div>
