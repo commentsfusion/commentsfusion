@@ -3,7 +3,7 @@
 import Layout from "../components/layout";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useState } from "react";
+import { useState} from "react";
 
 const FollowersChart = dynamic(
   () => import("../components/charts/FollowersChart"),
@@ -33,7 +33,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="h-full p-4">
+      <div className="h-full p-1">
         <div className="flex justify-end space-x-2 mb-4">
           {filters.map((f) => (
             <button
