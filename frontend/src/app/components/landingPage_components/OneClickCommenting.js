@@ -6,7 +6,7 @@ export default function OneClickSmartCommenting() {
   return (
     <section className="bg-[#070720] text-white py-20 px-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
-        
+
         {/* Left Side - Text */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -15,11 +15,11 @@ export default function OneClickSmartCommenting() {
           className="text-left w-full lg:w-1/2"
         >
           <h2 className="text-white text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3">
-            <span className="text-cyan-400 text-4xl">➞</span> 
+            <span className="text-cyan-400 text-4xl">➞</span>
             One-Click Smart Commenting
           </h2>
           <p className="text-gray-300 text-lg mb-6 leading-relaxed">
-            Engage instantly with AI-powered comments on LinkedIn! 
+            Engage instantly with AI-powered comments on LinkedIn!
             The Smart Comment button generates personalized, relevant responses in just one click.
           </p>
           <ul className="text-gray-300 space-y-4 mb-8 pl-4">
@@ -45,13 +45,14 @@ export default function OneClickSmartCommenting() {
           </p>
 
           {/* Button */}
-          <motion.a
-            href="#"
-            className="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-md hover:scale-105 transition-transform"
-            whileHover={{ scale: 1.05 }}
-          >
+          <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2">
+            <img
+              src="/images/landing-page/chrome.svg"
+              alt="Chrome Icon"
+              className="w-5 h-5 inline-block align-middle"
+            />
             Download Free Chrome Extension
-          </motion.a>
+          </button>
         </motion.div>
 
         {/* Right Side - Image */}
@@ -62,9 +63,9 @@ export default function OneClickSmartCommenting() {
           className="w-full lg:w-1/2"
         >
           <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 ">
-            <img 
-              src="/images/landing-page/oneClick-smartCommenting.gif" 
-              alt="One Click Smart Commenting Demo" 
+            <img
+              src="/images/landing-page/oneClick-smartCommenting.gif"
+              alt="One Click Smart Commenting Demo"
               className="w-full h-auto object-contain rounded-xl"
             />
           </div>

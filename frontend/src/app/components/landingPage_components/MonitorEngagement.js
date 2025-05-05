@@ -15,23 +15,26 @@ export default function MonitorEngagement() {
         </p>
 
         {/* Image with hover animation only */}
-        <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2 transition-transform duration-500 hover:scale-105 hover:-translate-y-1">
+        <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-4 transition-transform duration-500 hover:scale-105 hover:-translate-y-1 max-w-6xl mx-auto">
           <Image
             src="/images/landing-page/dashboard.png"
             alt="Monitor Engagement"
-            width={600}
-            height={400}
+            width={1000}
+            height={667}
             className="w-full h-auto object-contain rounded-xl"
+            priority
           />
         </div>
 
         {/* Button */}
-        <a
-          href="#"
-          className="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-md hover:scale-105 transition-transform mt-10"
-        >
+        <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 mx-auto my-6">
+          <img
+            src="/images/landing-page/chrome.svg"
+            alt="Chrome Icon"
+            className="w-5 h-5 inline-block align-middle"
+          />
           Download Free Chrome Extension
-        </a>
+        </button>
       </div>
     </section>
   );
