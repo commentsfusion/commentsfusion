@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function LeadConversionFlow() {
 return (
-    <section className="py-20 bg-[#070720] text-white">
+    <section className="py-20 text-white">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

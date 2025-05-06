@@ -25,7 +25,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-20 bg-[#070720] text-white relative overflow-hidden">
+    <section className="py-20 text-white relative overflow-hidden">
       <div className="container mx-auto px-4 max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

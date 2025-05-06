@@ -10,7 +10,7 @@ export default function HeroText() {
     >
       <h1 className="text-4xl sm:text-5xl font-bold leading-tight">
         Automate 200+ Comments & Turn
-        <span className="text-purple-400"> Engagement to Revenue !</span>
+        <span className="text-[#33C6F4]"> Engagement to Revenue !</span>
       </h1>
       <p className="mt-6 text-lg text-gray-300">
         Never miss a client! Automate comments, Capture leads,<br />Grow with AI.

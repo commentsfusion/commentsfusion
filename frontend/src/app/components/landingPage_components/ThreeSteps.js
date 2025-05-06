@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function ThreeSteps() {
   return (
-    <section className="bg-[#070720] text-white px-6">
+    <section className="text-white px-6">
       <div className="max-w-4xl mx-auto text-center mb-16">
         <motion.h3
           initial={{ opacity: 0, y: -10 }}

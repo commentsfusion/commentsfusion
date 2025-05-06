@@ -34,7 +34,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="bg-gradient-to-b from-[#1a1a40] text-white py-20 px-6">
+    <section className="text-white py-20 px-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-between gap-12">
 
         {/* FAQ Content */}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function AIGeneratedSmartComments() {
   return (
-    <section className="bg-[#070720] text-white py-20 px-6">
+    <section className="text-white py-20 px-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
 
         {/* Left Side - Text */}

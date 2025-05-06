@@ -1,6 +1,6 @@
 export default function Footer() {
     return (
-      <footer className="bg-gradient-to-b from-[#070720] to-[#1a1a40] text-white py-20 px-1">
+      <footer className="text-white py-20 px-1">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-start gap-10">
   
     

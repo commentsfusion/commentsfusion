@@ -16,9 +16,9 @@ import Footer from "./components/landingPage_components/Footer";
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="bg-[linear-gradient(to_bottom,#000000,#33C6F4)] bg-fixed">
       <Navbar />
-      <section className="min-h-screen flex flex-col justify-center items-center text-white bg-gradient-to-b from-[#0f0f3e] to-[#070720] relative overflow-hidden">
+      <section className="min-h-screen flex flex-col justify-center items-center text-white relative overflow-hidden">
         <HeroText />
         <DecorativeBirds />
         <Reviews />

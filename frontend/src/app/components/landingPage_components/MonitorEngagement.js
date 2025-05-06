@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function MonitorEngagement() {
   return (
-    <section className="bg-gradient-to-b from-[#070720] to-[#1a1a40] text-white py-20 px-6">
+    <section className="text-white py-20 px-6">
       <div className="max-w-7xl mx-auto flex flex-col items-center gap-12">
         {/* Heading */}
         <h2 className="text-white text-3xl md:text-4xl font-bold text-center">
