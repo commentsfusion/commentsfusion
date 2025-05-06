@@ -1,26 +1,33 @@
-
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const { protect } = require('./middleware/auth');
+const { connectDB} = require('./utils/db');
 const connectDatabase = require("./utils/db");
 
 const app = express();
 
-// Connect to the database
+// 1) JSON parsing
+app.use(express.json());
 connectDatabase();
 
-app.use(express.json());
+// 2) Enable CORS for your front-end origin
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // e.g. "http://localhost:3000"
+    methods: ['GET','POST','PUT','DELETE'],
+    credentials: true,
+  })
+);
 
-// Middleware
-app.use(cors());
+// 3) Mount auth routes
+app.use('/api/auth', authRoutes);
 
-// Public auth endpoints
-app.use("/api/auth", authRoutes);
-
-// A protected example
-app.get("/api/profile", protect, (req, res) => {
-  res.json({ message: "This is your profile data", user: req.user });
+// 4) Example protected route
+app.get('/api/protected', protect, (req, res) => {
+  res.json({ message: `Hello user ${req.user.id}`, role: req.user.role });
 });
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log("Server up");
-});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`API listening on ${PORT}`));

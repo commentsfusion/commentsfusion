@@ -125,19 +125,22 @@ export default function AuthPage() {
 
   const validate = () => {
     const errs = {};
-  
+
+    // Username: required + no spaces
     if (!formData.username.trim()) {
       errs.username = "Username is required";
     } else if (/\s/.test(formData.username)) {
       errs.username = "Username must not contain spaces";
     }
-  
+
+    // Email
     if (!formData.email) {
       errs.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errs.email = "Invalid email address";
     }
-  
+
+    // Phone: digits only, ≥10 chars
     if (!formData.phone) {
       errs.phone = "Phone is required";
     } else if (!/^\d+$/.test(formData.phone)) {
@@ -145,21 +148,31 @@ export default function AuthPage() {
     } else if (formData.phone.length < 10) {
       errs.phone = "Phone number must be at least 10 digits";
     }
-  
+
+    // Password: required, ≥8 chars, at least one digit, at least one special char
     if (!formData.password) {
       errs.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      errs.password = "Password must be at least 8 characters";
+    } else {
+      if (formData.password.length < 8) {
+        errs.password = "Password must be at least 8 characters";
+      }
+      if (!/\d/.test(formData.password)) {
+        errs.password = "Password must include at least one digit";
+      }
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+        errs.password = "Password must include at least one special character";
+      }
     }
-  
+
+    // Confirm password
     if (!formData.confirmPassword) {
       errs.confirmPassword = "Please confirm your password";
     } else if (formData.confirmPassword !== formData.password) {
       errs.confirmPassword = "Passwords do not match";
     }
-  
+
     return errs;
-  };  
+  };
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
@@ -170,7 +183,7 @@ export default function AuthPage() {
     }
 
     try {
-      const { token, user } = await signupUser({
+      const { token } = await signupUser({
         name: formData.username,
         email: formData.email,
         phone: formData.phone,
@@ -179,7 +192,7 @@ export default function AuthPage() {
 
       window.localStorage.setItem("token", token);
 
-      router.push("/dashboard");
+      setMode("verify");
     } catch (err) {
       setErrors({ general: err.message });
     }
@@ -293,12 +306,15 @@ export default function AuthPage() {
                       )}
                     </div>
                   ))}
-                  <button
+                  <motion.button
                     type="submit"
-                    className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className="w-full py-3 rounded-full bg-black text-white font-medium"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
                     Confirm
-                  </button>
+                  </motion.button>
                 </form>
                 <div className="text-center text-sm">
                   Don’t have an account?{" "}
@@ -327,10 +343,6 @@ export default function AuthPage() {
                 <p className="text-sm text-center">Please enter your details</p>
 
                 <form onSubmit={handleSignupSubmit} className="space-y-4">
-                  {errors.general && (
-                    <p className="text-red-400 text-center">{errors.general}</p>
-                  )}
-
                   <div>
                     <label className="block text-sm">Username</label>
                     <input
@@ -410,12 +422,20 @@ export default function AuthPage() {
                     )}
                   </div>
 
-                  <button
+                  <motion.button
                     type="submit"
                     className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
                     Register
-                  </button>
+                  </motion.button>
+                  {errors.general && (
+                    <p className="text-red-400 text-center text-xl">
+                      {errors.general}
+                    </p>
+                  )}
                 </form>
 
                 <p className="text-center text-sm">
@@ -444,13 +464,16 @@ export default function AuthPage() {
                       className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                     />
                   </div>
-                  <button
+                  <motion.button
                     type="submit"
                     onClick={() => setMode("verify")}
                     className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
                     Confirm
-                  </button>
+                  </motion.button>
                 </form>
                 <div className="text-center text-sm">
                   Back to Login?{" "}
@@ -490,12 +513,15 @@ export default function AuthPage() {
                     ))}
                   </div>
 
-                  <button
+                  <motion.button
                     type="submit"
                     className="w-full py-3 mt-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
                     Confirm
-                  </button>
+                  </motion.button>
 
                   <div className="text-center text-sm mt-4">
                     Didn’t receive the code?{" "}
