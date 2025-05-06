@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { signupUser } from "../../app/utils/api";
 
 const testimonials = [
   {
@@ -38,12 +40,19 @@ const testimonials = [
 export default function AuthPage() {
   const [idx, setIdx] = useState(0);
   const [mode, setMode] = useState("login");
-
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({});
+  const router = useRouter();
   const inputRefs = useRef([]);
-
   const { name, designation, rating, quote } = testimonials[idx];
 
-  // manual nav
+  //animations in the testinomials
   const prev = () =>
     setIdx((i) => (i - 1 + testimonials.length) % testimonials.length);
   const next = () => setIdx((i) => (i + 1) % testimonials.length);
@@ -62,7 +71,6 @@ export default function AuthPage() {
     exit: { x: -300, opacity: 0 },
   };
 
-  // helper: render stars
   const Stars = ({ count }) => (
     <div className="flex space-x-1 m-0 p-0">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -80,25 +88,22 @@ export default function AuthPage() {
 
   const handleForgotSubmit = (e) => {
     e.preventDefault();
-    // Validate email or do any other checks here
-    // ...
-    // Then set the mode to "verify"
+    //TODO validate if the email is already registered in the system
     setMode("verify");
   };
 
-  // Example: if the user completes the verification code, do final step
   const handleVerifySubmit = (e) => {
     e.preventDefault();
     // Check or validate the code here
     // ...
     alert("Verification successful (placeholder)!");
-    // Possibly set mode back to login or to a success page
+
     setMode("login");
   };
 
+  //
   const handleInputChange = (e, index) => {
     if (e.target.value.length === 1) {
-      // Automatically move focus to next input if it exists
       if (index < inputRefs.current.length - 1) {
         inputRefs.current[index + 1].focus();
       }
@@ -109,6 +114,74 @@ export default function AuthPage() {
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !e.target.value && index > 0) {
       inputRefs.current[index - 1].focus();
+    }
+  };
+
+  // handle input changes
+  const handleChange = (e) => {
+    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
+    setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
+  };
+
+  const validate = () => {
+    const errs = {};
+  
+    if (!formData.username.trim()) {
+      errs.username = "Username is required";
+    } else if (/\s/.test(formData.username)) {
+      errs.username = "Username must not contain spaces";
+    }
+  
+    if (!formData.email) {
+      errs.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errs.email = "Invalid email address";
+    }
+  
+    if (!formData.phone) {
+      errs.phone = "Phone is required";
+    } else if (!/^\d+$/.test(formData.phone)) {
+      errs.phone = "Phone must contain only numbers";
+    } else if (formData.phone.length < 10) {
+      errs.phone = "Phone number must be at least 10 digits";
+    }
+  
+    if (!formData.password) {
+      errs.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      errs.password = "Password must be at least 8 characters";
+    }
+  
+    if (!formData.confirmPassword) {
+      errs.confirmPassword = "Please confirm your password";
+    } else if (formData.confirmPassword !== formData.password) {
+      errs.confirmPassword = "Passwords do not match";
+    }
+  
+    return errs;
+  };  
+
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    try {
+      const { token, user } = await signupUser({
+        name: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
+
+      window.localStorage.setItem("token", token);
+
+      router.push("/dashboard");
+    } catch (err) {
+      setErrors({ general: err.message });
     }
   };
 
@@ -252,22 +325,91 @@ export default function AuthPage() {
               <>
                 <h2 className="text-3xl font-semibold text-center">Sign Up</h2>
                 <p className="text-sm text-center">Please enter your details</p>
-                <form className="space-y-4">
-                  {[
-                    { label: "Username", type: "text" },
-                    { label: "Email", type: "text" },
-                    { label: "Phone", type: "text" },
-                    { label: "Password", type: "password" },
-                    { label: "Confirm Password", type: "password" },
-                  ].map((field, i) => (
-                    <div key={i} className="space-y-1">
-                      <label className="block text-sm">{field.label}</label>
-                      <input
-                        type={field.type}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                    </div>
-                  ))}
+
+                <form onSubmit={handleSignupSubmit} className="space-y-4">
+                  {errors.general && (
+                    <p className="text-red-400 text-center">{errors.general}</p>
+                  )}
+
+                  <div>
+                    <label className="block text-sm">Username</label>
+                    <input
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {errors.username && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.username}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm">Email</label>
+                    <input
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {errors.email && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm">Phone</label>
+                    <input
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {errors.phone && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.phone}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm">Password</label>
+                    <input
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {errors.password && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm">Confirm Password</label>
+                    <input
+                      name="confirmPassword"
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {errors.confirmPassword && (
+                      <p className="text-red-400 text-xs mt-1">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
+
                   <button
                     type="submit"
                     className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
@@ -275,7 +417,8 @@ export default function AuthPage() {
                     Register
                   </button>
                 </form>
-                <div className="text-center text-sm">
+
+                <p className="text-center text-sm">
                   Already have an account?{" "}
                   <button
                     onClick={() => setMode("login")}
@@ -283,7 +426,7 @@ export default function AuthPage() {
                   >
                     Log In
                   </button>
-                </div>
+                </p>
               </>
             )}
 
@@ -333,18 +476,17 @@ export default function AuthPage() {
 
                 <form className="space-y-4" onSubmit={handleVerifySubmit}>
                   <div className="flex items-center justify-center mt-4 gap-4">
-                    
                     {Array.from({ length: 6 }).map((_, i) => (
                       <input
-                      key={i}
-                      ref={(el) => (inputRefs.current[i] = el)}
-                      type="text"
-                      maxLength={1}
-                      className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      required
-                      onChange={(e) => handleInputChange(e, i)}
-                      onKeyDown={(e) => handleKeyDown(e, i)}
-                    />
+                        key={i}
+                        ref={(el) => (inputRefs.current[i] = el)}
+                        type="text"
+                        maxLength={1}
+                        className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        required
+                        onChange={(e) => handleInputChange(e, i)}
+                        onKeyDown={(e) => handleKeyDown(e, i)}
+                      />
                     ))}
                   </div>
 
