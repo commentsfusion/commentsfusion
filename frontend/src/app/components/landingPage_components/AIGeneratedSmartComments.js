@@ -59,18 +59,19 @@ export default function AIGeneratedSmartComments() {
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2"
+          className="w-full lg:w-1/2 flex justify-center"
         >
-          <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2">
+          <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2 max-w-[460px]">
             <Image
               src="/images/landing-page/AI-generatedSmartComments.gif"
               alt="AI Generated Smart Comments Demo"
-              width={600}
-              height={400}
+              width={320}
+              height={240}
               className="w-full h-auto object-contain rounded-xl"
             />
           </div>
         </motion.div>
+
 
       </div>
     </section>

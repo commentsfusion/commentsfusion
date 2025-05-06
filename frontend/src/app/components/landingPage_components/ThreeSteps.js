@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function ThreeSteps() {
   return (
-    <section className="bg-[#070720] text-white py-20 px-6">
+    <section className="bg-[#070720] text-white px-6">
       <div className="max-w-4xl mx-auto text-center mb-16">
         <motion.h3
           initial={{ opacity: 0, y: -10 }}
@@ -51,7 +51,7 @@ export default function ThreeSteps() {
 
           <p className="text-lg mb-4">Click, Comment, Convert! Let AI handle engagement while you focus on closing deals.</p>
 
-          <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2">
+          <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 ">
             <img
               src="/images/landing-page/chrome.svg"
               alt="Chrome Icon"
@@ -66,18 +66,19 @@ export default function ThreeSteps() {
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex-1"
+          className="flex-1 flex justify-center" // center the image block
         >
-          <div className="rounded-2xl overflow-hidden shadow-lg border border-cyan-400 p-2">
+          <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2  max-w-[460px]">
             <Image
               src="/images/landing-page/smart-commenting.gif"
               alt="Smart Commenting Demo"
-              width={600}
-              height={400}
-              className="w-full h-auto object-cover rounded-2xl"
+              width={320} // smaller width
+              height={240} // smaller height
+              className="w-full h-auto object-cover rounded-xl"
             />
           </div>
         </motion.div>
+
       </div>
     </section>
   );
