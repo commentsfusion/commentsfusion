@@ -6,7 +6,7 @@ export default function HeroText() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
-      className="text-center max-w-2xl z-10 mt-40 mx-auto px-4 sm:px-0"
+      className="text-center max-w-3xl z-10 mt-50 mx-auto px-4 sm:px-0"
     >
       <h1 className="text-4xl sm:text-5xl font-bold leading-tight">
         Automate 200+ Comments & Turn
@@ -25,7 +25,7 @@ export default function HeroText() {
         Download Free Chrome Extension
       </button>
 
-      <p className="mt-3 text-sm text-gray-400">No credit card required</p>
+      <p className="mt-3 text-sm text-gray-200">No credit card required</p>
     </motion.div>
   );
 }

@@ -38,15 +38,23 @@ export default function FeaturesSection() {
             <span className="bg-gradient-to-r from-[#00B4D8] to-[#7B2CBF] bg-clip-text text-transparent">Client Acquisition</span>
           </h2>
         </motion.div>
-
         <div className="grid md:grid-cols-2 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: index * 0.2 }}
-              className="group relative bg-gradient-to-b from-[#0F0F29] to-[#070720] p-8 rounded-xl border border-transparent hover:border-[#00B4D8] transition-all duration-300"
+              whileHover={{
+                scale: 1.02,
+                transition: { type: "spring", stiffness: 300 }
+              }}
+              transition={{ 
+                duration: 0.8, 
+                delay: index * 0.2,
+                type: "spring",
+                stiffness: 120 
+              }}
+              className="group relative bg-gradient-to-b from-[#0F0F29] to-[#070720] p-8 rounded-xl border border-transparent hover:border-[#00B4D8] cursor-pointer"
               style={{
                 backgroundImage: `
                   linear-gradient(to bottom, #0F0F29, #070720),
@@ -57,14 +65,25 @@ export default function FeaturesSection() {
                 border: '2px solid transparent'
               }}
             >
-              <div className="text-4xl mb-6 text-cyan-400">{feature.icon}</div>
+              <motion.div
+                whileHover={{ scale: 1.2, rotate: 10 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="text-4xl mb-6 text-cyan-400 inline-block"
+              >
+                {feature.icon}
+              </motion.div>
+              
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#00B4D8] to-[#7B2CBF] bg-clip-text text-transparent">
                 {feature.title}
               </h3>
               <p className="text-[#B4B4CF] text-lg leading-relaxed">{feature.description}</p>
               
-              {/* Gradient border effect */}
-              <div className="absolute inset-0 rounded-xl -z-10 bg-gradient-to-r from-[#00B4D8] to-[#7B2CBF] opacity-20 group-hover:opacity-30 transition-opacity duration-300" />
+              {/* Animated gradient border */}
+              <motion.div
+                initial={{ opacity: 0.2 }}
+                whileHover={{ opacity: 0.4 }}
+                className="absolute inset-0 rounded-xl -z-10 bg-gradient-to-r from-[#00B4D8] to-[#7B2CBF]"
+              />
             </motion.div>
           ))}
         </div>
