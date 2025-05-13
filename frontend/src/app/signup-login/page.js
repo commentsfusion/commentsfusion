@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { signupUser } from "../../app/utils/api";
+import { sendCode, verifySignup } from "../../app/utils/api";
 
 const testimonials = [
   {
@@ -92,15 +92,6 @@ export default function AuthPage() {
     setMode("verify");
   };
 
-  const handleVerifySubmit = (e) => {
-    e.preventDefault();
-    // Check or validate the code here
-    // ...
-    alert("Verification successful (placeholder)!");
-
-    setMode("login");
-  };
-
   //
   const handleInputChange = (e, index) => {
     if (e.target.value.length === 1) {
@@ -183,16 +174,27 @@ export default function AuthPage() {
     }
 
     try {
-      const { token } = await signupUser({
+      await sendCode({
         name: formData.username,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
       });
-
-      window.localStorage.setItem("token", token);
-
       setMode("verify");
+    } catch (err) {
+      setErrors({ general: err.message });
+    }
+  };
+
+  const handleVerifySubmit = async e => {
+    e.preventDefault();
+    try {
+      const { token, user } = await verifySignup({
+        email: formData.email,
+        code: formData.code,
+      });
+      window.localStorage.setItem("token", token);
+      // redirect or set user in context…
     } catch (err) {
       setErrors({ general: err.message });
     }

@@ -1,12 +1,17 @@
-// routes/auth.js
+// routes/authRoutes.js
 const express = require("express");
-const { body } = require("express-validator");
-const { signup, login } = require("../controllers/authController");
+const { sendCodeRules, verifySignupRules } = require("../validators/auth");
+const { handleValidationErrors }       = require("../middleware/handleValidationErrors");
+const {
+  sendVerificationCode,
+  verifySignup,
+  login,
+} = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post("/signup", signup);
-
+router.post("/send-code", sendCodeRules, sendVerificationCode);
+router.post("/verify-signup", verifySignupRules, verifySignup);
 router.post("/login", login);
 
 module.exports = router;

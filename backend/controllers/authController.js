@@ -1,7 +1,88 @@
 // controllers/authController.js
 const User = require("../models/user");
+const VerificationToken = require("../models/verificationToken");
 const { hashPassword, comparePassword, signToken } = require("../utils/auth");
 const { validationResult } = require("express-validator");
+const nodemailer = require("nodemailer");
+const bcryptjs = require("bcryptjs");
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: +process.env.SMTP_PORT || 587,
+  secure: process.env.SECURE,
+  requireTLS: true,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+exports.sendVerificationCode = async (req, res) => {
+  // 1) Validate input...
+  const { name, email, phone, password } = req.body;
+
+  // 2) Hash the user’s password for later
+  const passwordHash = await hashPassword(password);
+
+  // 3) Generate & hash a 6-digit code
+  const rawCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const codeHash = await bcryptjs.hash(rawCode, 10);
+
+  // 4) Upsert the token document
+  await VerificationToken.findOneAndUpdate(
+    { email },
+    { name, email, phone, passwordHash, codeHash },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
+  // 5) Send the email async
+  transporter
+    .sendMail({
+      from: process.env.SMTP_USER, 
+      to: email,
+      subject: "Your verification code",
+      text: `Your signup code is ${rawCode}. It expires in 15 minutes.`,
+    })
+    .catch((err) => console.error("Email failed:", err));
+
+  res.json({ message: "Verification code sent" });
+};
+
+exports.verifySignup = async (req, res) => {
+  const { email, code } = req.body;
+  const record = await VerificationToken.findOne({ email });
+  if (!record) {
+    return res
+      .status(400)
+      .json({ message: "No pending signup for this email" });
+  }
+  // 1) Check code
+  const valid = await bcryptjs.compare(code, record.codeHash);
+  if (!valid) {
+    return res.status(400).json({ message: "Invalid or expired code" });
+  }
+
+  // 2) Create the real user
+  const user = new User({
+    name: record.name,
+    email: record.email,
+    phone: record.phone,
+    password: record.passwordHash,
+  });
+  await user.save();
+
+  // 3) Issue JWT
+  const token = signToken({ userId: user._id, role: user.role });
+
+  // 4) Clean up
+  await VerificationToken.deleteOne({ email });
+
+  res.status(201).json({
+    message: "User created",
+    token,
+    user: { id: user._id, name: user.name, email, role: user.role },
+  });
+};
 
 exports.signup = async (req, res) => {
   // 1) run validations
