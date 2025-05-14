@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendCode, verifySignup } from "../../app/utils/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const testimonials = [
   {
@@ -51,6 +53,7 @@ export default function AuthPage() {
   const router = useRouter();
   const inputRefs = useRef([]);
   const { name, designation, rating, quote } = testimonials[idx];
+  const [loading, setLoading] = useState(false);
 
   //animations in the testinomials
   const prev = () =>
@@ -167,12 +170,14 @@ export default function AuthPage() {
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
+
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
+    setLoading(true);
     try {
       await sendCode({
         name: formData.username,
@@ -180,28 +185,57 @@ export default function AuthPage() {
         phone: formData.phone,
         password: formData.password,
       });
+      toast.success("Verification code sent to your email");
       setMode("verify");
     } catch (err) {
+      toast.error(err.message);
       setErrors({ general: err.message });
+    }finally {
+      setLoading(false);
     }
   };
 
-  const handleVerifySubmit = async e => {
+  const handleVerifySubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    const code = inputRefs.current.map((input) => input.value.trim()).join("");
     try {
-      const { token, user } = await verifySignup({
+      const { token } = await verifySignup({
         email: formData.email,
-        code: formData.code,
+        code,
       });
       window.localStorage.setItem("token", token);
-      // redirect or set user in context…
+      toast.success("Signup successful! Login Now...");
+      setMode("login");
     } catch (err) {
       setErrors({ general: err.message });
+      const msg = err.message || "Something went wrong";
+
+      if (msg.toLowerCase().includes("expired")) {
+        toast.error("Your code has expired. Please request a new one.");
+      } else if (msg.toLowerCase().includes("invalid")) {
+        toast.error("The code you entered is not correct.");
+      } else {
+        toast.error(msg);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,#000000,#33C6F4)]">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
       {/* Left panel */}
       <div className="w-1/2 flex flex-col justify-start px-12 py-8 text-white">
         {/* Logo & headline */}
@@ -280,6 +314,7 @@ export default function AuthPage() {
       <div className="w-5/14 flex items-center justify-center px-12 py-8">
         <div className="flex w-full max-w-2xl bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 text-white">
           <div className="flex-1 space-y-6">
+            {/* Login */}
             {mode === "login" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">Log In</h2>
@@ -310,12 +345,43 @@ export default function AuthPage() {
                   ))}
                   <motion.button
                     type="submit"
-                    className="w-full py-3 rounded-full bg-black text-white font-medium"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Confirm
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Logging In…" : "Log In"}
                   </motion.button>
                 </form>
                 <div className="text-center text-sm">
@@ -338,7 +404,7 @@ export default function AuthPage() {
                 </button>
               </>
             )}
-
+            {/* signup */}
             {mode === "signup" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">Sign Up</h2>
@@ -426,18 +492,44 @@ export default function AuthPage() {
 
                   <motion.button
                     type="submit"
-                    className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Register
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Loading…" : "Register"}
                   </motion.button>
-                  {errors.general && (
-                    <p className="text-red-400 text-center text-xl">
-                      {errors.general}
-                    </p>
-                  )}
                 </form>
 
                 <p className="text-center text-sm">
@@ -451,7 +543,7 @@ export default function AuthPage() {
                 </p>
               </>
             )}
-
+            {/* Forgot Password */}
             {mode === "forgot" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">
@@ -468,13 +560,43 @@ export default function AuthPage() {
                   </div>
                   <motion.button
                     type="submit"
-                    onClick={() => setMode("verify")}
-                    className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Confirm
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Verifying…" : "Confirm"}
                   </motion.button>
                 </form>
                 <div className="text-center text-sm">
@@ -490,6 +612,7 @@ export default function AuthPage() {
               </>
             )}
 
+            {/* OTP verification */}
             {mode === "verify" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">
@@ -507,6 +630,8 @@ export default function AuthPage() {
                         ref={(el) => (inputRefs.current[i] = el)}
                         type="text"
                         maxLength={1}
+                        inputMode="numeric"
+                        pattern="\d*"
                         className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                         required
                         onChange={(e) => handleInputChange(e, i)}
@@ -517,12 +642,43 @@ export default function AuthPage() {
 
                   <motion.button
                     type="submit"
-                    className="w-full py-3 mt-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Confirm
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Verifying…" : "Confirm"}
                   </motion.button>
 
                   <div className="text-center text-sm mt-4">

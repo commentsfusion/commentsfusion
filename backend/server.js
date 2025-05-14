@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const { protect } = require('./middleware/auth');
 const connectDatabase = require("./utils/db");
+const { apiErrorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(
 
 // 3) Mount auth routes
 app.use('/api/auth', authRoutes);
+app.use(apiErrorHandler); 
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`API listening on ${PORT}`));
