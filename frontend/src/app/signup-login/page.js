@@ -190,7 +190,7 @@ export default function AuthPage() {
     } catch (err) {
       toast.error(err.message);
       setErrors({ general: err.message });
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -207,6 +207,15 @@ export default function AuthPage() {
       });
       window.localStorage.setItem("token", token);
       toast.success("Signup successful! Login Now...");
+
+      setFormData({
+        username: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+      });
+
       setMode("login");
     } catch (err) {
       setErrors({ general: err.message });
@@ -550,7 +559,7 @@ export default function AuthPage() {
                   Forgot Password
                 </h2>
                 <p className="text-sm text-center">Please enter your details</p>
-                <form className="space-y-4 onSubmit={handleForgotSubmit}">
+                <form className="space-y-4" onSubmit={handleForgotSubmit}>
                   <div className="space-y-1">
                     <label className="block text-sm">Email</label>
                     <input
@@ -622,10 +631,15 @@ export default function AuthPage() {
                   Check your Email for Verification Code!
                 </p>
 
-                <form className="space-y-4" onSubmit={handleVerifySubmit}>
+                <form
+                  className="space-y-4"
+                  onSubmit={handleVerifySubmit}
+                  autoComplete="off"
+                >
                   <div className="flex items-center justify-center mt-4 gap-4">
                     {Array.from({ length: 6 }).map((_, i) => (
                       <input
+                        name={`otp-${i}`}
                         key={i}
                         ref={(el) => (inputRefs.current[i] = el)}
                         type="text"
@@ -634,6 +648,7 @@ export default function AuthPage() {
                         pattern="\d*"
                         className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                         required
+                        autoComplete="one-time-code"
                         onChange={(e) => handleInputChange(e, i)}
                         onKeyDown={(e) => handleKeyDown(e, i)}
                       />
