@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { signupUser } from "../../app/utils/api";
+import { sendCode, verifySignup, loginUser } from "../../app/utils/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 const testimonials = [
   {
@@ -48,9 +50,12 @@ export default function AuthPage() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const router = useRouter();
   const inputRefs = useRef([]);
   const { name, designation, rating, quote } = testimonials[idx];
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState("");
 
   //animations in the testinomials
   const prev = () =>
@@ -86,44 +91,47 @@ export default function AuthPage() {
     </div>
   );
 
-  const handleForgotSubmit = (e) => {
-    e.preventDefault();
-    //TODO validate if the email is already registered in the system
-    setMode("verify");
+  const validateLogin = () => {
+    const errors = {};
+    if (!loginData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
+      errors.email = "Invalid email address";
+    }
+    if (!loginData.password) {
+      errors.password = "Password is required";
+    }
+    return errors;
   };
 
-  const handleVerifySubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    // Check or validate the code here
-    // ...
-    alert("Verification successful (placeholder)!");
 
-    setMode("login");
-  };
+    // 1) run client-side validation
+    const errors = validateLogin();
+    if (Object.keys(errors).length > 0) {
+      setLoginError(errors);
+      return;
+    }
+    setLoginError({ email: "", password: "", general: "" });
 
-  //
-  const handleInputChange = (e, index) => {
-    if (e.target.value.length === 1) {
-      if (index < inputRefs.current.length - 1) {
-        inputRefs.current[index + 1].focus();
-      }
+    // 2) call API
+    setLoading(true);
+    try {
+      const { token } = await loginUser(loginData);
+      localStorage.setItem("token", token);
+      toast.success("Logged in!");
+      router.push("/main_dashboard");
+    } catch (err) {
+      const msg = err.message || "Login failed";
+      setLoginError({ ...errors, general: msg });
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // (Optional) Handle backspace to move focus to previous input if needed
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !e.target.value && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
-  // handle input changes
-  const handleChange = (e) => {
-    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
-    setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
-  };
-
-  const validate = () => {
+  const validateSignup = () => {
     const errs = {};
 
     // Username: required + no spaces
@@ -176,30 +184,109 @@ export default function AuthPage() {
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validate();
+
+    const validationErrors = validateSignup();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
+    setLoading(true);
     try {
-      const { token } = await signupUser({
+      await sendCode({
         name: formData.username,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
       });
-
-      window.localStorage.setItem("token", token);
-
+      toast.success("Verification code sent to your email");
       setMode("verify");
     } catch (err) {
+      toast.error(err.message);
       setErrors({ general: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    //TODO validate if the email is already registered in the system
+    setMode("verify");
+  };
+
+  //
+  const handleInputChange = (e, index) => {
+    if (e.target.value.length === 1) {
+      if (index < inputRefs.current.length - 1) {
+        inputRefs.current[index + 1].focus();
+      }
+    }
+  };
+
+  // (Optional) Handle backspace to move focus to previous input if needed
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  // handle input changes
+  const handleChange = (e) => {
+    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
+    setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
+  };
+
+  const handleVerifySubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const code = inputRefs.current.map((input) => input.value.trim()).join("");
+    try {
+      const { token } = await verifySignup({
+        email: formData.email,
+        code,
+      });
+      window.localStorage.setItem("token", token);
+      toast.success("Signup successful! Login Now...");
+
+      setFormData({
+        username: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      setMode("login");
+    } catch (err) {
+      setErrors({ general: err.message });
+      const msg = err.message || "Something went wrong";
+
+      if (msg.toLowerCase().includes("expired")) {
+        toast.error("Your code has expired. Please request a new one.");
+      } else if (msg.toLowerCase().includes("invalid")) {
+        toast.error("The code you entered is not correct.");
+      } else {
+        toast.error(msg);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,#000000,#33C6F4)]">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
       {/* Left panel */}
       <div className="w-1/2 flex flex-col justify-start px-12 py-8 text-white">
         {/* Logo & headline */}
@@ -278,44 +365,105 @@ export default function AuthPage() {
       <div className="w-5/14 flex items-center justify-center px-12 py-8">
         <div className="flex w-full max-w-2xl bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 text-white">
           <div className="flex-1 space-y-6">
+            {/* Login */}
             {mode === "login" && (
-              <>
+              <form
+                className="space-y-4 max-w-sm mx-auto"
+                onSubmit={handleLoginSubmit}
+                autoComplete="off"
+              >
                 <h2 className="text-3xl font-semibold text-center">Log In</h2>
                 <p className="text-sm text-center">Please enter your details</p>
-                <form className="space-y-4">
-                  {[
-                    { label: "Username / Email", type: "text" },
-                    { label: "Password", type: "password", forgot: true },
-                  ].map((field, i) => (
-                    <div key={i} className="space-y-1">
-                      <label className="block text-sm">{field.label}</label>
-                      <input
-                        type={field.type}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+
+                {/* Email Field */}
+                <div className="space-y-1">
+                  <label className="block text-sm">User Email</label>
+                  <input
+                    name="email"
+                    type="text"
+                    value={loginData.email}
+                    onChange={(e) => {
+                      setLoginData({ ...loginData, email: e.target.value });
+                      setLoginError({ ...loginError, email: "" });
+                    }}
+                    className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                  {loginError.email && (
+                    <p className="text-red-400 text-xs">{loginError.email}</p>
+                  )}
+                </div>
+
+                {/* Password Field */}
+                <div className="space-y-1">
+                  <label className="block text-sm">Password</label>
+                  <input
+                    name="password"
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) => {
+                      setLoginData({ ...loginData, password: e.target.value });
+                      setLoginError({ ...loginError, password: "" });
+                    }}
+                    className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                  {loginError.password && (
+                    <p className="text-red-400 text-xs">
+                      {loginError.password}
+                    </p>
+                  )}
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setMode("forgot")}
+                      className="text-xs hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className={`
+              w-full py-3 mt-4 rounded-full
+              ${
+                loading
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-black hover:opacity-90"
+              }
+              text-white font-medium flex justify-center items-center transition
+            `}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
                       />
-                      {field.forgot && (
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => setMode("forgot")}
-                            className="text-xs hover:underline cursor-pointer"
-                          >
-                            Forgot Password?
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <motion.button
-                    type="submit"
-                    className="w-full py-3 rounded-full bg-black text-white font-medium"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  >
-                    Confirm
-                  </motion.button>
-                </form>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                  )}
+                  {loading ? "Logging In…" : "Log In"}
+                </motion.button>
+
                 <div className="text-center text-sm">
                   Don’t have an account?{" "}
                   <button
@@ -325,6 +473,8 @@ export default function AuthPage() {
                     Sign Up
                   </button>
                 </div>
+
+                {/* Google Sign-In Button */}
                 <button className="w-full py-2 flex items-center justify-center space-x-2 border border-white rounded-full mt-4">
                   <Image
                     src="/images/authPage/googleIcon.svg"
@@ -334,9 +484,9 @@ export default function AuthPage() {
                   />
                   <span>Sign In with Google</span>
                 </button>
-              </>
+              </form>
             )}
-
+            {/* signup */}
             {mode === "signup" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">Sign Up</h2>
@@ -424,18 +574,44 @@ export default function AuthPage() {
 
                   <motion.button
                     type="submit"
-                    className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Register
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Loading…" : "Register"}
                   </motion.button>
-                  {errors.general && (
-                    <p className="text-red-400 text-center text-xl">
-                      {errors.general}
-                    </p>
-                  )}
                 </form>
 
                 <p className="text-center text-sm">
@@ -449,14 +625,14 @@ export default function AuthPage() {
                 </p>
               </>
             )}
-
+            {/* Forgot Password */}
             {mode === "forgot" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">
                   Forgot Password
                 </h2>
                 <p className="text-sm text-center">Please enter your details</p>
-                <form className="space-y-4 onSubmit={handleForgotSubmit}">
+                <form className="space-y-4" onSubmit={handleForgotSubmit}>
                   <div className="space-y-1">
                     <label className="block text-sm">Email</label>
                     <input
@@ -466,13 +642,43 @@ export default function AuthPage() {
                   </div>
                   <motion.button
                     type="submit"
-                    onClick={() => setMode("verify")}
-                    className="w-full py-3 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Confirm
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Verifying…" : "Confirm"}
                   </motion.button>
                 </form>
                 <div className="text-center text-sm">
@@ -488,6 +694,7 @@ export default function AuthPage() {
               </>
             )}
 
+            {/* OTP verification */}
             {mode === "verify" && (
               <>
                 <h2 className="text-3xl font-semibold text-center">
@@ -497,16 +704,24 @@ export default function AuthPage() {
                   Check your Email for Verification Code!
                 </p>
 
-                <form className="space-y-4" onSubmit={handleVerifySubmit}>
+                <form
+                  className="space-y-4"
+                  onSubmit={handleVerifySubmit}
+                  autoComplete="off"
+                >
                   <div className="flex items-center justify-center mt-4 gap-4">
                     {Array.from({ length: 6 }).map((_, i) => (
                       <input
+                        name={`otp-${i}`}
                         key={i}
                         ref={(el) => (inputRefs.current[i] = el)}
                         type="text"
                         maxLength={1}
+                        inputMode="numeric"
+                        pattern="\d*"
                         className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                         required
+                        autoComplete="one-time-code"
                         onChange={(e) => handleInputChange(e, i)}
                         onKeyDown={(e) => handleKeyDown(e, i)}
                       />
@@ -515,12 +730,43 @@ export default function AuthPage() {
 
                   <motion.button
                     type="submit"
-                    className="w-full py-3 mt-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+                    className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
+                    disabled={loading}
                     transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   >
-                    Confirm
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    )}
+                    {loading ? "Verifying…" : "Confirm"}
                   </motion.button>
 
                   <div className="text-center text-sm mt-4">
