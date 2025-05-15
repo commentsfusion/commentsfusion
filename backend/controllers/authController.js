@@ -1,7 +1,7 @@
 // controllers/authController.js
 const User = require("../models/user");
 const VerificationToken = require("../models/verificationToken");
-const { hashPassword, signToken } = require("../utils/auth");
+const { hashPassword, signToken, comparePassword } = require("../utils/auth");
 const bcryptjs = require("bcryptjs");
 const { sendVerificationMail } = require("../utils/mailer");
 const ApiError = require("../utils/apiError");
@@ -91,65 +91,17 @@ exports.verifySignup = async (req, res) => {
   });
 };
 
-exports.signup = async (req, res) => {
-  // 1) run validations
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    // send first error message
-    return res.status(400).json({ message: errors.array()[0].msg });
-  }
-
-  const { name, email, phone, password } = req.body;
-
-  try {
-    const existing = await User.findOne({ $or: [{ email }, { phone }] });
-    if (existing) {
-      if (existing.email === email)
-        throw new ApiError(409, "Email already registered");
-      else throw new ApiError(409, "Phone already registered");
-    }
-
-    // 3) hash & save
-    const hashed = await hashPassword(password);
-    const user = new User({ name, email, phone, password: hashed });
-    await user.save();
-
-    // 4) issue JWT
-    const token = signToken({ userId: user._id, role: user.role });
-
-    res.status(201).json({
-      message: "User created",
-      token,
-      user: { id: user._id, name: user.name, email, role: user.role },
-    });
-  } catch (err) {
-    if (err.code === 11000 && err.keyPattern) {
-      if (err.keyPattern.email) {
-        return res.status(409).json({ message: "Email already registered" });
-      }
-      if (err.keyPattern.phone) {
-        return res
-          .status(409)
-          .json({ message: "Phone number already registered" });
-      }
-    }
-
-    console.error("Signup error:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
 exports.login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ message: errors.array()[0].msg });
+    return next(new ApiError(400, errors.array()[0].msg));
   }
 
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user || !(await comparePassword(password, user.password))) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return next(new ApiError(401, "Invalid credentials"));
     }
     const token = signToken({ userId: user._id, role: user.role });
     res.json({
@@ -158,7 +110,7 @@ exports.login = async (req, res) => {
       user: { id: user._id, name: user.name, email, role: user.role },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Login error:", err);
+    return next(new ApiError(500, "Internal server error"))
   }
 };

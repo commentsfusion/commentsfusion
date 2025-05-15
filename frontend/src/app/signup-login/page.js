@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { sendCode, verifySignup } from "../../app/utils/api";
+import { sendCode, verifySignup, loginUser } from "../../app/utils/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 const testimonials = [
   {
@@ -50,10 +50,12 @@ export default function AuthPage() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  const router = useRouter();
   const inputRefs = useRef([]);
   const { name, designation, rating, quote } = testimonials[idx];
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState("");
 
   //animations in the testinomials
   const prev = () =>
@@ -89,35 +91,47 @@ export default function AuthPage() {
     </div>
   );
 
-  const handleForgotSubmit = (e) => {
+  const validateLogin = () => {
+    const errors = {};
+    if (!loginData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
+      errors.email = "Invalid email address";
+    }
+    if (!loginData.password) {
+      errors.password = "Password is required";
+    }
+    return errors;
+  };
+
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    //TODO validate if the email is already registered in the system
-    setMode("verify");
-  };
 
-  //
-  const handleInputChange = (e, index) => {
-    if (e.target.value.length === 1) {
-      if (index < inputRefs.current.length - 1) {
-        inputRefs.current[index + 1].focus();
-      }
+    // 1) run client-side validation
+    const errors = validateLogin();
+    if (Object.keys(errors).length > 0) {
+      setLoginError(errors);
+      return;
+    }
+    setLoginError({ email: "", password: "", general: "" });
+
+    // 2) call API
+    setLoading(true);
+    try {
+      const { token } = await loginUser(loginData);
+      localStorage.setItem("token", token);
+      toast.success("Logged in!");
+      router.push("/main_dashboard");
+    } catch (err) {
+      const msg = err.message || "Login failed";
+      setLoginError({ ...errors, general: msg });
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // (Optional) Handle backspace to move focus to previous input if needed
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !e.target.value && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
-  // handle input changes
-  const handleChange = (e) => {
-    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
-    setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
-  };
-
-  const validate = () => {
+  const validateSignup = () => {
     const errs = {};
 
     // Username: required + no spaces
@@ -171,7 +185,7 @@ export default function AuthPage() {
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = validate();
+    const validationErrors = validateSignup();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -193,6 +207,34 @@ export default function AuthPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotSubmit = (e) => {
+    e.preventDefault();
+    //TODO validate if the email is already registered in the system
+    setMode("verify");
+  };
+
+  //
+  const handleInputChange = (e, index) => {
+    if (e.target.value.length === 1) {
+      if (index < inputRefs.current.length - 1) {
+        inputRefs.current[index + 1].focus();
+      }
+    }
+  };
+
+  // (Optional) Handle backspace to move focus to previous input if needed
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  // handle input changes
+  const handleChange = (e) => {
+    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
+    setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
   };
 
   const handleVerifySubmit = async (e) => {
@@ -325,74 +367,103 @@ export default function AuthPage() {
           <div className="flex-1 space-y-6">
             {/* Login */}
             {mode === "login" && (
-              <>
+              <form
+                className="space-y-4 max-w-sm mx-auto"
+                onSubmit={handleLoginSubmit}
+                autoComplete="off"
+              >
                 <h2 className="text-3xl font-semibold text-center">Log In</h2>
                 <p className="text-sm text-center">Please enter your details</p>
-                <form className="space-y-4">
-                  {[
-                    { label: "Username / Email", type: "text" },
-                    { label: "Password", type: "password", forgot: true },
-                  ].map((field, i) => (
-                    <div key={i} className="space-y-1">
-                      <label className="block text-sm">{field.label}</label>
-                      <input
-                        type={field.type}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+
+                {/* Email Field */}
+                <div className="space-y-1">
+                  <label className="block text-sm">User Email</label>
+                  <input
+                    name="email"
+                    type="text"
+                    value={loginData.email}
+                    onChange={(e) => {
+                      setLoginData({ ...loginData, email: e.target.value });
+                      setLoginError({ ...loginError, email: "" });
+                    }}
+                    className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                  {loginError.email && (
+                    <p className="text-red-400 text-xs">{loginError.email}</p>
+                  )}
+                </div>
+
+                {/* Password Field */}
+                <div className="space-y-1">
+                  <label className="block text-sm">Password</label>
+                  <input
+                    name="password"
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) => {
+                      setLoginData({ ...loginData, password: e.target.value });
+                      setLoginError({ ...loginError, password: "" });
+                    }}
+                    className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  />
+                  {loginError.password && (
+                    <p className="text-red-400 text-xs">
+                      {loginError.password}
+                    </p>
+                  )}
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setMode("forgot")}
+                      className="text-xs hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className={`
+              w-full py-3 mt-4 rounded-full
+              ${
+                loading
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-black hover:opacity-90"
+              }
+              text-white font-medium flex justify-center items-center transition
+            `}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
                       />
-                      {field.forgot && (
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => setMode("forgot")}
-                            className="text-xs hover:underline cursor-pointer"
-                          >
-                            Forgot Password?
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <motion.button
-                    type="submit"
-                    className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.95 }}
-                    disabled={loading}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  >
-                    {loading && (
-                      <svg
-                        className="animate-spin h-5 w-5 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        />
-                      </svg>
-                    )}
-                    {loading ? "Logging In…" : "Log In"}
-                  </motion.button>
-                </form>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                  )}
+                  {loading ? "Logging In…" : "Log In"}
+                </motion.button>
+
                 <div className="text-center text-sm">
                   Don’t have an account?{" "}
                   <button
@@ -402,6 +473,8 @@ export default function AuthPage() {
                     Sign Up
                   </button>
                 </div>
+
+                {/* Google Sign-In Button */}
                 <button className="w-full py-2 flex items-center justify-center space-x-2 border border-white rounded-full mt-4">
                   <Image
                     src="/images/authPage/googleIcon.svg"
@@ -411,7 +484,7 @@ export default function AuthPage() {
                   />
                   <span>Sign In with Google</span>
                 </button>
-              </>
+              </form>
             )}
             {/* signup */}
             {mode === "signup" && (
