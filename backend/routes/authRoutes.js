@@ -9,6 +9,8 @@ const {
   verifySignup,
   login,
 } = require("../controllers/authController");
+const passport = require("passport");
+const {signToken} = require("../utils/auth");
 
 const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
@@ -46,6 +48,24 @@ router.post(
   ...loginRules,
   handleValidationErrors,
   asyncHandler(login)
+);
+
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login?error=oauth_failed",
+    session: true,
+  }),
+  (req, res) => {
+
+    const token = signToken({ userId: req.user._id, role: req.user.role });
+    res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}`);
+  }
 );
 
 module.exports = router;
