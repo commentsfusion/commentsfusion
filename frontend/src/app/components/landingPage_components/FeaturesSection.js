@@ -38,7 +38,7 @@ export default function FeaturesSection() {
             <span className="bg-gradient-to-r from-[#00B4D8] to-[#7B2CBF] bg-clip-text text-transparent">Client Acquisition</span>
           </h2>
         </motion.div>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -57,8 +57,8 @@ export default function FeaturesSection() {
               className="group relative bg-gradient-to-b from-[#0F0F29] to-[#070720] p-8 rounded-xl border border-transparent hover:border-[#00B4D8] cursor-pointer"
               style={{
                 backgroundImage: `
-                  linear-gradient(to bottom, #0F0F29, #070720),
-                  linear-gradient(45deg, #00B4D8, #7B2CBF)
+                  linear-gradient(to bottom,rgb(50, 117, 135), #070720),
+                  linear-gradient(45deg,rgb(9, 201, 239),rgb(6, 207, 253))
                 `,
                 backgroundOrigin: 'border-box',
                 backgroundClip: 'padding-box, border-box',

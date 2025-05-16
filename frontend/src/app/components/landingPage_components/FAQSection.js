@@ -34,12 +34,12 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="text-white py-20 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-between gap-12">
+    <section className="text-white py-12 sm:py-20 px-2 sm:px-6">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-between gap-8 sm:gap-12">
 
         {/* FAQ Content */}
         <div className="w-full lg:w-2/3">
-          <h2 className="text-4xl md:text-5xl font-bold text-center lg:text-left mb-12 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center lg:text-left mb-8 sm:mb-12 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
             FAQ's
           </h2>
 
@@ -88,7 +88,7 @@ export default function FAQSection() {
           <img
             src="images/landing-page/faq-bot.svg"
             alt="FAQ Bot"
-            className="w-[620px] h-[400] object-contain"
+            className="w-full max-w-xs sm:w-[420px] sm:h-[300px] object-contain"
           />
         </motion.div>
       </div>

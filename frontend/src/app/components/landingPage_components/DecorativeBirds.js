@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function DecorativeBirds() {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full hidden sm:block">
       <Image 
         src="/images/landing-page/left_bot.svg" 
         alt="Bird left" 

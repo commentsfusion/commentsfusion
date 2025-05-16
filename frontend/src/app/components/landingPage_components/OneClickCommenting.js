@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 
 export default function OneClickSmartCommenting() {
   return (
-    <section className="text-white py-20 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+    <section className="text-white py-12 sm:py-20 px-2 sm:px-6">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12">
 
         {/* Left Side - Text */}
         <motion.div
@@ -60,9 +60,9 @@ export default function OneClickSmartCommenting() {
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 flex justify-center"
+          className="w-full lg:w-1/2 flex justify-center mt-8 lg:mt-0"
         >
-          <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2  max-w-[460px]">
+          <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2 max-w-full sm:max-w-[460px] w-full">
             <img
               src="/images/landing-page/oneClick-smartCommenting.gif"
               alt="One Click Smart Commenting Demo"
@@ -70,7 +70,6 @@ export default function OneClickSmartCommenting() {
             />
           </div>
         </motion.div>
-
 
       </div>
     </section>

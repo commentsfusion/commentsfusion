@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 
 export default function ThreeSteps() {
   return (
-    <section className="text-white px-6">
-      <div className="max-w-4xl mx-auto text-center mb-16">
+    <section className="text-white px-2 sm:px-6">
+      <div className="max-w-4xl mx-auto text-center mb-10 sm:mb-16">
         <motion.h3
           initial={{ opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -24,7 +24,7 @@ export default function ThreeSteps() {
         </motion.h2>
       </div>
 
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12">
         {/* Text Section */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -66,19 +66,18 @@ export default function ThreeSteps() {
           initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex-1 flex justify-center" // center the image block
+          className="flex-1 flex justify-center w-full mt-8 lg:mt-0"
         >
-          <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2  max-w-[460px]">
+          <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2 max-w-full sm:max-w-[460px] w-full">
             <Image
               src="/images/landing-page/smart-commenting.gif"
               alt="Smart Commenting Demo"
-              width={320} // smaller width
-              height={240} // smaller height
+              width={320}
+              height={240}
               className="w-full h-auto object-cover rounded-xl"
             />
           </div>
         </motion.div>
-
       </div>
     </section>
   );
