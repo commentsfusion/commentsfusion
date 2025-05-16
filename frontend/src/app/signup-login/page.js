@@ -464,6 +464,27 @@ export default function AuthPage() {
                   {loading ? "Logging In…" : "Log In"}
                 </motion.button>
 
+                {/* Google Sign-In Button */}
+                <motion.button
+                  type="button"
+                  onClick={() => {
+                    // redirect to your backend’s Google OAuth endpoint
+                    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+                  }}
+                  className="w-full py-2 mt-4 flex items-center justify-center space-x-2 border border-white rounded-full hover:opacity-90 font-medium transition "
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  <Image
+                    src="/images/authPage/googleIcon.svg"
+                    alt="Google"
+                    width={20}
+                    height={20}
+                  />
+                  <span>Sign In with Google</span>
+                </motion.button>
+
                 <div className="text-center text-sm">
                   Don’t have an account?{" "}
                   <button
@@ -473,17 +494,6 @@ export default function AuthPage() {
                     Sign Up
                   </button>
                 </div>
-
-                {/* Google Sign-In Button */}
-                <button className="w-full py-2 flex items-center justify-center space-x-2 border border-white rounded-full mt-4">
-                  <Image
-                    src="/images/authPage/googleIcon.svg"
-                    alt="Google"
-                    width={20}
-                    height={20}
-                  />
-                  <span>Sign In with Google</span>
-                </button>
               </form>
             )}
             {/* signup */}

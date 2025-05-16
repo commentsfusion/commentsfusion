@@ -1,26 +1,37 @@
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session');   
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const connectDatabase = require("./utils/db");
 const { apiErrorHandler } = require('./middleware/errorHandler');
+const passport = require('passport');
+require('./utils/passport_setup');
 
 const app = express();
 
-// 1) JSON parsing
 app.use(express.json());
 connectDatabase();
 
-// 2) Enable CORS for your front-end origin
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // e.g. "http://localhost:3000"
+    origin: process.env.FRONTEND_URL,
     methods: ['GET','POST','PUT','DELETE'],
     credentials: true,
   })
 );
 
-// 3) Mount auth routes
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/api/auth', authRoutes);
 app.use(apiErrorHandler); 
 

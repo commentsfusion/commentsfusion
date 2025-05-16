@@ -1,8 +1,8 @@
 # dependencies
 /node_modules/
 
-# Environment (never commit secrets)
-/.env*
+# Environments
+backend/.env
 *.pem
 
 # Logs
