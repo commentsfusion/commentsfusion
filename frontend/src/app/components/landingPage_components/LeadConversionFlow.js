@@ -57,6 +57,12 @@ const steps = [
     style: "left-[67%] top-[47%]",
     textAlign: "text-right",
   },
+   // Arrow to Left
+  {
+    img: "/images/landing-page/Arrow.png",
+    style: "left-[68%] top-[76%]",
+    isArrow: true,
+  },
   // Final Centered Step
   {
     img: "/images/landing-page/7.png",
@@ -96,7 +102,7 @@ export default function LeadConversionFlow() {
               >
                 <Image
                   src={step.img}
-                  alt=""
+                  alt="Arrow"
                   fill
                   className="object-contain"
                   draggable={false}

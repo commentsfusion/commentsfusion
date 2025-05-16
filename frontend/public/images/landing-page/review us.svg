@@ -23,12 +23,12 @@
 <path d="M598 132L600.47 139.601H608.462L601.996 144.298L604.466 151.899L598 147.202L591.534 151.899L594.004 144.298L587.538 139.601H595.53L598 132Z" fill="#EDD51F"/>
 <path d="M629 132L631.47 139.601H639.462L632.996 144.298L635.466 151.899L629 147.202L622.534 151.899L625.004 144.298L618.538 139.601H626.53L629 132Z" fill="#EDD51F"/>
 <path d="M656 132L658.47 139.601H666.462L659.996 144.298L662.466 151.899L656 147.202L649.534 151.899L652.004 144.298L645.538 139.601H653.53L656 132Z" fill="#EDD51F"/>
-<rect x="872" y="27" width="169" height="169" fill="url(#pattern1_906_285)"/>
-<rect x="921" y="142" width="17" height="17" fill="url(#pattern2_906_285)"/>
-<rect x="949" y="142" width="17" height="17" fill="url(#pattern3_906_285)"/>
-<rect x="978" y="142" width="17" height="17" fill="url(#pattern4_906_285)"/>
-<rect x="1007" y="142" width="17" height="17" fill="url(#pattern5_906_285)"/>
-<rect x="1036" y="142" width="17" height="17" fill="url(#pattern6_906_285)"/>
+<rect x="850" y="26" width="169" height="169" fill="url(#pattern1_906_285)"/>
+<rect x="863" y="141" width="17" height="17" fill="url(#pattern2_906_285)"/>
+<rect x="899" y="141" width="17" height="17" fill="url(#pattern3_906_285)"/>
+<rect x="934" y="141" width="17" height="17" fill="url(#pattern4_906_285)"/>
+<rect x="969" y="141" width="17" height="17" fill="url(#pattern5_906_285)"/>
+<rect x="1002" y="141" width="17" height="17" fill="url(#pattern6_906_285)"/>
 <defs>
 <filter id="filter0_dd_906_285" x="0" y="0" width="1514" height="256" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
