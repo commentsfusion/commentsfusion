@@ -11,9 +11,10 @@ const {
 } = require("../controllers/authController");
 const passport = require("passport");
 const {signToken} = require("../utils/auth");
-
+const verifyRecaptcha = require('../middleware/verifyRecaptcha');
 const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
+
 const sendCodeLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 10,
@@ -27,6 +28,7 @@ router.post(
   ...sendCodeRules,
   sendCodeLimiter,
   handleValidationErrors,
+  verifyRecaptcha('signup'),
   asyncHandler(sendVerificationCode)
 );
 router.post(
@@ -47,6 +49,7 @@ router.post(
   loginLimiter,
   ...loginRules,
   handleValidationErrors,
+  verifyRecaptcha('login'),
   asyncHandler(login)
 );
 

@@ -24,3 +24,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.grecaptcha-badge {
+  position: fixed !important;
+  bottom: 6px    !important;
+  right: 6px     !important;
+  transform: scale(0.4) !important;
+  transform-origin: bottom right !important;
+  z-index: 9999  !important;
+}

@@ -91,6 +91,17 @@ export default function AuthPage() {
     </div>
   );
 
+  function getRecaptchaToken(action) {
+    return new Promise((resolve, reject) => {
+      window.grecaptcha.ready(() => {
+        window.grecaptcha
+          .execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action })
+          .then(resolve)
+          .catch(reject);
+      });
+    });
+  }
+
   const validateLogin = () => {
     const errors = {};
     if (!loginData.email.trim()) {
@@ -118,7 +129,8 @@ export default function AuthPage() {
     // 2) call API
     setLoading(true);
     try {
-      const { token } = await loginUser(loginData);
+      const recaptchaToken = await getRecaptchaToken('login');
+      const { token } = await loginUser({ ...loginData, recaptchaToken });
       localStorage.setItem("token", token);
       toast.success("Logged in!");
       router.push("/main_dashboard");
@@ -193,11 +205,13 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
+      const recaptchaToken = await getRecaptchaToken('signup');
       await sendCode({
         name: formData.username,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
+        recaptchaToken: recaptchaToken,
       });
       toast.success("Verification code sent to your email");
       setMode("verify");
@@ -374,7 +388,6 @@ export default function AuthPage() {
               >
                 <h2 className="text-3xl font-semibold text-center">Log In</h2>
                 <p className="text-sm text-center">Please enter your details</p>
-
                 {/* Email Field */}
                 <div className="space-y-1">
                   <label className="block text-sm">User Email</label>
@@ -392,7 +405,6 @@ export default function AuthPage() {
                     <p className="text-red-400 text-xs">{loginError.email}</p>
                   )}
                 </div>
-
                 {/* Password Field */}
                 <div className="space-y-1">
                   <label className="block text-sm">Password</label>
@@ -421,7 +433,6 @@ export default function AuthPage() {
                     </button>
                   </div>
                 </div>
-
                 {/* Submit Button */}
                 <motion.button
                   type="submit"
@@ -463,7 +474,6 @@ export default function AuthPage() {
                   )}
                   {loading ? "Logging In…" : "Log In"}
                 </motion.button>
-
                 {/* Google Sign-In Button */}
                 <motion.button
                   type="button"
@@ -484,7 +494,6 @@ export default function AuthPage() {
                   />
                   <span>Sign In with Google</span>
                 </motion.button>
-
                 <div className="text-center text-sm">
                   Don’t have an account?{" "}
                   <button
@@ -517,7 +526,6 @@ export default function AuthPage() {
                       </p>
                     )}
                   </div>
-
                   <div>
                     <label className="block text-sm">Email</label>
                     <input
@@ -533,7 +541,6 @@ export default function AuthPage() {
                       </p>
                     )}
                   </div>
-
                   <div>
                     <label className="block text-sm">Phone</label>
                     <input
@@ -549,7 +556,6 @@ export default function AuthPage() {
                       </p>
                     )}
                   </div>
-
                   <div>
                     <label className="block text-sm">Password</label>
                     <input
@@ -565,7 +571,6 @@ export default function AuthPage() {
                       </p>
                     )}
                   </div>
-
                   <div>
                     <label className="block text-sm">Confirm Password</label>
                     <input
@@ -581,7 +586,6 @@ export default function AuthPage() {
                       </p>
                     )}
                   </div>
-
                   <motion.button
                     type="submit"
                     className={`
