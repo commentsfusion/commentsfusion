@@ -478,7 +478,7 @@ export default function AuthPage() {
                 >
                   <Image
                     src="/images/authPage/googleIcon.svg"
-                    alt="Google"
+                    alt="Google Icon"
                     width={20}
                     height={20}
                   />

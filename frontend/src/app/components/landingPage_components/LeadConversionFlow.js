@@ -24,7 +24,7 @@ const steps = [
   // Second Row - Right
   {
     img: "/images/landing-page/3.png",
-    style: "left-[20%] top-[21%]",
+    style: "left-[25%] top-[21%]",
     textAlign: "text-right",
   },
   // Arrow to Left
@@ -42,7 +42,7 @@ const steps = [
   // Third Row - Left
   {
     img: "/images/landing-page/5.png",
-    style: "left-[20%] top-[48%]",
+    style: "left-[25%] top-[48%]",
     textAlign: "text-left",
   },
   // Arrow to Right
@@ -54,7 +54,7 @@ const steps = [
   // Third Row - Right
   {
     img: "/images/landing-page/6.png",
-    style: "left-[67%] top-[47%]",
+    style: "left-[65%] top-[47%]",
     textAlign: "text-right",
   },
    // Arrow to Left
@@ -78,7 +78,7 @@ export default function LeadConversionFlow() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-30 leading-tight text-center">
             Freelancer Struggling to
             <br />
-            <span className="text-blue-400">Turn Cold Leads into Clients</span>
+            <span className="text-white">Turn Cold Leads into Clients</span>
           </h2>
         
         
@@ -102,7 +102,7 @@ export default function LeadConversionFlow() {
               >
                 <Image
                   src={step.img}
-                  alt="Arrow"
+                  alt={step.isArrow ? "Arrow" : step.label || "Lead Step"}
                   fill
                   className="object-contain"
                   draggable={false}
@@ -124,9 +124,9 @@ export default function LeadConversionFlow() {
                 <div className="relative w-full aspect-[4/5]">
                   <Image
                     src={step.img}
-                    alt={step.label}
+                    alt={step.label || "Lead Step"}
                     fill
-                    className="object-contain rounded-xl shadow-lg"
+                    className="object-contain rounded-xl"
                     draggable={false}
                     priority
                   />
