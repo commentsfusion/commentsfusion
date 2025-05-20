@@ -1,6 +1,10 @@
 // routes/authRoutes.js
 const express = require("express");
-const { sendCodeRules, verifySignupRules, loginRules } = require("../validators/auth");
+const {
+  sendCodeRules,
+  verifySignupRules,
+  loginRules,
+} = require("../middleware/validators/auth");
 const {
   handleValidationErrors,
 } = require("../middleware/handleValidationErrors");
@@ -10,25 +14,34 @@ const {
   login,
 } = require("../controllers/authController");
 const passport = require("passport");
-const {signToken} = require("../utils/auth");
-
+const { signToken } = require("../utils/auth");
 const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
+const recaptchaFallback = require("../middleware/recaptchaFallback");
+
 const sendCodeLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 10,
   message: "Too many signup attempts, please try later.",
 });
 
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  message: "Too many login attempts, please try later.",
+});
+
 const router = express.Router();
 
 router.post(
   "/send-code",
-  ...sendCodeRules,
   sendCodeLimiter,
+  ...sendCodeRules,
   handleValidationErrors,
+  recaptchaFallback("signup"),
   asyncHandler(sendVerificationCode)
 );
+
 router.post(
   "/verify-signup",
   ...verifySignupRules,
@@ -36,17 +49,12 @@ router.post(
   asyncHandler(verifySignup)
 );
 
-const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 10,
-  message: "Too many login attempts, please try later.",
-});
-
 router.post(
   "/login",
   loginLimiter,
   ...loginRules,
   handleValidationErrors,
+  recaptchaFallback("login"),
   asyncHandler(login)
 );
 
@@ -62,7 +70,6 @@ router.get(
     session: true,
   }),
   (req, res) => {
-
     const token = signToken({ userId: req.user._id, role: req.user.role });
     res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}`);
   }

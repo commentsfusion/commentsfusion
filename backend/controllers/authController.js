@@ -91,7 +91,7 @@ exports.verifySignup = async (req, res) => {
   });
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(new ApiError(400, errors.array()[0].msg));
@@ -100,9 +100,26 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user || !(await comparePassword(password, user.password))) {
+    if (!user) {
       return next(new ApiError(401, "Invalid credentials"));
     }
+
+    // 2) If no local password exists, tell them to use Google or reset a password
+    if (!user.password) {
+      return next(
+        new ApiError(
+          403,
+          "This account is linked via Google. Please sign in with Google or sign up first."
+        )
+      );
+    }
+
+    // 3) Compare the submitted password
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return next(new ApiError(401, "Invalid credentials"));
+    }
+
     const token = signToken({ userId: user._id, role: user.role });
     res.json({
       message: "Logged in",
@@ -111,6 +128,6 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
-    return next(new ApiError(500, "Internal server error"))
+    return next(new ApiError(500, "Internal server error"));
   }
 };

@@ -7,6 +7,10 @@ import { sendCode, verifySignup, loginUser } from "../../app/utils/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
+import Script from "next/script";
+
+const RECAPTCHA_V2_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY;
 
 const testimonials = [
   {
@@ -56,6 +60,8 @@ export default function AuthPage() {
   const router = useRouter();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
+  const [captchaRequired, setCaptchaRequired] = useState(false);
+  const recaptchaV2Ref = useRef(null);
 
   //animations in the testinomials
   const prev = () =>
@@ -91,6 +97,17 @@ export default function AuthPage() {
     </div>
   );
 
+  function getRecaptchaToken(action) {
+    return new Promise((resolve, reject) => {
+      window.grecaptcha.ready(() => {
+        window.grecaptcha
+          .execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action })
+          .then(resolve)
+          .catch(reject);
+      });
+    });
+  }
+
   const validateLogin = () => {
     const errors = {};
     if (!loginData.email.trim()) {
@@ -107,25 +124,44 @@ export default function AuthPage() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
-    // 1) run client-side validation
     const errors = validateLogin();
     if (Object.keys(errors).length > 0) {
       setLoginError(errors);
       return;
     }
     setLoginError({ email: "", password: "", general: "" });
-
-    // 2) call API
     setLoading(true);
+
     try {
-      const { token } = await loginUser(loginData);
-      localStorage.setItem("token", token);
+      const recaptchaToken = await getRecaptchaToken("login");
+
+      const result = await loginUser({
+        ...loginData,
+        recaptchaToken,
+        recaptchaV2Token: null,
+      });
+
+      if (result.captchaRequired) {
+        setLoading(false);
+        setCaptchaRequired(true);
+        return;
+      }
+
+      if (!result.token) {
+        throw new Error("No token returned from login API");
+      }
+
+      localStorage.setItem("token", result.token);
       toast.success("Logged in!");
       router.push("/main_dashboard");
     } catch (err) {
-      const msg = err.message || "Login failed";
-      setLoginError({ ...errors, general: msg });
-      toast.error(msg);
+      if (err.message) {
+        toast.error(err.message);
+        setLoginError((prev) => ({ ...prev, general: err.message }));
+      } else {
+        toast.error("Login failed");
+        setLoginError((prev) => ({ ...prev, general: "Login failed" }));
+      }
     } finally {
       setLoading(false);
     }
@@ -193,12 +229,22 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      await sendCode({
+      const recaptchaToken = await getRecaptchaToken("signup");
+      const result = await sendCode({
         name: formData.username,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
+        recaptchaToken: recaptchaToken,
+        recaptchaV2Token: null,
       });
+
+      if (result.captchaRequired) {
+        setLoading(false);
+        setCaptchaRequired(true);
+        return;
+      }
+
       toast.success("Verification code sent to your email");
       setMode("verify");
     } catch (err) {
@@ -215,7 +261,6 @@ export default function AuthPage() {
     setMode("verify");
   };
 
-  //
   const handleInputChange = (e, index) => {
     if (e.target.value.length === 1) {
       if (index < inputRefs.current.length - 1) {
@@ -275,158 +320,228 @@ export default function AuthPage() {
     }
   };
 
+  const onLoginV2Submit = async (v2Token) => {
+    if (!v2Token) return;
+    setLoading(true);
+
+    try {
+      const result = await loginUser({
+        email: loginData.email,
+        password: loginData.password,
+        recaptchaV2Token: v2Token,
+      });
+
+      localStorage.setItem("token", result.token);
+      toast.success("Logged in!");
+      router.push("/main_dashboard");
+    } catch (err) {
+      if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
+      const msg = err.message || "Captcha failed";
+      setErrors((prev) => ({ ...prev, general: msg }));
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSignupV2Submit = async (v2Token) => {
+    if (!v2Token) return;
+    setLoading(true);
+    setErrors({});
+
+    try {
+      // 1) Call the same /send-code endpoint—but now include recaptchaV2Token
+      const result = await sendCode({
+        name: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        recaptchaToken: null,
+        recaptchaV2Token: v2Token,
+      });
+
+      // 2) If v2 was valid, the server will send back a success and send the email code
+      toast.success("Verification code sent to your email");
+      setMode("verify");
+    } catch (err) {
+      // 3) If v2 verification fails, the middleware will return 400 { message: "reCAPTCHA v2 validation failed", … }
+      toast.error(err.message || "Captcha failed");
+      setErrors({ general: err.message || "Captcha failed" });
+      // Reset the v2 widget so the user can try again
+      if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,#000000,#33C6F4)]">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={true}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="dark"
-      />
-      {/* Left panel */}
-      <div className="w-1/2 flex flex-col justify-start px-12 py-8 text-white">
-        {/* Logo & headline */}
-        <div className="space-y-8">
-          <div className="w-20 h-20 relative mx-auto">
-            <Image
-              src="/images/chatBotIcon.svg"
-              alt="Chatbot Icon"
-              fill
-              style={{ objectFit: "contain" }}
-            />
+    <>
+      <>
+        {/* load v3 automatically */}
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+          strategy="afterInteractive"
+        />
+        {/* load v2 explicit render */}
+        <Script
+          src="https://www.google.com/recaptcha/api.js?render=explicit"
+          strategy="afterInteractive"
+          onLoad={() => console.log("reCAPTCHA v2 lib loaded")}
+        />
+      </>
+      <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,#000000,#33C6F4)]">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="dark"
+        />
+        {/* Left panel */}
+        <div className="w-1/2 flex flex-col justify-start px-12 py-8 text-white">
+          {/* Logo & headline */}
+          <div className="space-y-8">
+            <div className="w-20 h-20 relative mx-auto">
+              <Image
+                src="/images/chatBotIcon.svg"
+                alt="Chatbot Icon"
+                fill
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            <h1 className="text-4xl font-bold leading-snug text-center">
+              <span>Transform Conversations with</span>
+              <span className="block text-[#33C6F4]">AI-Powered Smart</span>
+              <span className="block text-[#33C6F4]">Comments!</span>
+            </h1>
           </div>
-          <h1 className="text-4xl font-bold leading-snug text-center">
-            <span>Transform Conversations with</span>
-            <span className="block text-[#33C6F4]">AI-Powered Smart</span>
-            <span className="block text-[#33C6F4]">Comments!</span>
-          </h1>
-        </div>
 
-        {/* Testimonial */}
-        <div className="flex-1 flex items-center justify-center my-8 relative">
-          <button
-            onClick={prev}
-            className="absolute left-0 text-white text-3xl hover:opacity-80"
-          >
-            ‹
-          </button>
+          {/* Testimonial */}
+          <div className="flex-1 flex items-center justify-center my-8 relative">
+            <button
+              onClick={prev}
+              className="absolute left-0 text-white text-3xl hover:opacity-80"
+            >
+              ‹
+            </button>
 
-          <div className="relative w-full max-w-2xl min-h-[200px] mx-8">
-            <AnimatePresence initial={false} exitBeforeEnter>
-              <motion.div
-                key={idx}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5 }}
-                className="
+            <div className="relative w-full max-w-2xl min-h-[200px] mx-8">
+              <AnimatePresence initial={false} exitBeforeEnter>
+                <motion.div
+                  key={idx}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.5 }}
+                  className="
                   absolute inset-0
                   border border-white rounded-lg
                   p-6 bg-white/10
                   flex flex-col gap-4
                 "
-              >
-                {/* Header: name + stars */}
-                <div className="flex items-center justify-between">
+                >
+                  {/* Header: name + stars */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-lg">{name}</p>
+                      <p className="text-sm opacity-80">{designation}</p>
+                    </div>
+                    <Stars count={rating} />
+                  </div>
+
+                  {/* Quote */}
                   <div>
-                    <p className="font-semibold text-lg">{name}</p>
-                    <p className="text-sm opacity-80">{designation}</p>
+                    <hr className="border-white/50 mb-1" />
+                    <p className="text-sm leading-relaxed">{quote}</p>
                   </div>
-                  <Stars count={rating} />
-                </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-                {/* Quote */}
-                <div>
-                  <hr className="border-white/50 mb-1" />
-                  <p className="text-sm leading-relaxed">{quote}</p>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+            <button
+              onClick={next}
+              className="absolute right-0 text-white text-3xl hover:opacity-80"
+            >
+              ›
+            </button>
           </div>
-
-          <button
-            onClick={next}
-            className="absolute right-0 text-white text-3xl hover:opacity-80"
-          >
-            ›
-          </button>
         </div>
-      </div>
 
-      {/* Separator */}
-      <div className="w-px bg-white/20"></div>
+        {/* Separator */}
+        <div className="w-px bg-white/20"></div>
 
-      {/* Right panel */}
-      <div className="w-5/14 flex items-center justify-center px-12 py-8">
-        <div className="flex w-full max-w-2xl bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 text-white">
-          <div className="flex-1 space-y-6">
-            {/* Login */}
-            {mode === "login" && (
-              <form
-                className="space-y-4 max-w-sm mx-auto"
-                onSubmit={handleLoginSubmit}
-                autoComplete="off"
-              >
-                <h2 className="text-3xl font-semibold text-center">Log In</h2>
-                <p className="text-sm text-center">Please enter your details</p>
-
-                {/* Email Field */}
-                <div className="space-y-1">
-                  <label className="block text-sm">User Email</label>
-                  <input
-                    name="email"
-                    type="text"
-                    value={loginData.email}
-                    onChange={(e) => {
-                      setLoginData({ ...loginData, email: e.target.value });
-                      setLoginError({ ...loginError, email: "" });
-                    }}
-                    className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  />
-                  {loginError.email && (
-                    <p className="text-red-400 text-xs">{loginError.email}</p>
-                  )}
-                </div>
-
-                {/* Password Field */}
-                <div className="space-y-1">
-                  <label className="block text-sm">Password</label>
-                  <input
-                    name="password"
-                    type="password"
-                    value={loginData.password}
-                    onChange={(e) => {
-                      setLoginData({ ...loginData, password: e.target.value });
-                      setLoginError({ ...loginError, password: "" });
-                    }}
-                    className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  />
-                  {loginError.password && (
-                    <p className="text-red-400 text-xs">
-                      {loginError.password}
-                    </p>
-                  )}
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setMode("forgot")}
-                      className="text-xs hover:underline"
-                    >
-                      Forgot Password?
-                    </button>
+        {/* Right panel */}
+        <div className="w-5/14 flex items-center justify-center px-12 py-8">
+          <div className="flex w-full max-w-2xl bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 text-white">
+            <div className="flex-1 space-y-6">
+              {/* Login */}
+              {mode === "login" && (
+                <form
+                  className="space-y-4 max-w-sm mx-auto"
+                  onSubmit={handleLoginSubmit}
+                  autoComplete="off"
+                >
+                  <h2 className="text-3xl font-semibold text-center">Log In</h2>
+                  <p className="text-sm text-center">
+                    Please enter your details
+                  </p>
+                  {/* Email Field */}
+                  <div className="space-y-1">
+                    <label className="block text-sm">User Email</label>
+                    <input
+                      name="email"
+                      type="text"
+                      value={loginData.email}
+                      onChange={(e) => {
+                        setLoginData({ ...loginData, email: e.target.value });
+                        setLoginError({ ...loginError, email: "" });
+                      }}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {loginError.email && (
+                      <p className="text-red-400 text-xs">{loginError.email}</p>
+                    )}
                   </div>
-                </div>
-
-                {/* Submit Button */}
-                <motion.button
-                  type="submit"
-                  disabled={loading}
-                  className={`
+                  {/* Password Field */}
+                  <div className="space-y-1">
+                    <label className="block text-sm">Password</label>
+                    <input
+                      name="password"
+                      type="password"
+                      value={loginData.password}
+                      onChange={(e) => {
+                        setLoginData({
+                          ...loginData,
+                          password: e.target.value,
+                        });
+                        setLoginError({ ...loginError, password: "" });
+                      }}
+                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    />
+                    {loginError.password && (
+                      <p className="text-red-400 text-xs">
+                        {loginError.password}
+                      </p>
+                    )}
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setMode("forgot")}
+                        className="text-xs hover:underline"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                  </div>
+                  {/* Submit Button */}
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    className={`
               w-full py-3 mt-4 rounded-full
               ${
                 loading
@@ -435,168 +550,13 @@ export default function AuthPage() {
               }
               text-white font-medium flex justify-center items-center transition
             `}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                >
-                  {loading && (
-                    <svg
-                      className="animate-spin h-5 w-5 mr-2 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      />
-                    </svg>
-                  )}
-                  {loading ? "Logging In…" : "Log In"}
-                </motion.button>
-
-                {/* Google Sign-In Button */}
-                <motion.button
-                  type="button"
-                  onClick={() => {
-                    // redirect to your backend’s Google OAuth endpoint
-                    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
-                  }}
-                  className="w-full py-2 mt-4 flex items-center justify-center space-x-2 border border-white rounded-full hover:opacity-90 font-medium transition "
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                >
-                  <Image
-                    src="/images/authPage/googleIcon.svg"
-                    alt="Google Icon"
-                    width={20}
-                    height={20}
-                  />
-                  <span>Sign In with Google</span>
-                </motion.button>
-
-                <div className="text-center text-sm">
-                  Don’t have an account?{" "}
-                  <button
-                    onClick={() => setMode("signup")}
-                    className="underline"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              </form>
-            )}
-            {/* signup */}
-            {mode === "signup" && (
-              <>
-                <h2 className="text-3xl font-semibold text-center">Sign Up</h2>
-                <p className="text-sm text-center">Please enter your details</p>
-
-                <form onSubmit={handleSignupSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm">Username</label>
-                    <input
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {errors.username && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.username}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm">Email</label>
-                    <input
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {errors.email && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm">Phone</label>
-                    <input
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {errors.phone && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.phone}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm">Password</label>
-                    <input
-                      name="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {errors.password && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.password}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm">Confirm Password</label>
-                    <input
-                      name="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {errors.confirmPassword && (
-                      <p className="text-red-400 text-xs mt-1">
-                        {errors.confirmPassword}
-                      </p>
-                    )}
-                  </div>
-
-                  <motion.button
-                    type="submit"
-                    className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
-                    disabled={loading}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 25,
+                    }}
                   >
                     {loading && (
                       <svg
@@ -620,196 +580,397 @@ export default function AuthPage() {
                         />
                       </svg>
                     )}
-                    {loading ? "Loading…" : "Register"}
+                    {loading ? "Logging In…" : "Log In"}
                   </motion.button>
-                </form>
-
-                <p className="text-center text-sm">
-                  Already have an account?{" "}
-                  <button
-                    onClick={() => setMode("login")}
-                    className="underline"
-                  >
-                    Log In
-                  </button>
-                </p>
-              </>
-            )}
-            {/* Forgot Password */}
-            {mode === "forgot" && (
-              <>
-                <h2 className="text-3xl font-semibold text-center">
-                  Forgot Password
-                </h2>
-                <p className="text-sm text-center">Please enter your details</p>
-                <form className="space-y-4" onSubmit={handleForgotSubmit}>
-                  <div className="space-y-1">
-                    <label className="block text-sm">Email</label>
-                    <input
-                      type="email"
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                  </div>
+                  {/* Google Sign-In Button */}
                   <motion.button
-                    type="submit"
-                    className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.95 }}
-                    disabled={loading}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  >
-                    {loading && (
-                      <svg
-                        className="animate-spin h-5 w-5 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        />
-                      </svg>
-                    )}
-                    {loading ? "Verifying…" : "Confirm"}
-                  </motion.button>
-                </form>
-                <div className="text-center text-sm">
-                  Back to Login?{" "}
-                  <button
                     type="button"
-                    onClick={() => setMode("login")}
-                    className="underline"
-                  >
-                    Log In
-                  </button>
-                </div>
-              </>
-            )}
-
-            {/* OTP verification */}
-            {mode === "verify" && (
-              <>
-                <h2 className="text-3xl font-semibold text-center">
-                  Verification Code
-                </h2>
-                <p className="text-center text-sm mt-2">
-                  Check your Email for Verification Code!
-                </p>
-
-                <form
-                  className="space-y-4"
-                  onSubmit={handleVerifySubmit}
-                  autoComplete="off"
-                >
-                  <div className="flex items-center justify-center mt-4 gap-4">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <input
-                        name={`otp-${i}`}
-                        key={i}
-                        ref={(el) => (inputRefs.current[i] = el)}
-                        type="text"
-                        maxLength={1}
-                        inputMode="numeric"
-                        pattern="\d*"
-                        className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        required
-                        autoComplete="one-time-code"
-                        onChange={(e) => handleInputChange(e, i)}
-                        onKeyDown={(e) => handleKeyDown(e, i)}
-                      />
-                    ))}
-                  </div>
-
-                  <motion.button
-                    type="submit"
-                    className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
+                    onClick={() => {
+                      // redirect to your backend’s Google OAuth endpoint
+                      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+                    }}
+                    className="w-full py-2 mt-4 flex items-center justify-center space-x-2 border border-white rounded-full hover:opacity-90 font-medium transition "
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
-                    disabled={loading}
-                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 25,
+                    }}
                   >
-                    {loading && (
-                      <svg
-                        className="animate-spin h-5 w-5 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        />
-                      </svg>
-                    )}
-                    {loading ? "Verifying…" : "Confirm"}
+                    <Image
+                      src="/images/authPage/googleIcon.svg"
+                      alt="Google"
+                      width={20}
+                      height={20}
+                    />
+                    <span>Sign In with Google</span>
                   </motion.button>
-
-                  <div className="text-center text-sm mt-4">
-                    Didn’t receive the code?{" "}
+                  <div className="text-center text-sm">
+                    Don’t have an account?{" "}
                     <button
-                      type="button"
+                      onClick={() => setMode("signup")}
                       className="underline"
-                      onClick={() => {
-                        // Logic to resend the code
-                        alert("Code resent (placeholder)!");
-                      }}
                     >
-                      Resend Code
+                      Sign Up
                     </button>
                   </div>
+                  {captchaRequired && (
+                    <div className="mt-4 flex flex-col items-center justify-center text-center">
+                      <p className="mb-2">
+                        Please complete this CAPTCHA to continue:
+                      </p>
+                      <ReCAPTCHA
+                        ref={recaptchaV2Ref}
+                        sitekey={RECAPTCHA_V2_SITE_KEY}
+                        size="normal"
+                        onChange={onLoginV2Submit}
+                      />
+                    </div>
+                  )}
                 </form>
-              </>
-            )}
+              )}
+              {/* signup */}
+              {mode === "signup" && (
+                <>
+                  <h2 className="text-3xl font-semibold text-center">
+                    Sign Up
+                  </h2>
+                  <p className="text-sm text-center">
+                    Please enter your details
+                  </p>
+
+                  <form onSubmit={handleSignupSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm">Username</label>
+                      <input
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                      {errors.username && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.username}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm">Email</label>
+                      <input
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                      {errors.email && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.email}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm">Phone</label>
+                      <input
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                      {errors.phone && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.phone}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm">Password</label>
+                      <input
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                      {errors.password && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.password}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm">Confirm Password</label>
+                      <input
+                        name="confirmPassword"
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                      {errors.confirmPassword && (
+                        <p className="text-red-400 text-xs mt-1">
+                          {errors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
+                    <motion.button
+                      type="submit"
+                      className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
+                      disabled={loading}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                    >
+                      {loading && (
+                        <svg
+                          className="animate-spin h-5 w-5 mr-2 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          />
+                        </svg>
+                      )}
+                      {loading ? "Loading…" : "Register"}
+                    </motion.button>
+                  </form>
+
+                  <p className="text-center text-sm">
+                    Already have an account?{" "}
+                    <button
+                      onClick={() => setMode("login")}
+                      className="underline"
+                    >
+                      Log In
+                    </button>
+                  </p>
+                  {captchaRequired && (
+                    <div className="mt-4 flex flex-col items-center justify-center text-center">
+                      <p className="mb-2">
+                        Please complete this CAPTCHA to continue:
+                      </p>
+                      <ReCAPTCHA
+                        ref={recaptchaV2Ref}
+                        sitekey={RECAPTCHA_V2_SITE_KEY}
+                        size="normal"
+                        onChange={onSignupV2Submit}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+              {/* Forgot Password */}
+              {mode === "forgot" && (
+                <>
+                  <h2 className="text-3xl font-semibold text-center">
+                    Forgot Password
+                  </h2>
+                  <p className="text-sm text-center">
+                    Please enter your details
+                  </p>
+                  <form className="space-y-4" onSubmit={handleForgotSubmit}>
+                    <div className="space-y-1">
+                      <label className="block text-sm">Email</label>
+                      <input
+                        type="email"
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                    </div>
+                    <motion.button
+                      type="submit"
+                      className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
+                      disabled={loading}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                    >
+                      {loading && (
+                        <svg
+                          className="animate-spin h-5 w-5 mr-2 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          />
+                        </svg>
+                      )}
+                      {loading ? "Verifying…" : "Confirm"}
+                    </motion.button>
+                  </form>
+                  <div className="text-center text-sm">
+                    Back to Login?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setMode("login")}
+                      className="underline"
+                    >
+                      Log In
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* OTP verification */}
+              {mode === "verify" && (
+                <>
+                  <h2 className="text-3xl font-semibold text-center">
+                    Verification Code
+                  </h2>
+                  <p className="text-center text-sm mt-2">
+                    Check your Email for Verification Code!
+                  </p>
+
+                  <form
+                    className="space-y-4"
+                    onSubmit={handleVerifySubmit}
+                    autoComplete="off"
+                  >
+                    <div className="flex items-center justify-center mt-4 gap-4">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <input
+                          name={`otp-${i}`}
+                          key={i}
+                          ref={(el) => (inputRefs.current[i] = el)}
+                          type="text"
+                          maxLength={1}
+                          inputMode="numeric"
+                          pattern="\d*"
+                          className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                          required
+                          autoComplete="one-time-code"
+                          onChange={(e) => handleInputChange(e, i)}
+                          onKeyDown={(e) => handleKeyDown(e, i)}
+                        />
+                      ))}
+                    </div>
+
+                    <motion.button
+                      type="submit"
+                      className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
+                      disabled={loading}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                    >
+                      {loading && (
+                        <svg
+                          className="animate-spin h-5 w-5 mr-2 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          />
+                        </svg>
+                      )}
+                      {loading ? "Verifying…" : "Confirm"}
+                    </motion.button>
+
+                    <div className="text-center text-sm mt-4">
+                      Didn’t receive the code?{" "}
+                      <button
+                        type="button"
+                        className="underline"
+                        onClick={() => {
+                          // Logic to resend the code
+                          alert("Code resent (placeholder)!");
+                        }}
+                      >
+                        Resend Code
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-        {/* Mascot section */}
-        <div className="absolute bottom-20 right-20 w-32 h-32">
-          <div className="w-50 h-50 relative">
-            <Image
-              src="/images/authPage/mascot.svg"
-              alt="Mascot"
-              fill
-              style={{ objectFit: "contain" }}
-              className="animate-bounce"
-            />
+          {/* Mascot section */}
+          <div className="absolute bottom-20 right-20 w-32 h-32">
+            <div className="w-50 h-50 relative">
+              <Image
+                src="/images/authPage/mascot.svg"
+                alt="Mascot"
+                fill
+                style={{ objectFit: "contain" }}
+                className="animate-bounce"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
