@@ -12,9 +12,9 @@ export default function Reviews() {
       <div className="flex justify-center items-center">
         <Image
           src="/images/landing-page/review us.svg"
-          alt="Review Section"
-          width={1200} // Adjust to desired width
-          height={180} // Adjust height accordingly
+          alt="Review Section showcasing customer feedback and ratings"
+          width={1200}
+          height={180}
           className="object-contain"
         />
       </div>

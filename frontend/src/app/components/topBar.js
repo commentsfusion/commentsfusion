@@ -54,7 +54,7 @@ export default function Topbar() {
           </div>
           <Image
             src="/images/topbar/userIcon.svg"
-            alt="COMMENTS'USION Logo"
+            alt="User Icon"
             width={30}
             height={30}
             className="block"

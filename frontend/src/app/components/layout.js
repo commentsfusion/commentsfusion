@@ -30,7 +30,7 @@ export default function Layout({ children }) {
         <button className="fixed bottom-2 right-4 text-white p-3 rounded-full transition-colors animate-bounce">
           <Image
             src="/images/chatBotIcon.svg"
-            alt="Comments"
+            alt="Chatbot Icon"
             width={80}
             height={80}
           />

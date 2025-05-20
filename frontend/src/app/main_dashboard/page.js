@@ -58,7 +58,7 @@ export default function Home() {
               <div className="flex items-center space-x-2">
                 <Image
                   src="/images/main_dashboard/followersIcon.svg"
-                  alt="Followers"
+                  alt="Followers Icon"
                   width={24}
                   height={24}
                 />
@@ -77,7 +77,7 @@ export default function Home() {
               <div className="flex items-center space-x-2">
                 <Image
                   src="/images/main_dashboard/connectionsIcon.svg"
-                  alt="Connections"
+                  alt="Connections Icon"
                   width={24}
                   height={24}
                 />
@@ -96,7 +96,7 @@ export default function Home() {
               <div className="flex items-center space-x-2">
                 <Image
                   src="/images/main_dashboard/commentsIcon.svg"
-                  alt="Comments"
+                  alt="Comments Icon"
                   width={24}
                   height={24}
                 />
@@ -151,7 +151,7 @@ export default function Home() {
                   <div className="flex items-center space-x-3">
                     <img
                       src={`/images/topbar/userIcon.svg`}
-                      alt={user.name}
+                      alt={user.name + " Icon"}
                       className="w-8 h-8 rounded-full"
                     />
                     <div className="text-sm">

@@ -39,7 +39,7 @@ export default function FAQSection() {
 
         {/* FAQ Content */}
         <div className="w-full lg:w-2/3">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center lg:text-left mb-8 sm:mb-12 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center lg:text-left mb-8 sm:mb-12">
             FAQ's
           </h2>
 

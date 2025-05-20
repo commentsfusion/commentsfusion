@@ -40,7 +40,7 @@ export default function CustomizeAI() {
           <div className="flex items-center space-x-4">
             <Image
               src="/images/customise_AI/customiseAIIcon.svg"
-              alt="Customize AI"
+              alt="Customize AI Icon"
               width={30}
               height={30}
             />
@@ -52,7 +52,7 @@ export default function CustomizeAI() {
           >
             <Image
               src="/images/customise_AI/plusIcon.svg"
-              alt="Tone icon"
+              alt="Add Tone Icon"
               width={16}
               height={16}
             />
@@ -74,7 +74,7 @@ export default function CustomizeAI() {
               <h3 className="flex items-center space-x-2 text-xl font-semibold text-white">
                 <Image
                   src="/images/customise_AI/toneIcon.svg"
-                  alt="Tone icon"
+                  alt="Tone Icon"
                   width={20}
                   height={20}
                 />
@@ -91,7 +91,7 @@ export default function CustomizeAI() {
           <div className="flex flex-col items-center justify-center bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow space-y-2">
             <Image
               src="/images/customise_AI/addToneIcon.svg"
-              alt="Add tone"
+              alt="Add Tone Icon"
               width={40}
               height={40}
             />

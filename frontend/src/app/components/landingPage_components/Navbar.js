@@ -15,20 +15,20 @@ export default function Navbar() {
     >
       <nav className="container mx-auto flex justify-between items-center py-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center">
-          <Image 
-            src="/images/logo/logo.svg" 
-            alt="Comment's Fusion Logo" 
-            width={140} 
+          <Image
+            src="/images/logo/logo.svg"
+            alt="Comment's Fusion Logo"
+            width={140}
             height={40}
             className="h-14 w-auto"
           />
         </Link>
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-6 lg:space-x-12">
-          {['Home', 'Features', 'Pricing', 'About us', 'Contact us'].map((item, idx) => (
-            <Link 
-              key={idx} 
-              href="#" 
+          {["Home", "Features", "Pricing", "About us", "Contact us"].map((item, idx) => (
+            <Link
+              key={idx}
+              href={item === "Pricing" ? "/pricing" : item === "Home" ? "/" : "#"}
               className="text-white hover:text-cyan-400 transition-colors text-base font-medium"
             >
               {item}
@@ -52,10 +52,10 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden bg-black/90 backdrop-blur-lg px-6 py-4 flex flex-col space-y-4">
-          {['Home', 'Features', 'Pricing', 'About us', 'Contact us'].map((item, idx) => (
-            <Link 
-              key={idx} 
-              href="#" 
+          {["Home", "Features", "Pricing", "About us", "Contact us"].map((item, idx) => (
+            <Link
+              key={idx}
+              href={item === "Pricing" ? "/pricing" : item === "Home" ? "/" : "#"}
               className="text-white hover:text-cyan-400 transition-colors text-base font-medium"
               onClick={() => setMobileOpen(false)}
             >

@@ -10,7 +10,7 @@ export default function ThreeSteps() {
           initial={{ opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-2xl sm:text-3xl text-sky-400 font-bold mb-2 bg-gradient-to-r from-[#00B4D8] to-[#7B2CBF] bg-clip-text text-transparent"
+          className="text-2xl sm:text-5xl font-bold"
         >
           3 Simple Steps To Create
         </motion.h3>
