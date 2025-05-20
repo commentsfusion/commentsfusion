@@ -32,15 +32,15 @@ export default function OAuthSuccessPage() {
           border-2 border-[#33C6F4]
           bg-black bg-opacity-50 backdrop-blur-lg
           flex flex-col items-center
-          space-y-10
+          space-y-5
         "
       >
         {/* Chatbot icon */}
         <div className="flex justify-center">
           <Image
             src="/images/chatBotIcon.svg"
-            width={100}
-            height={100}
+            width={120}
+            height={120}
             alt="chatbot icon"
             className="mb-[-0.5rem]"
           />

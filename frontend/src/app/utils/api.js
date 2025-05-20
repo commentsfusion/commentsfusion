@@ -26,11 +26,11 @@ export async function verifySignup({ email, code }) {
   return body;
 }
 
-export async function loginUser({ email, password, recaptchaToken }) {
+export async function loginUser({ email, password, recaptchaToken, recaptchaV2Token }) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, recaptchaToken }),
+    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token}),
   });
   const body = await res.json();
   if (!res.ok) {

@@ -17,11 +17,6 @@ async function verifyToken(token, expectedAction) {
     err.details = data["error-codes"];
     throw err;
   }
-  if (typeof data.score === "number" && data.score < 0.5) {
-    const err = new Error("Low reCAPTCHA score");
-    err.details = { score: data.score };
-    throw err;
-  }
   if (expectedAction && data.action !== expectedAction) {
     throw new Error(`Unexpected reCAPTCHA action: ${data.action}`);
   }

@@ -109,7 +109,7 @@ exports.login = async (req, res, next) => {
       return next(
         new ApiError(
           403,
-          "This account is linked via Google. Please sign in with Google or set a password first."
+          "This account is linked via Google. Please sign in with Google or sign up first."
         )
       );
     }
