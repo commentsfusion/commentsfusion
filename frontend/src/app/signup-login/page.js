@@ -230,13 +230,21 @@ export default function AuthPage() {
     setLoading(true);
     try {
       const recaptchaToken = await getRecaptchaToken("signup");
-      await sendCode({
+      const result = await sendCode({
         name: formData.username,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
         recaptchaToken: recaptchaToken,
+        recaptchaV2Token: null,
       });
+
+      if (result.captchaRequired) {
+        setLoading(false);
+        setCaptchaRequired(true);
+        return;
+      }
+
       toast.success("Verification code sent to your email");
       setMode("verify");
     } catch (err) {
@@ -312,7 +320,7 @@ export default function AuthPage() {
     }
   };
 
-  const onV2Submit = async (v2Token) => {
+  const onLoginV2Submit = async (v2Token) => {
     if (!v2Token) return;
     setLoading(true);
 
@@ -331,6 +339,36 @@ export default function AuthPage() {
       const msg = err.message || "Captcha failed";
       setErrors((prev) => ({ ...prev, general: msg }));
       toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSignupV2Submit = async (v2Token) => {
+    if (!v2Token) return;
+    setLoading(true);
+    setErrors({});
+
+    try {
+      // 1) Call the same /send-code endpoint—but now include recaptchaV2Token
+      const result = await sendCode({
+        name: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        recaptchaToken: null,
+        recaptchaV2Token: v2Token,
+      });
+
+      // 2) If v2 was valid, the server will send back a success and send the email code
+      toast.success("Verification code sent to your email");
+      setMode("verify");
+    } catch (err) {
+      // 3) If v2 verification fails, the middleware will return 400 { message: "reCAPTCHA v2 validation failed", … }
+      toast.error(err.message || "Captcha failed");
+      setErrors({ general: err.message || "Captcha failed" });
+      // Reset the v2 widget so the user can try again
+      if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
     } finally {
       setLoading(false);
     }
@@ -586,7 +624,7 @@ export default function AuthPage() {
                         ref={recaptchaV2Ref}
                         sitekey={RECAPTCHA_V2_SITE_KEY}
                         size="normal"
-                        onChange={onV2Submit}
+                        onChange={onLoginV2Submit}
                       />
                     </div>
                   )}
@@ -741,7 +779,7 @@ export default function AuthPage() {
                         ref={recaptchaV2Ref}
                         sitekey={RECAPTCHA_V2_SITE_KEY}
                         size="normal"
-                        onChange={onV2Submit}
+                        onChange={onSignupV2Submit}
                       />
                     </div>
                   )}

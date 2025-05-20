@@ -2,7 +2,7 @@
 const { verifyToken } = require("../utils/recaptcha");
 const { verifyRecaptchaV2 } = require("./verifyRecaptchaV2");
 
-const EXTREME = 0.3;
+const EXTREME = 0.2;
 const SOFT = 0.5;
 
 function recaptchaFallback(actionName) {
@@ -33,9 +33,8 @@ function recaptchaFallback(actionName) {
         });
       }
 
-      //score = typeof data.score === "number" ? data.score : 0;
-      score = 0.4;
-
+      score = typeof data.score === "number" ? data.score : 0;
+      //score = 0.4; (For Testing)
     } else {
       score = SOFT;
     }
@@ -44,7 +43,7 @@ function recaptchaFallback(actionName) {
     if (score < EXTREME) {
       return res.status(403).json({
         success: false,
-        message: `reCAPTCHA blocked (score=${score.toFixed(2)}<${EXTREME})`,
+        message: `User Blocked due to reCAPTCHA`,
       });
     }
 
