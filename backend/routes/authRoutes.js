@@ -2,8 +2,10 @@
 const express = require("express");
 const {
   sendCodeRules,
-  verifySignupRules,
+  verifyOTPRules,
   loginRules,
+  forgotPasswordRules,
+  resetPasswordRules
 } = require("../middleware/validators/auth");
 const {
   handleValidationErrors,
@@ -12,6 +14,9 @@ const {
   sendVerificationCode,
   verifySignup,
   login,
+  requestPasswordReset,
+  verifyPasswordOTP,
+  resetPassword
 } = require("../controllers/authController");
 const passport = require("passport");
 const { signToken } = require("../utils/auth");
@@ -19,23 +24,21 @@ const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
 const recaptchaFallback = require("../middleware/recaptchaFallback");
 
-const sendCodeLimiter = rateLimit({
+const attemptLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 10,
-  message: "Too many signup attempts, please try later.",
-});
-
-const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 10,
-  message: "Too many login attempts, please try later.",
+  max: 8,
+  handler: (res) => {
+    res
+      .status(429)
+      .json({ message: "Too many attempts, please try later." });
+  },
 });
 
 const router = express.Router();
 
 router.post(
   "/send-code",
-  sendCodeLimiter,
+  attemptLimiter,
   ...sendCodeRules,
   handleValidationErrors,
   recaptchaFallback("signup"),
@@ -44,14 +47,15 @@ router.post(
 
 router.post(
   "/verify-signup",
-  ...verifySignupRules,
+  attemptLimiter,
+  ...verifyOTPRules,
   handleValidationErrors,
   asyncHandler(verifySignup)
 );
 
 router.post(
   "/login",
-  loginLimiter,
+  attemptLimiter,
   ...loginRules,
   handleValidationErrors,
   recaptchaFallback("login"),
@@ -73,6 +77,30 @@ router.get(
     const token = signToken({ userId: req.user._id, role: req.user.role });
     res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}`);
   }
+);
+
+router.post(
+  "/forgot-password",
+  attemptLimiter,
+  ...forgotPasswordRules,
+  handleValidationErrors,
+  asyncHandler(requestPasswordReset)
+);
+
+router.post(
+  "/forgot-password/verify-otp",
+  attemptLimiter,
+  ...verifyOTPRules,
+  handleValidationErrors,
+  asyncHandler(verifyPasswordOTP)
+);
+
+router.post(
+  "/forgot-password/reset",
+  attemptLimiter,
+  ...resetPasswordRules,
+  handleValidationErrors,
+  asyncHandler(resetPassword)
 );
 
 module.exports = router;

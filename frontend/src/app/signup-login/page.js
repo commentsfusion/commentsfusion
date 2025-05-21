@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { sendCode, verifySignup, loginUser } from "../../app/utils/api";
+import {
+  sendCode,
+  verifySignup,
+  loginUser,
+  requestPasswordReset,
+  verifyPasswordOTP,
+  resetPassword,
+} from "../../app/utils/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
@@ -60,6 +67,10 @@ export default function AuthPage() {
   const router = useRouter();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [flow, setFlow] = useState(null);
   const [captchaRequired, setCaptchaRequired] = useState(false);
   const recaptchaV2Ref = useRef(null);
 
@@ -246,6 +257,7 @@ export default function AuthPage() {
       }
 
       toast.success("Verification code sent to your email");
+      setFlow("signup");
       setMode("verify");
     } catch (err) {
       toast.error(err.message);
@@ -255,10 +267,95 @@ export default function AuthPage() {
     }
   };
 
-  const handleForgotSubmit = (e) => {
+  const handleForgotSubmit = async (e) => {
     e.preventDefault();
-    //TODO validate if the email is already registered in the system
-    setMode("verify");
+    setLoading(true);
+    try {
+      await requestPasswordReset(forgotEmail);
+      toast.success("Reset code sent to your email.");
+      setFlow("forgot");
+      setMode("verify");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifySubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const code = inputRefs.current.map((input) => input.value.trim()).join("");
+
+    try {
+      if (flow === "signup") {
+        const code = inputRefs.current
+          .map((input) => input.value.trim())
+          .join("");
+        try {
+          const { token } = await verifySignup({
+            email: formData.email,
+            code,
+          });
+          window.localStorage.setItem("token", token);
+          toast.success("Signup successful! Login Now...");
+
+          setFormData({
+            username: "",
+            email: "",
+            phone: "",
+            password: "",
+            confirmPassword: "",
+          });
+
+          setMode("login");
+        } catch (err) {
+          setErrors({ general: err.message });
+          const msg = err.message || "Something went wrong";
+
+          if (msg.toLowerCase().includes("expired")) {
+            toast.error("Your code has expired. Please request a new one.");
+          } else if (msg.toLowerCase().includes("invalid")) {
+            toast.error("The code you entered is not correct.");
+          } else {
+            toast.error(msg);
+          }
+        } finally {
+          setLoading(false);
+        }
+      } else if (flow === "forgot") {
+        await verifyPasswordOTP(forgotEmail, code);
+        toast.success("Code verified! Enter a new password.");
+        setInputCode(code);
+        setMode("forgot-reset");
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const code = inputCode;
+
+    try {
+      await resetPassword(forgotEmail, code, newPassword);
+      toast.success("Password reset! Please log in.");
+      setMode("login");
+      setForgotEmail("");
+      setInputCode("");
+      setNewPassword("");
+    } catch (err) {
+      toast.error(err.message);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (e, index) => {
@@ -269,55 +366,15 @@ export default function AuthPage() {
     }
   };
 
-  // (Optional) Handle backspace to move focus to previous input if needed
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !e.target.value && index > 0) {
       inputRefs.current[index - 1].focus();
     }
   };
 
-  // handle input changes
   const handleChange = (e) => {
     setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
     setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
-  };
-
-  const handleVerifySubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const code = inputRefs.current.map((input) => input.value.trim()).join("");
-    try {
-      const { token } = await verifySignup({
-        email: formData.email,
-        code,
-      });
-      window.localStorage.setItem("token", token);
-      toast.success("Signup successful! Login Now...");
-
-      setFormData({
-        username: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: "",
-      });
-
-      setMode("login");
-    } catch (err) {
-      setErrors({ general: err.message });
-      const msg = err.message || "Something went wrong";
-
-      if (msg.toLowerCase().includes("expired")) {
-        toast.error("Your code has expired. Please request a new one.");
-      } else if (msg.toLowerCase().includes("invalid")) {
-        toast.error("The code you entered is not correct.");
-      } else {
-        toast.error(msg);
-      }
-    } finally {
-      setLoading(false);
-    }
   };
 
   const onLoginV2Submit = async (v2Token) => {
@@ -350,7 +407,6 @@ export default function AuthPage() {
     setErrors({});
 
     try {
-      // 1) Call the same /send-code endpoint—but now include recaptchaV2Token
       const result = await sendCode({
         name: formData.username,
         email: formData.email,
@@ -360,14 +416,12 @@ export default function AuthPage() {
         recaptchaV2Token: v2Token,
       });
 
-      // 2) If v2 was valid, the server will send back a success and send the email code
       toast.success("Verification code sent to your email");
       setMode("verify");
     } catch (err) {
-      // 3) If v2 verification fails, the middleware will return 400 { message: "reCAPTCHA v2 validation failed", … }
       toast.error(err.message || "Captcha failed");
       setErrors({ general: err.message || "Captcha failed" });
-      // Reset the v2 widget so the user can try again
+
       if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
     } finally {
       setLoading(false);
@@ -800,6 +854,10 @@ export default function AuthPage() {
                       <input
                         type="email"
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="Your email"
+                        required
                       />
                     </div>
                     <motion.button
@@ -954,6 +1012,27 @@ export default function AuthPage() {
                     </div>
                   </form>
                 </>
+              )}
+
+              {/* Reset Password */}
+              {mode === "forgot-reset" && (
+                <form
+                  onSubmit={handleResetPassword}
+                  className="max-w-sm mx-auto space-y-4"
+                >
+                  <h2 className="text-center text-2xl">Reset Password</h2>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New password"
+                    required
+                    className="…"
+                  />
+                  <motion.button disabled={loading} className="…">
+                    {loading ? "Resetting…" : "Reset Password"}
+                  </motion.button>
+                </form>
               )}
             </div>
           </div>

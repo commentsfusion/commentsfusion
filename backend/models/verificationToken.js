@@ -8,6 +8,11 @@ const verificationTokenSchema = new mongoose.Schema(
     phone: String,
     passwordHash: String,
     codeHash: String,
+    purpose: {
+      type: String,
+      enum: ["signup", "forgot-password"],
+      required: true,
+    },
   },
   { timestamps: true }
 );
