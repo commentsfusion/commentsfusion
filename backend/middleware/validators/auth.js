@@ -33,19 +33,20 @@ exports.loginRules = [
 ];
 
 exports.forgotPasswordRules = [
-  body("email")
-    .isEmail()
-    .withMessage("A valid email is required"),
+  body("email").isEmail().withMessage("A valid email is required"),
 ];
 
 exports.resetPasswordRules = [
-  body("email")
-    .isEmail()
-    .withMessage("A valid email is required"),
-  body("code")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be 6 digits"),
+  body("email").isEmail().withMessage("A valid email is required"),
+  body("code").isLength({ min: 6, max: 6 }).withMessage("OTP must be 6 digits"),
   body("newPassword")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters")
+    .matches(/\d/)
+    .withMessage("Password must include a digit")
+    .matches(/[!@#$%^&*]/)
+    .withMessage("Password must include a special character"),
+  body("confirmNewPassword")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters")
     .matches(/\d/)

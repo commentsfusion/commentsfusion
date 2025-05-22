@@ -61,11 +61,11 @@ export async function verifyPasswordOTP(email, code) {
   return body;
 }
 
-export async function resetPassword(email, code, newPassword) {
+export async function resetPassword(email, code, newPassword, confirmNewPassword) {
   const res = await fetch(`${API_BASE}/api/auth/forgot-password/reset`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, code, newPassword }),
+    body: JSON.stringify({ email, code, newPassword, confirmNewPassword }),
   });
   const body = await res.json();
   if (!res.ok) throw new Error(body.message);

@@ -3,16 +3,16 @@ const User = require("../models/user");
 const { hashPassword, signToken, comparePassword } = require("../utils/auth");
 const ApiError = require("../utils/apiError");
 const { validationResult } = require("express-validator");
-const {generateOtp, verifyOtp} = require("../services/authServices")
+const { generateOtp, verifyOtp } = require("../services/authServices");
 
 exports.sendVerificationCode = async (req, res, next) => {
   const { name, email, phone, password } = req.body;
-  if (await User.exists({ $or:[{email},{phone}] })) {
+  if (await User.exists({ $or: [{ email }, { phone }] })) {
     return next(new ApiError(409, "Email or phone already registered"));
   }
   const passwordHash = await hashPassword(password);
   await generateOtp(email, "signup", { name, phone, passwordHash });
-  res.json({ success:true, message:"Verification code sent" });
+  res.json({ success: true, message: "Verification code sent" });
 };
 
 exports.verifySignup = async (req, res, next) => {
@@ -24,17 +24,17 @@ exports.verifySignup = async (req, res, next) => {
 
     // rec is never null, so you can immediately use it:
     const user = await new User({
-      name:     rec.name,
-      email:    rec.email,
-      phone:    rec.phone,
+      name: rec.name,
+      email: rec.email,
+      phone: rec.phone,
       password: rec.passwordHash,
     }).save();
 
-    const token = signToken({ userId:user._id, role:user.role });
+    const token = signToken({ userId: user._id, role: user.role });
     res.status(201).json({
       success: true,
       token,
-      user: { id:user._id, name:user.name, email:user.email }
+      user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (err) {
     next(new ApiError(400, err.message));
@@ -101,7 +101,6 @@ exports.requestPasswordReset = async (req, res, next) => {
       success: true,
       message: "Reset code sent to your email.",
     });
-
   } catch (err) {
     // any unexpected errors
     console.error("Forgot-password error:", err);
@@ -114,19 +113,27 @@ exports.verifyPasswordOTP = async (req, res, next) => {
   try {
     const { email, code } = req.body;
     await verifyOtp(email, code, "forgot-password");
-    res.json({ success:true, message:"OTP verified" });
+    res.json({ success: true, message: "OTP verified" });
   } catch (err) {
     next(new ApiError(400, err.message));
   }
 };
 
 // --- forgot password: reset new password ---
+// --- forgot password: reset new password ---
 exports.resetPassword = async (req, res, next) => {
   try {
-    const { email, newPassword } = req.body;
+    const { email, newPassword, confirmNewPassword } = req.body;
+
+    if (newPassword !== confirmNewPassword) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Passwords do not match" });
+    }
     const hash = await hashPassword(newPassword);
     await User.updateOne({ email }, { password: hash });
-    res.json({ success:true, message:"Password updated" });
+
+    return res.json({ success: true, message: "Password updated" });
   } catch (err) {
     next(new ApiError(400, err.message));
   }

@@ -16,6 +16,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
 import Script from "next/script";
+import {
+  validateSignupForm,
+  validateLoginForm,
+  validateEmail,
+  validatePasswordPair,
+  validateOTP,
+} from "../../app/utils/validations";
 
 const RECAPTCHA_V2_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY;
 
@@ -60,17 +67,21 @@ export default function AuthPage() {
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState({});
+  const [signupErrors, setSignupErrors] = useState({});
   const inputRefs = useRef([]);
   const { name, designation, rating, quote } = testimonials[idx];
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [loginError, setLoginError] = useState("");
+  const [loginError, setLoginError] = useState({});
   const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotError, setForgotError] = useState("");
   const [inputCode, setInputCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [resetErrors, setResetErrors] = useState({});
   const [flow, setFlow] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [captchaRequired, setCaptchaRequired] = useState(false);
   const recaptchaV2Ref = useRef(null);
 
@@ -86,6 +97,14 @@ export default function AuthPage() {
     );
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const timerId = setInterval(() => {
+      setTimeLeft((t) => t - 1);
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [timeLeft]);
 
   const variants = {
     enter: { x: 300, opacity: 0 },
@@ -108,6 +127,14 @@ export default function AuthPage() {
     </div>
   );
 
+  function changeMode(newMode) {
+    setLoginError({});
+    setSignupErrors({});
+    setForgotError("");
+    setResetErrors({});
+    setMode(newMode);
+  }
+
   function getRecaptchaToken(action) {
     return new Promise((resolve, reject) => {
       window.grecaptcha.ready(() => {
@@ -119,25 +146,12 @@ export default function AuthPage() {
     });
   }
 
-  const validateLogin = () => {
-    const errors = {};
-    if (!loginData.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
-      errors.email = "Invalid email address";
-    }
-    if (!loginData.password) {
-      errors.password = "Password is required";
-    }
-    return errors;
-  };
-
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
-    const errors = validateLogin();
-    if (Object.keys(errors).length > 0) {
-      setLoginError(errors);
+    const validationErrors = validateLoginForm(loginData);
+    if (Object.keys(validationErrors).length > 0) {
+      setLoginError(validationErrors);
       return;
     }
     setLoginError({ email: "", password: "", general: "" });
@@ -178,63 +192,12 @@ export default function AuthPage() {
     }
   };
 
-  const validateSignup = () => {
-    const errs = {};
-
-    // Username: required + no spaces
-    if (!formData.username.trim()) {
-      errs.username = "Username is required";
-    } else if (/\s/.test(formData.username)) {
-      errs.username = "Username must not contain spaces";
-    }
-
-    // Email
-    if (!formData.email) {
-      errs.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errs.email = "Invalid email address";
-    }
-
-    // Phone: digits only, ≥10 chars
-    if (!formData.phone) {
-      errs.phone = "Phone is required";
-    } else if (!/^\d+$/.test(formData.phone)) {
-      errs.phone = "Phone must contain only numbers";
-    } else if (formData.phone.length < 10) {
-      errs.phone = "Phone number must be at least 10 digits";
-    }
-
-    // Password: required, ≥8 chars, at least one digit, at least one special char
-    if (!formData.password) {
-      errs.password = "Password is required";
-    } else {
-      if (formData.password.length < 8) {
-        errs.password = "Password must be at least 8 characters";
-      }
-      if (!/\d/.test(formData.password)) {
-        errs.password = "Password must include at least one digit";
-      }
-      if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
-        errs.password = "Password must include at least one special character";
-      }
-    }
-
-    // Confirm password
-    if (!formData.confirmPassword) {
-      errs.confirmPassword = "Please confirm your password";
-    } else if (formData.confirmPassword !== formData.password) {
-      errs.confirmPassword = "Passwords do not match";
-    }
-
-    return errs;
-  };
-
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = validateSignup();
+    const validationErrors = validateSignupForm(formData);
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+      setSignupErrors(validationErrors);
       return;
     }
 
@@ -258,10 +221,10 @@ export default function AuthPage() {
 
       toast.success("Verification code sent to your email");
       setFlow("signup");
-      setMode("verify");
+      changeMode("verify");
     } catch (err) {
       toast.error(err.message);
-      setErrors({ general: err.message });
+      setSignupErrors({ general: err.message });
     } finally {
       setLoading(false);
     }
@@ -269,12 +232,21 @@ export default function AuthPage() {
 
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
+
+    const emailErr = validateEmail(forgotEmail);
+    if (emailErr) {
+      setForgotError(emailErr);
+      return;
+    } else {
+      setForgotError("");
+    }
+
     setLoading(true);
     try {
       await requestPasswordReset(forgotEmail);
       toast.success("Reset code sent to your email.");
       setFlow("forgot");
-      setMode("verify");
+      changeMode("verify");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -284,10 +256,16 @@ export default function AuthPage() {
 
   const handleVerifySubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const code = inputRefs.current.map((input) => input.value.trim()).join("");
 
+    const otpErr = validateOTP(code);
+    if (otpErr) {
+      toast.error(otpErr);
+      return;
+    }
+
+    setLoading(true);
     try {
       if (flow === "signup") {
         const code = inputRefs.current
@@ -309,9 +287,9 @@ export default function AuthPage() {
             confirmPassword: "",
           });
 
-          setMode("login");
+          changeMode("login");
         } catch (err) {
-          setErrors({ general: err.message });
+          setSignupErrors({ general: err.message });
           const msg = err.message || "Something went wrong";
 
           if (msg.toLowerCase().includes("expired")) {
@@ -328,7 +306,7 @@ export default function AuthPage() {
         await verifyPasswordOTP(forgotEmail, code);
         toast.success("Code verified! Enter a new password.");
         setInputCode(code);
-        setMode("forgot-reset");
+        changeMode("forgot-reset");
       }
     } catch (err) {
       toast.error(err.message);
@@ -341,12 +319,21 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
 
+    const validationErrors = validatePasswordPair(
+      newPassword,
+      confirmNewPassword
+    );
+    if (Object.keys(validationErrors).length > 0) {
+      setResetErrors(validationErrors);
+      return;
+    }
+
     const code = inputCode;
 
     try {
-      await resetPassword(forgotEmail, code, newPassword);
+      await resetPassword(forgotEmail, code, newPassword, confirmNewPassword);
       toast.success("Password reset! Please log in.");
-      setMode("login");
+      changeMode("login");
       setForgotEmail("");
       setInputCode("");
       setNewPassword("");
@@ -374,7 +361,7 @@ export default function AuthPage() {
 
   const handleChange = (e) => {
     setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
-    setErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
+    setSignupErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
   };
 
   const onLoginV2Submit = async (v2Token) => {
@@ -394,7 +381,7 @@ export default function AuthPage() {
     } catch (err) {
       if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
       const msg = err.message || "Captcha failed";
-      setErrors((prev) => ({ ...prev, general: msg }));
+      setSignupErrors((prev) => ({ ...prev, general: msg }));
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -404,7 +391,7 @@ export default function AuthPage() {
   const onSignupV2Submit = async (v2Token) => {
     if (!v2Token) return;
     setLoading(true);
-    setErrors({});
+    setSignupErrors({});
 
     try {
       const result = await sendCode({
@@ -417,12 +404,44 @@ export default function AuthPage() {
       });
 
       toast.success("Verification code sent to your email");
-      setMode("verify");
+      changeMode("verify");
     } catch (err) {
       toast.error(err.message || "Captcha failed");
-      setErrors({ general: err.message || "Captcha failed" });
+      setSignupErrors({ general: err.message || "Captcha failed" });
 
       if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!flow) return;
+
+    try {
+      if (flow === "signup") {
+        
+        await sendCode({
+          name: formData.username,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          recaptchaToken: null,
+          recaptchaV2Token: null,
+        });
+        toast.success("Verification code resent to your email");
+      } else if (flow === "forgot") {
+
+        await requestPasswordReset(forgotEmail);
+        toast.success("Password reset code resent to your email");
+      }
+
+      setTimeLeft(60);
+      
+      inputRefs.current.forEach((input) => (input.value = ""));
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      toast.error(err.message || "Failed to resend code");
     } finally {
       setLoading(false);
     }
@@ -584,7 +603,7 @@ export default function AuthPage() {
                     <div className="flex justify-end">
                       <button
                         type="button"
-                        onClick={() => setMode("forgot")}
+                        onClick={() => changeMode("forgot")}
                         className="text-xs hover:underline"
                       >
                         Forgot Password?
@@ -663,7 +682,7 @@ export default function AuthPage() {
                   <div className="text-center text-sm">
                     Don’t have an account?{" "}
                     <button
-                      onClick={() => setMode("signup")}
+                      onClick={() => changeMode("signup")}
                       className="underline"
                     >
                       Sign Up
@@ -703,9 +722,9 @@ export default function AuthPage() {
                         onChange={handleChange}
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
-                      {errors.username && (
+                      {signupErrors.username && (
                         <p className="text-red-400 text-xs mt-1">
-                          {errors.username}
+                          {signupErrors.username}
                         </p>
                       )}
                     </div>
@@ -718,9 +737,9 @@ export default function AuthPage() {
                         onChange={handleChange}
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
-                      {errors.email && (
+                      {signupErrors.email && (
                         <p className="text-red-400 text-xs mt-1">
-                          {errors.email}
+                          {signupErrors.email}
                         </p>
                       )}
                     </div>
@@ -733,9 +752,9 @@ export default function AuthPage() {
                         onChange={handleChange}
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
-                      {errors.phone && (
+                      {signupErrors.phone && (
                         <p className="text-red-400 text-xs mt-1">
-                          {errors.phone}
+                          {signupErrors.phone}
                         </p>
                       )}
                     </div>
@@ -748,9 +767,9 @@ export default function AuthPage() {
                         onChange={handleChange}
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
-                      {errors.password && (
+                      {signupErrors.password && (
                         <p className="text-red-400 text-xs mt-1">
-                          {errors.password}
+                          {signupErrors.password}
                         </p>
                       )}
                     </div>
@@ -763,9 +782,9 @@ export default function AuthPage() {
                         onChange={handleChange}
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
-                      {errors.confirmPassword && (
+                      {signupErrors.confirmPassword && (
                         <p className="text-red-400 text-xs mt-1">
-                          {errors.confirmPassword}
+                          {signupErrors.confirmPassword}
                         </p>
                       )}
                     </div>
@@ -818,7 +837,7 @@ export default function AuthPage() {
                   <p className="text-center text-sm">
                     Already have an account?{" "}
                     <button
-                      onClick={() => setMode("login")}
+                      onClick={() => changeMode("login")}
                       className="underline"
                     >
                       Log In
@@ -855,10 +874,16 @@ export default function AuthPage() {
                         type="email"
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                         value={forgotEmail}
-                        onChange={(e) => setForgotEmail(e.target.value)}
+                        onChange={(e) => {
+                          setForgotEmail(e.target.value);
+                          setForgotError("");
+                        }}
                         placeholder="Your email"
                         required
                       />
+                      {forgotError && (
+                        <p className="text-red-400 text-xs">{forgotError}</p>
+                      )}
                     </div>
                     <motion.button
                       type="submit"
@@ -909,7 +934,7 @@ export default function AuthPage() {
                     Back to Login?{" "}
                     <button
                       type="button"
-                      onClick={() => setMode("login")}
+                      onClick={() => changeMode("login")}
                       className="underline"
                     >
                       Log In
@@ -929,6 +954,7 @@ export default function AuthPage() {
                   </p>
 
                   <form
+                    noValidate
                     className="space-y-4"
                     onSubmit={handleVerifySubmit}
                     autoComplete="off"
@@ -944,7 +970,6 @@ export default function AuthPage() {
                           inputMode="numeric"
                           pattern="\d*"
                           className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                          required
                           autoComplete="one-time-code"
                           onChange={(e) => handleInputChange(e, i)}
                           onKeyDown={(e) => handleKeyDown(e, i)}
@@ -1001,13 +1026,15 @@ export default function AuthPage() {
                       Didn’t receive the code?{" "}
                       <button
                         type="button"
+                        onClick={handleResendCode}
+                        disabled={loading || timeLeft > 0}
                         className="underline"
-                        onClick={() => {
-                          // Logic to resend the code
-                          alert("Code resent (placeholder)!");
-                        }}
                       >
-                        Resend Code
+                        {timeLeft > 0
+                          ? `Resend in ${timeLeft}s`
+                          : loading
+                          ? "Resending…"
+                          : "Resend Code"}
                       </button>
                     </div>
                   </form>
@@ -1016,23 +1043,77 @@ export default function AuthPage() {
 
               {/* Reset Password */}
               {mode === "forgot-reset" && (
-                <form
-                  onSubmit={handleResetPassword}
-                  className="max-w-sm mx-auto space-y-4"
-                >
-                  <h2 className="text-center text-2xl">Reset Password</h2>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="New password"
-                    required
-                    className="…"
-                  />
-                  <motion.button disabled={loading} className="…">
-                    {loading ? "Resetting…" : "Reset Password"}
-                  </motion.button>
-                </form>
+                <>
+                  <h2 className="text-3xl font-semibold text-center">
+                    Reset Password
+                  </h2>
+                  <p className="text-sm text-center">
+                    Please enter your new password
+                  </p>
+
+                  <form
+                    onSubmit={handleResetPassword}
+                    className="space-y-4 max-w-sm mx-auto"
+                  >
+                    {/* New Password */}
+                    <div className="space-y-1">
+                      <label className="block text-sm">New Password</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                    </div>
+                    {resetErrors.password && (
+                      <p className="text-red-400 text-xs">
+                        {resetErrors.password}
+                      </p>
+                    )}
+
+                    {/* Confirm Password */}
+                    <div className="space-y-1">
+                      <label className="block text-sm">Confirm Password</label>
+                      <input
+                        type="password"
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        required
+                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                    </div>
+                    {resetErrors.confirmPassword && (
+                      <p className="text-red-400 text-xs">
+                        {resetErrors.confirmPassword}
+                      </p>
+                    )}
+
+                    {/* Reset Button */}
+                    <motion.button
+                      type="submit"
+                      disabled={loading}
+                      className={`
+          w-full py-3 mt-4 rounded-full
+          ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-black hover:opacity-90"
+          }
+          text-white font-medium flex justify-center items-center transition
+        `}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                    >
+                      {loading ? "Resetting…" : "Reset Password"}
+                    </motion.button>
+                  </form>
+                </>
               )}
             </div>
           </div>

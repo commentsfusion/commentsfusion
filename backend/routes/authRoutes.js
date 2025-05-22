@@ -27,7 +27,7 @@ const recaptchaFallback = require("../middleware/recaptchaFallback");
 const attemptLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 8,
-  handler: (res) => {
+  handler: (req, res) => {
     res
       .status(429)
       .json({ message: "Too many attempts, please try later." });
