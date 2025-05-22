@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import TestimonialsCarousel from "../components/signup-login_components/TestimonialsCarousel";
+import LoginForm from "../components/signup-login_components/LoginForm";
 import {
   sendCode,
   verifySignup,
@@ -69,8 +71,8 @@ export default function AuthPage() {
   });
   const [signupErrors, setSignupErrors] = useState({});
   const inputRefs = useRef([]);
-  const { name, designation, rating, quote } = testimonials[idx];
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const router = useRouter();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState({});
@@ -84,11 +86,25 @@ export default function AuthPage() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [captchaRequired, setCaptchaRequired] = useState(false);
   const recaptchaV2Ref = useRef(null);
+  const loginEmailRef = useRef(null);
+  const signupUsernameRef = useRef(null);
+  const forgotEmailRef = useRef(null);
+  const otpFirstInputRef = useRef(null);
+  const resetPasswordRef = useRef(null);
 
-  //animations in the testinomials
-  const prev = () =>
-    setIdx((i) => (i - 1 + testimonials.length) % testimonials.length);
-  const next = () => setIdx((i) => (i + 1) % testimonials.length);
+  useEffect(() => {
+    setFormData({
+      username: "",
+      email: "",
+      phone: "",
+      password: "",
+    });
+    setNewPassword("");
+    setConfirmNewPassword("");
+    setInputCode("");
+    setResetErrors({});
+    setForgotEmail("");
+  }, [mode]);
 
   useEffect(() => {
     const id = setInterval(
@@ -106,26 +122,23 @@ export default function AuthPage() {
     return () => clearInterval(timerId);
   }, [timeLeft]);
 
-  const variants = {
-    enter: { x: 300, opacity: 0 },
-    center: { x: 0, opacity: 1 },
-    exit: { x: -300, opacity: 0 },
-  };
-
-  const Stars = ({ count }) => (
-    <div className="flex space-x-1 m-0 p-0">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className={`text-xl ${
-            i < count ? "text-yellow-400" : "text-white/50"
-          }`}
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
+  useEffect(() => {
+    if (mode === "login" && loginEmailRef.current) {
+      loginEmailRef.current.focus();
+    }
+    if (mode === "signup" && signupUsernameRef.current) {
+      signupUsernameRef.current.focus();
+    }
+    if (mode === "forgot" && forgotEmailRef.current) {
+      forgotEmailRef.current.focus();
+    }
+    if (mode === "verify" && otpFirstInputRef.current) {
+      otpFirstInputRef.current.focus();
+    }
+    if (mode === "forgot-reset" && resetPasswordRef.current) {
+      resetPasswordRef.current.focus();
+    }
+  }, [mode]);
 
   function changeMode(newMode) {
     setLoginError({});
@@ -317,7 +330,6 @@ export default function AuthPage() {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const validationErrors = validatePasswordPair(
       newPassword,
@@ -330,6 +342,7 @@ export default function AuthPage() {
 
     const code = inputCode;
 
+    setLoading(true);
     try {
       await resetPassword(forgotEmail, code, newPassword, confirmNewPassword);
       toast.success("Password reset! Please log in.");
@@ -377,6 +390,7 @@ export default function AuthPage() {
 
       localStorage.setItem("token", result.token);
       toast.success("Logged in!");
+      setCaptchaRequired(false);
       router.push("/main_dashboard");
     } catch (err) {
       if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();
@@ -404,6 +418,7 @@ export default function AuthPage() {
       });
 
       toast.success("Verification code sent to your email");
+      setCaptchaRequired(false);
       changeMode("verify");
     } catch (err) {
       toast.error(err.message || "Captcha failed");
@@ -418,9 +433,9 @@ export default function AuthPage() {
   const handleResendCode = async () => {
     if (!flow) return;
 
+    setResending(true);
     try {
       if (flow === "signup") {
-        
         await sendCode({
           name: formData.username,
           email: formData.email,
@@ -431,19 +446,18 @@ export default function AuthPage() {
         });
         toast.success("Verification code resent to your email");
       } else if (flow === "forgot") {
-
         await requestPasswordReset(forgotEmail);
         toast.success("Password reset code resent to your email");
       }
 
       setTimeLeft(60);
-      
+
       inputRefs.current.forEach((input) => (input.value = ""));
       inputRefs.current[0]?.focus();
     } catch (err) {
       toast.error(err.message || "Failed to resend code");
     } finally {
-      setLoading(false);
+      setResending(false);
     }
   };
 
@@ -494,53 +508,7 @@ export default function AuthPage() {
 
           {/* Testimonial */}
           <div className="flex-1 flex items-center justify-center my-8 relative">
-            <button
-              onClick={prev}
-              className="absolute left-0 text-white text-3xl hover:opacity-80"
-            >
-              ‹
-            </button>
-
-            <div className="relative w-full max-w-2xl min-h-[200px] mx-8">
-              <AnimatePresence initial={false} exitBeforeEnter>
-                <motion.div
-                  key={idx}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.5 }}
-                  className="
-                  absolute inset-0
-                  border border-white rounded-lg
-                  p-6 bg-white/10
-                  flex flex-col gap-4
-                "
-                >
-                  {/* Header: name + stars */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-lg">{name}</p>
-                      <p className="text-sm opacity-80">{designation}</p>
-                    </div>
-                    <Stars count={rating} />
-                  </div>
-
-                  {/* Quote */}
-                  <div>
-                    <hr className="border-white/50 mb-1" />
-                    <p className="text-sm leading-relaxed">{quote}</p>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <button
-              onClick={next}
-              className="absolute right-0 text-white text-3xl hover:opacity-80"
-            >
-              ›
-            </button>
+            <TestimonialsCarousel testimonials={testimonials} />
           </div>
         </div>
 
@@ -553,155 +521,21 @@ export default function AuthPage() {
             <div className="flex-1 space-y-6">
               {/* Login */}
               {mode === "login" && (
-                <form
-                  className="space-y-4 max-w-sm mx-auto"
-                  onSubmit={handleLoginSubmit}
-                  autoComplete="off"
-                >
-                  <h2 className="text-3xl font-semibold text-center">Log In</h2>
-                  <p className="text-sm text-center">
-                    Please enter your details
-                  </p>
-                  {/* Email Field */}
-                  <div className="space-y-1">
-                    <label className="block text-sm">User Email</label>
-                    <input
-                      name="email"
-                      type="text"
-                      value={loginData.email}
-                      onChange={(e) => {
-                        setLoginData({ ...loginData, email: e.target.value });
-                        setLoginError({ ...loginError, email: "" });
-                      }}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {loginError.email && (
-                      <p className="text-red-400 text-xs">{loginError.email}</p>
-                    )}
-                  </div>
-                  {/* Password Field */}
-                  <div className="space-y-1">
-                    <label className="block text-sm">Password</label>
-                    <input
-                      name="password"
-                      type="password"
-                      value={loginData.password}
-                      onChange={(e) => {
-                        setLoginData({
-                          ...loginData,
-                          password: e.target.value,
-                        });
-                        setLoginError({ ...loginError, password: "" });
-                      }}
-                      className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    />
-                    {loginError.password && (
-                      <p className="text-red-400 text-xs">
-                        {loginError.password}
-                      </p>
-                    )}
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => changeMode("forgot")}
-                        className="text-xs hover:underline"
-                      >
-                        Forgot Password?
-                      </button>
-                    </div>
-                  </div>
-                  {/* Submit Button */}
-                  <motion.button
-                    type="submit"
-                    disabled={loading}
-                    className={`
-              w-full py-3 mt-4 rounded-full
-              ${
-                loading
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-black hover:opacity-90"
-              }
-              text-white font-medium flex justify-center items-center transition
-            `}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 25,
-                    }}
-                  >
-                    {loading && (
-                      <svg
-                        className="animate-spin h-5 w-5 mr-2 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        />
-                      </svg>
-                    )}
-                    {loading ? "Logging In…" : "Log In"}
-                  </motion.button>
-                  {/* Google Sign-In Button */}
-                  <motion.button
-                    type="button"
-                    onClick={() => {
-                      // redirect to your backend’s Google OAuth endpoint
-                      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
-                    }}
-                    className="w-full py-2 mt-4 flex items-center justify-center space-x-2 border border-white rounded-full hover:opacity-90 font-medium transition "
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 25,
-                    }}
-                  >
-                    <Image
-                      src="/images/authPage/googleIcon.svg"
-                      alt="Google"
-                      width={20}
-                      height={20}
-                    />
-                    <span>Sign In with Google</span>
-                  </motion.button>
-                  <div className="text-center text-sm">
-                    Don’t have an account?{" "}
-                    <button
-                      onClick={() => changeMode("signup")}
-                      className="underline"
-                    >
-                      Sign Up
-                    </button>
-                  </div>
-                  {captchaRequired && (
-                    <div className="mt-4 flex flex-col items-center justify-center text-center">
-                      <p className="mb-2">
-                        Please complete this CAPTCHA to continue:
-                      </p>
-                      <ReCAPTCHA
-                        ref={recaptchaV2Ref}
-                        sitekey={RECAPTCHA_V2_SITE_KEY}
-                        size="normal"
-                        onChange={onLoginV2Submit}
-                      />
-                    </div>
-                  )}
-                </form>
+                <LoginForm
+                  loginData={loginData}
+                  loginError={loginError}
+                  loading={loading}
+                  captchaRequired={captchaRequired}
+                  onLoginChange={(e) => {
+                    const { name, value } = e.target;
+                    setLoginData((prev) => ({ ...prev, [name]: value }));
+                    setLoginError((prev) => ({ ...prev, [name]: "" }));
+                  }}
+                  onLoginSubmit={handleLoginSubmit}
+                  onLoginV2Submit={onLoginV2Submit}
+                  onSwitchMode={changeMode}
+                  loginEmailRef={loginEmailRef}
+                />
               )}
               {/* signup */}
               {mode === "signup" && (
@@ -719,6 +553,7 @@ export default function AuthPage() {
                       <input
                         name="username"
                         value={formData.username}
+                        ref={signupUsernameRef}
                         onChange={handleChange}
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
@@ -874,6 +709,7 @@ export default function AuthPage() {
                         type="email"
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                         value={forgotEmail}
+                        ref={forgotEmailRef}
                         onChange={(e) => {
                           setForgotEmail(e.target.value);
                           setForgotError("");
@@ -964,7 +800,10 @@ export default function AuthPage() {
                         <input
                           name={`otp-${i}`}
                           key={i}
-                          ref={(el) => (inputRefs.current[i] = el)}
+                          ref={(el) => {
+                            inputRefs.current[i] = el;
+                            if (i === 0) otpFirstInputRef.current = el;
+                          }}
                           type="text"
                           maxLength={1}
                           inputMode="numeric"
@@ -1027,12 +866,12 @@ export default function AuthPage() {
                       <button
                         type="button"
                         onClick={handleResendCode}
-                        disabled={loading || timeLeft > 0}
+                        disabled={resending || timeLeft > 0}
                         className="underline"
                       >
                         {timeLeft > 0
                           ? `Resend in ${timeLeft}s`
-                          : loading
+                          : resending
                           ? "Resending…"
                           : "Resend Code"}
                       </button>
@@ -1061,7 +900,11 @@ export default function AuthPage() {
                       <input
                         type="password"
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        ref={resetPasswordRef}
+                        onChange={(e) => {
+                          setNewPassword(e.target.value);
+                          setResetErrors((prev) => ({ ...prev, password: "" }));
+                        }}
                         required
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />
@@ -1078,7 +921,13 @@ export default function AuthPage() {
                       <input
                         type="password"
                         value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        onChange={(e) => {
+                          setConfirmNewPassword(e.target.value);
+                          setResetErrors((prev) => ({
+                            ...prev,
+                            confirmPassword: "",
+                          }));
+                        }}
                         required
                         className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
                       />

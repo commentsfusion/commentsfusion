@@ -26,7 +26,7 @@ const recaptchaFallback = require("../middleware/recaptchaFallback");
 
 const attemptLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 8,
+  max: 15,
   handler: (req, res) => {
     res
       .status(429)
