@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import TestimonialsCarousel from "../components/signup-login_components/TestimonialsCarousel";
 import LoginForm from "../components/signup-login_components/LoginForm";
+import SignupForm from "../components/signup-login_components/SignUpForm";
 import {
   sendCode,
   verifySignup,
@@ -62,7 +63,7 @@ const testimonials = [
 export default function AuthPage() {
   const [idx, setIdx] = useState(0);
   const [mode, setMode] = useState("login");
-  const [formData, setFormData] = useState({
+  const [signupData, setSignupData] = useState({
     username: "",
     email: "",
     phone: "",
@@ -93,7 +94,7 @@ export default function AuthPage() {
   const resetPasswordRef = useRef(null);
 
   useEffect(() => {
-    setFormData({
+    setSignupData({
       username: "",
       email: "",
       phone: "",
@@ -208,7 +209,7 @@ export default function AuthPage() {
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
-    const validationErrors = validateSignupForm(formData);
+    const validationErrors = validateSignupForm(signupData);
     if (Object.keys(validationErrors).length > 0) {
       setSignupErrors(validationErrors);
       return;
@@ -218,10 +219,10 @@ export default function AuthPage() {
     try {
       const recaptchaToken = await getRecaptchaToken("signup");
       const result = await sendCode({
-        name: formData.username,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
+        name: signupData.username,
+        email: signupData.email,
+        phone: signupData.phone,
+        password: signupData.password,
         recaptchaToken: recaptchaToken,
         recaptchaV2Token: null,
       });
@@ -286,13 +287,13 @@ export default function AuthPage() {
           .join("");
         try {
           const { token } = await verifySignup({
-            email: formData.email,
+            email: signupData.email,
             code,
           });
           window.localStorage.setItem("token", token);
           toast.success("Signup successful! Login Now...");
 
-          setFormData({
+          setSignupData({
             username: "",
             email: "",
             phone: "",
@@ -373,7 +374,7 @@ export default function AuthPage() {
   };
 
   const handleChange = (e) => {
-    setFormData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
+    setSignupData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
     setSignupErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
   };
 
@@ -409,10 +410,10 @@ export default function AuthPage() {
 
     try {
       const result = await sendCode({
-        name: formData.username,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
+        name: signupData.username,
+        email: signupData.email,
+        phone: signupData.phone,
+        password: signupData.password,
         recaptchaToken: null,
         recaptchaV2Token: v2Token,
       });
@@ -437,10 +438,10 @@ export default function AuthPage() {
     try {
       if (flow === "signup") {
         await sendCode({
-          name: formData.username,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password,
+          name: signupData.username,
+          email: signupData.email,
+          phone: signupData.phone,
+          password: signupData.password,
           recaptchaToken: null,
           recaptchaV2Token: null,
         });
@@ -539,159 +540,21 @@ export default function AuthPage() {
               )}
               {/* signup */}
               {mode === "signup" && (
-                <>
-                  <h2 className="text-3xl font-semibold text-center">
-                    Sign Up
-                  </h2>
-                  <p className="text-sm text-center">
-                    Please enter your details
-                  </p>
-
-                  <form onSubmit={handleSignupSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm">Username</label>
-                      <input
-                        name="username"
-                        value={formData.username}
-                        ref={signupUsernameRef}
-                        onChange={handleChange}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                      {signupErrors.username && (
-                        <p className="text-red-400 text-xs mt-1">
-                          {signupErrors.username}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm">Email</label>
-                      <input
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                      {signupErrors.email && (
-                        <p className="text-red-400 text-xs mt-1">
-                          {signupErrors.email}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm">Phone</label>
-                      <input
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                      {signupErrors.phone && (
-                        <p className="text-red-400 text-xs mt-1">
-                          {signupErrors.phone}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm">Password</label>
-                      <input
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                      {signupErrors.password && (
-                        <p className="text-red-400 text-xs mt-1">
-                          {signupErrors.password}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm">Confirm Password</label>
-                      <input
-                        name="confirmPassword"
-                        type="password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                      {signupErrors.confirmPassword && (
-                        <p className="text-red-400 text-xs mt-1">
-                          {signupErrors.confirmPassword}
-                        </p>
-                      )}
-                    </div>
-                    <motion.button
-                      type="submit"
-                      className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={loading}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 25,
-                      }}
-                    >
-                      {loading && (
-                        <svg
-                          className="animate-spin h-5 w-5 mr-2 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                          />
-                        </svg>
-                      )}
-                      {loading ? "Loading…" : "Register"}
-                    </motion.button>
-                  </form>
-
-                  <p className="text-center text-sm">
-                    Already have an account?{" "}
-                    <button
-                      onClick={() => changeMode("login")}
-                      className="underline"
-                    >
-                      Log In
-                    </button>
-                  </p>
-                  {captchaRequired && (
-                    <div className="mt-4 flex flex-col items-center justify-center text-center">
-                      <p className="mb-2">
-                        Please complete this CAPTCHA to continue:
-                      </p>
-                      <ReCAPTCHA
-                        ref={recaptchaV2Ref}
-                        sitekey={RECAPTCHA_V2_SITE_KEY}
-                        size="normal"
-                        onChange={onSignupV2Submit}
-                      />
-                    </div>
-                  )}
-                </>
+                <SignupForm
+                  signupData={signupData}
+                  signupErrors={signupErrors}
+                  loading={loading}
+                  captchaRequired={captchaRequired}
+                  onSignupChange={(e) => {
+                    const { name, value } = e.target;
+                    setSignupData((prev) => ({ ...prev, [name]: value }));
+                    setSignupErrors((prev) => ({ ...prev, [name]: "" }));
+                  }}
+                  onSignupSubmit={handleSignupSubmit}
+                  onSignupV2Submit={onSignupV2Submit}
+                  onSwitchMode={changeMode}
+                  signupUsernameRef={signupUsernameRef}
+                />
               )}
               {/* Forgot Password */}
               {mode === "forgot" && (

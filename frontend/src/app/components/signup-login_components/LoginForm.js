@@ -132,7 +132,7 @@ export default function LoginForm({
       </motion.button>
       <div className="text-center text-sm">
         Don’t have an account?{" "}
-        <button onClick={() => changeMode("signup")} className="underline">
+        <button onClick={() => onSwitchMode("signup")} className="underline">
           Sign Up
         </button>
       </div>
