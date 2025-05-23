@@ -6,8 +6,9 @@ import Navbar from "../components/landingPage_components/Navbar";
 import Footer from "../components/landingPage_components/Footer";
 import ReviewsSection from "../components/pricing_components/reviews";
 import IncludedSection from "../components/pricing_components/included";
-import StrategicCommentingSection from "../components/pricing_components/StrategicCommentingSection";
-
+import StrategicCommentingSection from "../components/pricing_components/StrategicProspectsSection";
+import SocialInsightsSection from "../components/pricing_components/social_linkedin_supportSection";
+import FaqSection from "../components/pricing_components/FAQSection";
 const PricingPage = () => {
   return (
     
@@ -21,6 +22,9 @@ const PricingPage = () => {
       <ReviewsSection />
       <IncludedSection />
       <StrategicCommentingSection/>
+      <SocialInsightsSection/>
+      <FaqSection />
+      {/* Add any additional sections here */}
       <Footer/>
 
     </div>

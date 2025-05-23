@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const ReviewsSection = () => {
   return (
-    <section className="py-16 px-4 relative">
+    <section className="py-40 px-4 relative">
       <div className="max-w-4xl mx-auto relative" style={{ height: 480 }}>
         {/* Triangle SVG or Image */}
         <Image

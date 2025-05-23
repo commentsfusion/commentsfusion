@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const IncludedSection = () => {
   return (
-    <section className="w-full py-16 px-0">
+    <section className="w-full py-16 px-0 -mb-15">
       <h2 className="text-5xl font-bold text-white text-center mb-10">What's included</h2>
 
       <div className="w-full rounded-2xl bg-[#101820] flex flex-col md:flex-row items-center justify-start p-8 gap-8 shadow-lg">
@@ -14,7 +14,7 @@ const IncludedSection = () => {
         </div>
 
         {/* Plans */}
-        <div className="flex flex-row w-full justify-around pr-6 md:pr-16 gap-4 md:gap-6">
+        <div className="flex flex-row w-full justify-around pl-0 md:pl-8 gap-4 md:gap-16 mr-[-50px] md:mr-[-10px]">
           {[
             { name: 'Free', price: '$0', note: 'no credit card required' },
             { name: 'Starter', price: '$7.99', note: 'no credit card required' },
