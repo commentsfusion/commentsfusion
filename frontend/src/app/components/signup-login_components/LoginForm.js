@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
 
+const RECAPTCHA_V2_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY;
 export default function LoginForm({
   loginData,
   loginError,
@@ -14,8 +15,11 @@ export default function LoginForm({
   onLoginV2Submit,
   onSwitchMode,
   loginEmailRef,
+  recaptchaV2Ref,
+
 }) {
   return (
+    
     <form
       className="space-y-4 max-w-sm mx-auto"
       onSubmit={onLoginSubmit}

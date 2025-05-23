@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
+import Script from "next/script";
 import TestimonialsCarousel from "../components/signup-login_components/TestimonialsCarousel";
 import LoginForm from "../components/signup-login_components/LoginForm";
 import SignupForm from "../components/signup-login_components/SignUpForm";
@@ -16,10 +20,6 @@ import {
   verifyPasswordOTP,
   resetPassword,
 } from "../../app/utils/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useRouter } from "next/navigation";
-import Script from "next/script";
 import {
   validateSignupForm,
   validateLoginForm,
@@ -70,7 +70,7 @@ export default function AuthPage() {
     confirmPassword: "",
   });
   const [signupErrors, setSignupErrors] = useState({});
-  const inputRefs = useRef([]);
+  const otpInputRefs = useRef([]);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const router = useRouter();
@@ -93,19 +93,25 @@ export default function AuthPage() {
   const resetPasswordRef = useRef(null);
 
   useEffect(() => {
-    setSignupData({
-      username: "",
-      email: "",
-      phone: "",
-      password: "",
-    });
-    setNewPassword("");
-    setConfirmNewPassword("");
+    if (mode === "signup") {
+      setSignupData({
+        username: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+      });
+      setSignupErrors({});
+    }
+
+    if (mode === "forgot") {
+      setForgotData({ email: "" });
+      setForgotError("");
+    }
+
     if (mode !== "verify" && mode !== "forgot-reset") {
       setOtpCode(Array(6).fill(""));
-      setForgotData({ email: "" });
     }
-    setResetErrors({});
   }, [mode]);
 
   useEffect(() => {
@@ -149,6 +155,26 @@ export default function AuthPage() {
     setResetErrors({});
     setMode(newMode);
   }
+
+  const handleOTPChange = (e, index) => {
+    const val = e.target.value.replace(/\D/, "");
+
+    setOtpCode((prev) => {
+      const next = [...prev];
+      next[index] = val;
+      return next;
+    });
+
+    if (val && index < otpInputRefs.current.length - 1) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      otpInputRefs.current[index - 1].focus();
+    }
+  };
 
   function getRecaptchaToken(action) {
     return new Promise((resolve, reject) => {
@@ -272,7 +298,9 @@ export default function AuthPage() {
   const handleVerifySubmit = async (e) => {
     e.preventDefault();
 
-    const code = inputRefs.current.map((input) => input.value.trim()).join("");
+    const code = otpInputRefs.current
+      .map((input) => input.value.trim())
+      .join("");
 
     const otpErr = validateOTP(code);
     if (otpErr) {
@@ -283,7 +311,7 @@ export default function AuthPage() {
     setLoading(true);
     try {
       if (flow === "signup") {
-        const code = inputRefs.current
+        const code = otpInputRefs.current
           .map((input) => input.value.trim())
           .join("");
         try {
@@ -365,34 +393,6 @@ export default function AuthPage() {
     }
   };
 
-  const handleOTPChange = (e, index) => {
-    const val = e.target.value.replace(/\D/, "");
-
-    setOtpCode((prev) => {
-      const next = [...prev];
-      next[index] = val;
-      return next;
-    });
-
-    if (val && index < inputRefs.current.length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleResetChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "password") setNewPassword(value);
-    else if (name === "confirmPassword") setConfirmNewPassword(value);
-
-    setResetErrors((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !e.target.value && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
   const onLoginV2Submit = async (v2Token) => {
     if (!v2Token) return;
     setLoading(true);
@@ -419,12 +419,15 @@ export default function AuthPage() {
   };
 
   const onSignupV2Submit = async (v2Token) => {
-    if (!v2Token) return;
+    if (!v2Token) {
+      toast.error("Please complete the reCAPTCHA challenge before submitting.");
+      return;
+    }
     setLoading(true);
     setSignupErrors({});
 
     try {
-      const result = await sendCode({
+      await sendCode({
         name: signupData.username,
         email: signupData.email,
         phone: signupData.phone,
@@ -435,6 +438,7 @@ export default function AuthPage() {
 
       toast.success("Verification code sent to your email");
       setCaptchaRequired(false);
+      setFlow("signup");
       changeMode("verify");
     } catch (err) {
       toast.error(err.message || "Captcha failed");
@@ -468,8 +472,8 @@ export default function AuthPage() {
 
       setTimeLeft(60);
 
-      inputRefs.current.forEach((input) => (input.value = ""));
-      inputRefs.current[0]?.focus();
+      otpInputRefs.current.forEach((input) => (input.value = ""));
+      otpInputRefs.current[0]?.focus();
     } catch (err) {
       toast.error(err.message || "Failed to resend code");
     } finally {
@@ -489,7 +493,6 @@ export default function AuthPage() {
         <Script
           src="https://www.google.com/recaptcha/api.js?render=explicit"
           strategy="afterInteractive"
-          onLoad={() => console.log("reCAPTCHA v2 lib loaded")}
         />
       </>
       <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,#000000,#33C6F4)]">
@@ -548,6 +551,7 @@ export default function AuthPage() {
                   onLoginV2Submit={onLoginV2Submit}
                   onSwitchMode={changeMode}
                   loginEmailRef={loginEmailRef}
+                  recaptchaV2Ref={recaptchaV2Ref}
                 />
               )}
 
@@ -567,6 +571,7 @@ export default function AuthPage() {
                   onSignupV2Submit={onSignupV2Submit}
                   onSwitchMode={changeMode}
                   signupUsernameRef={signupUsernameRef}
+                  recaptchaV2Ref={recaptchaV2Ref}
                 />
               )}
 
@@ -590,18 +595,19 @@ export default function AuthPage() {
               {mode === "verify" && (
                 <OTPVerificationForm
                   otpValues={otpCode}
-                  inputRefs={inputRefs}
+                  inputRefs={otpInputRefs}
                   otpFirstInputRef={otpFirstInputRef}
                   loading={loading}
                   timeLeft={timeLeft}
                   resending={resending}
                   onOtpChange={handleOTPChange}
                   onKeyDown={handleKeyDown}
-                  onSubmit={handleVerifySubmit}
+                  onVerifySubmit={handleVerifySubmit}
                   onResend={handleResendCode}
                 />
               )}
 
+              {/* Reset Password */}
               {mode === "forgot-reset" && (
                 <ResetPasswordForm
                   newPassword={newPassword}
@@ -625,6 +631,7 @@ export default function AuthPage() {
               )}
             </div>
           </div>
+
           {/* Mascot section */}
           <div className="absolute bottom-20 right-20 w-32 h-32">
             <div className="w-50 h-50 relative">

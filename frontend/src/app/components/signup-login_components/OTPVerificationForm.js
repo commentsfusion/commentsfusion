@@ -11,13 +11,20 @@ export default function VerificationCodeForm({
   resending,
   onOtpChange,
   onKeyDown,
-  onSubmit,
+  onVerifySubmit,
   onResend,
 }) {
   return (
-    <form noValidate className="space-y-4 max-w-sm mx-auto" onSubmit={onSubmit} autoComplete="off">
+    <form
+      noValidate
+      className="space-y-4 max-w-sm mx-auto"
+      onSubmit={onVerifySubmit}
+      autoComplete="off"
+    >
       <h2 className="text-3xl font-semibold text-center">Verification Code</h2>
-      <p className="text-center text-sm mt-2">Check your Email for Verification Code!</p>
+      <p className="text-center text-sm mt-2">
+        Check your Email for Verification Code!
+      </p>
 
       <div className="flex items-center justify-center mt-4 gap-4">
         {otpValues.map((value, i) => (
@@ -45,7 +52,9 @@ export default function VerificationCodeForm({
         type="submit"
         disabled={loading}
         className={`w-full py-3 mt-4 rounded-full ${
-          loading ? "bg-gray-600 cursor-not-allowed" : "bg-black hover:opacity-90"
+          loading
+            ? "bg-gray-600 cursor-not-allowed"
+            : "bg-black hover:opacity-90"
         } text-white font-medium flex justify-center items-center transition`}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.95 }}
@@ -58,15 +67,26 @@ export default function VerificationCodeForm({
             fill="none"
             viewBox="0 0 24 24"
           >
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
           </svg>
         )}
         {loading ? "Verifying…" : "Confirm"}
       </motion.button>
 
       <div className="text-center text-sm mt-4">
-        Didn’t receive the code?{' '}
+        Didn’t receive the code?{" "}
         <button
           type="button"
           onClick={onResend}
@@ -93,6 +113,6 @@ VerificationCodeForm.propTypes = {
   resending: PropTypes.bool.isRequired,
   onOtpChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onVerifySubmit: PropTypes.func.isRequired,
   onResend: PropTypes.func.isRequired,
 };

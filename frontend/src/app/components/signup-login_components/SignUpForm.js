@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 import ReCAPTCHA from "react-google-recaptcha";
 
+const RECAPTCHA_V2_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY;
 export default function SignupForm({
   signupData,
   signupErrors,
@@ -13,6 +14,7 @@ export default function SignupForm({
   onSignupV2Submit,
   onSwitchMode,
   signupUsernameRef,
+  recaptchaV2Ref,
 }) {
   return (
     <>

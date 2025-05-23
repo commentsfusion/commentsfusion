@@ -11,7 +11,6 @@ async function verifyToken(token, expectedAction) {
   });
   const data = await res.json();
 
-   console.log("🔍 reCAPTCHA response:", data)
   if (!data.success) {
     const err = new Error("reCAPTCHA validation failed");
     err.details = data["error-codes"];
