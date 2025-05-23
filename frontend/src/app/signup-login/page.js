@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import TestimonialsCarousel from "../components/signup-login_components/TestimonialsCarousel";
 import LoginForm from "../components/signup-login_components/LoginForm";
 import SignupForm from "../components/signup-login_components/SignUpForm";
+import ForgotPasswordForm from "../components/signup-login_components/ForgotPasswordForm";
+import OTPVerificationForm from "../components/signup-login_components/OTPVerificationForm";
+import ResetPasswordForm from "../components/signup-login_components/ResetPasswordForm";
 import {
   sendCode,
   verifySignup,
@@ -17,7 +19,6 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
-import ReCAPTCHA from "react-google-recaptcha";
 import Script from "next/script";
 import {
   validateSignupForm,
@@ -26,8 +27,6 @@ import {
   validatePasswordPair,
   validateOTP,
 } from "../../app/utils/validations";
-
-const RECAPTCHA_V2_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY;
 
 const testimonials = [
   {
@@ -77,9 +76,9 @@ export default function AuthPage() {
   const router = useRouter();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState({});
-  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotData, setForgotData] = useState({ email: "" });
   const [forgotError, setForgotError] = useState("");
-  const [inputCode, setInputCode] = useState("");
+  const [otpCode, setOtpCode] = useState(Array(6).fill(""));
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [resetErrors, setResetErrors] = useState({});
@@ -102,9 +101,11 @@ export default function AuthPage() {
     });
     setNewPassword("");
     setConfirmNewPassword("");
-    setInputCode("");
+    if (mode !== "verify" && mode !== "forgot-reset") {
+      setOtpCode(Array(6).fill(""));
+      setForgotData({ email: "" });
+    }
     setResetErrors({});
-    setForgotEmail("");
   }, [mode]);
 
   useEffect(() => {
@@ -247,7 +248,7 @@ export default function AuthPage() {
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
 
-    const emailErr = validateEmail(forgotEmail);
+    const emailErr = validateEmail(forgotData.email);
     if (emailErr) {
       setForgotError(emailErr);
       return;
@@ -257,7 +258,7 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      await requestPasswordReset(forgotEmail);
+      await requestPasswordReset(forgotData.email);
       toast.success("Reset code sent to your email.");
       setFlow("forgot");
       changeMode("verify");
@@ -317,9 +318,9 @@ export default function AuthPage() {
           setLoading(false);
         }
       } else if (flow === "forgot") {
-        await verifyPasswordOTP(forgotEmail, code);
+        await verifyPasswordOTP(forgotData.email, code);
         toast.success("Code verified! Enter a new password.");
-        setInputCode(code);
+        setOtpCode(code);
         changeMode("forgot-reset");
       }
     } catch (err) {
@@ -341,15 +342,20 @@ export default function AuthPage() {
       return;
     }
 
-    const code = inputCode;
+    const code = otpCode;
 
     setLoading(true);
     try {
-      await resetPassword(forgotEmail, code, newPassword, confirmNewPassword);
+      await resetPassword(
+        forgotData.email,
+        code,
+        newPassword,
+        confirmNewPassword
+      );
       toast.success("Password reset! Please log in.");
       changeMode("login");
-      setForgotEmail("");
-      setInputCode("");
+      setForgotData("");
+      setOtpCode("");
       setNewPassword("");
     } catch (err) {
       toast.error(err.message);
@@ -359,23 +365,32 @@ export default function AuthPage() {
     }
   };
 
-  const handleInputChange = (e, index) => {
-    if (e.target.value.length === 1) {
-      if (index < inputRefs.current.length - 1) {
-        inputRefs.current[index + 1].focus();
-      }
+  const handleOTPChange = (e, index) => {
+    const val = e.target.value.replace(/\D/, "");
+
+    setOtpCode((prev) => {
+      const next = [...prev];
+      next[index] = val;
+      return next;
+    });
+
+    if (val && index < inputRefs.current.length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
+  };
+
+  const handleResetChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "password") setNewPassword(value);
+    else if (name === "confirmPassword") setConfirmNewPassword(value);
+
+    setResetErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !e.target.value && index > 0) {
       inputRefs.current[index - 1].focus();
     }
-  };
-
-  const handleChange = (e) => {
-    setSignupData((fd) => ({ ...fd, [e.target.name]: e.target.value }));
-    setSignupErrors((errs) => ({ ...errs, [e.target.name]: undefined }));
   };
 
   const onLoginV2Submit = async (v2Token) => {
@@ -447,7 +462,7 @@ export default function AuthPage() {
         });
         toast.success("Verification code resent to your email");
       } else if (flow === "forgot") {
-        await requestPasswordReset(forgotEmail);
+        await requestPasswordReset(forgotData.email);
         toast.success("Password reset code resent to your email");
       }
 
@@ -490,7 +505,6 @@ export default function AuthPage() {
         />
         {/* Left panel */}
         <div className="w-1/2 flex flex-col justify-start px-12 py-8 text-white">
-          {/* Logo & headline */}
           <div className="space-y-8">
             <div className="w-20 h-20 relative mx-auto">
               <Image
@@ -507,13 +521,11 @@ export default function AuthPage() {
             </h1>
           </div>
 
-          {/* Testimonial */}
           <div className="flex-1 flex items-center justify-center my-8 relative">
             <TestimonialsCarousel testimonials={testimonials} />
           </div>
         </div>
 
-        {/* Separator */}
         <div className="w-px bg-white/20"></div>
 
         {/* Right panel */}
@@ -538,6 +550,7 @@ export default function AuthPage() {
                   loginEmailRef={loginEmailRef}
                 />
               )}
+
               {/* signup */}
               {mode === "signup" && (
                 <SignupForm
@@ -556,276 +569,59 @@ export default function AuthPage() {
                   signupUsernameRef={signupUsernameRef}
                 />
               )}
+
               {/* Forgot Password */}
               {mode === "forgot" && (
-                <>
-                  <h2 className="text-3xl font-semibold text-center">
-                    Forgot Password
-                  </h2>
-                  <p className="text-sm text-center">
-                    Please enter your details
-                  </p>
-                  <form className="space-y-4" onSubmit={handleForgotSubmit}>
-                    <div className="space-y-1">
-                      <label className="block text-sm">Email</label>
-                      <input
-                        type="email"
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        value={forgotEmail}
-                        ref={forgotEmailRef}
-                        onChange={(e) => {
-                          setForgotEmail(e.target.value);
-                          setForgotError("");
-                        }}
-                        placeholder="Your email"
-                        required
-                      />
-                      {forgotError && (
-                        <p className="text-red-400 text-xs">{forgotError}</p>
-                      )}
-                    </div>
-                    <motion.button
-                      type="submit"
-                      className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={loading}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 25,
-                      }}
-                    >
-                      {loading && (
-                        <svg
-                          className="animate-spin h-5 w-5 mr-2 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                          />
-                        </svg>
-                      )}
-                      {loading ? "Verifying…" : "Confirm"}
-                    </motion.button>
-                  </form>
-                  <div className="text-center text-sm">
-                    Back to Login?{" "}
-                    <button
-                      type="button"
-                      onClick={() => changeMode("login")}
-                      className="underline"
-                    >
-                      Log In
-                    </button>
-                  </div>
-                </>
+                <ForgotPasswordForm
+                  forgotData={forgotData}
+                  forgotError={forgotError}
+                  loading={loading}
+                  onForgotChange={(e) => {
+                    setForgotData({ email: e.target.value });
+                    setForgotError("");
+                  }}
+                  onForgotSubmit={handleForgotSubmit}
+                  onSwitchMode={changeMode}
+                  forgotEmailRef={forgotEmailRef}
+                />
               )}
 
               {/* OTP verification */}
               {mode === "verify" && (
-                <>
-                  <h2 className="text-3xl font-semibold text-center">
-                    Verification Code
-                  </h2>
-                  <p className="text-center text-sm mt-2">
-                    Check your Email for Verification Code!
-                  </p>
-
-                  <form
-                    noValidate
-                    className="space-y-4"
-                    onSubmit={handleVerifySubmit}
-                    autoComplete="off"
-                  >
-                    <div className="flex items-center justify-center mt-4 gap-4">
-                      {Array.from({ length: 6 }).map((_, i) => (
-                        <input
-                          name={`otp-${i}`}
-                          key={i}
-                          ref={(el) => {
-                            inputRefs.current[i] = el;
-                            if (i === 0) otpFirstInputRef.current = el;
-                          }}
-                          type="text"
-                          maxLength={1}
-                          inputMode="numeric"
-                          pattern="\d*"
-                          className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                          autoComplete="one-time-code"
-                          onChange={(e) => handleInputChange(e, i)}
-                          onKeyDown={(e) => handleKeyDown(e, i)}
-                        />
-                      ))}
-                    </div>
-
-                    <motion.button
-                      type="submit"
-                      className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.95 }}
-                      disabled={loading}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 25,
-                      }}
-                    >
-                      {loading && (
-                        <svg
-                          className="animate-spin h-5 w-5 mr-2 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                          />
-                        </svg>
-                      )}
-                      {loading ? "Verifying…" : "Confirm"}
-                    </motion.button>
-
-                    <div className="text-center text-sm mt-4">
-                      Didn’t receive the code?{" "}
-                      <button
-                        type="button"
-                        onClick={handleResendCode}
-                        disabled={resending || timeLeft > 0}
-                        className="underline"
-                      >
-                        {timeLeft > 0
-                          ? `Resend in ${timeLeft}s`
-                          : resending
-                          ? "Resending…"
-                          : "Resend Code"}
-                      </button>
-                    </div>
-                  </form>
-                </>
+                <OTPVerificationForm
+                  otpValues={otpCode}
+                  inputRefs={inputRefs}
+                  otpFirstInputRef={otpFirstInputRef}
+                  loading={loading}
+                  timeLeft={timeLeft}
+                  resending={resending}
+                  onOtpChange={handleOTPChange}
+                  onKeyDown={handleKeyDown}
+                  onSubmit={handleVerifySubmit}
+                  onResend={handleResendCode}
+                />
               )}
 
-              {/* Reset Password */}
               {mode === "forgot-reset" && (
-                <>
-                  <h2 className="text-3xl font-semibold text-center">
-                    Reset Password
-                  </h2>
-                  <p className="text-sm text-center">
-                    Please enter your new password
-                  </p>
-
-                  <form
-                    onSubmit={handleResetPassword}
-                    className="space-y-4 max-w-sm mx-auto"
-                  >
-                    {/* New Password */}
-                    <div className="space-y-1">
-                      <label className="block text-sm">New Password</label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        ref={resetPasswordRef}
-                        onChange={(e) => {
-                          setNewPassword(e.target.value);
-                          setResetErrors((prev) => ({ ...prev, password: "" }));
-                        }}
-                        required
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                    </div>
-                    {resetErrors.password && (
-                      <p className="text-red-400 text-xs">
-                        {resetErrors.password}
-                      </p>
-                    )}
-
-                    {/* Confirm Password */}
-                    <div className="space-y-1">
-                      <label className="block text-sm">Confirm Password</label>
-                      <input
-                        type="password"
-                        value={confirmNewPassword}
-                        onChange={(e) => {
-                          setConfirmNewPassword(e.target.value);
-                          setResetErrors((prev) => ({
-                            ...prev,
-                            confirmPassword: "",
-                          }));
-                        }}
-                        required
-                        className="w-full h-10 px-3 rounded-full border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-                      />
-                    </div>
-                    {resetErrors.confirmPassword && (
-                      <p className="text-red-400 text-xs">
-                        {resetErrors.confirmPassword}
-                      </p>
-                    )}
-
-                    {/* Reset Button */}
-                    <motion.button
-                      type="submit"
-                      disabled={loading}
-                      className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 25,
-                      }}
-                    >
-                      {loading ? "Resetting…" : "Reset Password"}
-                    </motion.button>
-                  </form>
-                </>
+                <ResetPasswordForm
+                  newPassword={newPassword}
+                  confirmNewPassword={confirmNewPassword}
+                  resetErrors={resetErrors}
+                  loading={loading}
+                  onNewPasswordChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setResetErrors((prev) => ({ ...prev, password: "" }));
+                  }}
+                  onConfirmNewPasswordChange={(e) => {
+                    setConfirmNewPassword(e.target.value);
+                    setResetErrors((prev) => ({
+                      ...prev,
+                      confirmPassword: "",
+                    }));
+                  }}
+                  onResetSubmit={handleResetPassword}
+                  resetPasswordRef={resetPasswordRef}
+                />
               )}
             </div>
           </div>

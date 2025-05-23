@@ -120,7 +120,6 @@ exports.verifyPasswordOTP = async (req, res, next) => {
 };
 
 // --- forgot password: reset new password ---
-// --- forgot password: reset new password ---
 exports.resetPassword = async (req, res, next) => {
   try {
     const { email, newPassword, confirmNewPassword } = req.body;
