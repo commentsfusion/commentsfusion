@@ -1,94 +1,44 @@
 // controllers/authController.js
 const User = require("../models/user");
-const VerificationToken = require("../models/verificationToken");
 const { hashPassword, signToken, comparePassword } = require("../utils/auth");
-const bcryptjs = require("bcryptjs");
-const { sendVerificationMail } = require("../utils/mailer");
 const ApiError = require("../utils/apiError");
 const { validationResult } = require("express-validator");
+const { generateOtp, verifyOtp } = require("../services/authServices");
 
 exports.sendVerificationCode = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return next(new ApiError(400, errors.array()[0].msg));
-  }
-
   const { name, email, phone, password } = req.body;
-  try {
-    const existing = await User.findOne({ $or: [{ email }, { phone }] }).lean();
-    if (existing) {
-      const msg =
-        existing.email === email
-          ? "Email already registered"
-          : "Phone already registered";
-      throw new ApiError(409, msg);
-    }
-
-    const passwordHash = await hashPassword(password);
-    const rawCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const codeHash = await bcryptjs.hash(rawCode, 10);
-
-    await VerificationToken.findOneAndUpdate(
-      { email },
-      { name, email, phone, passwordHash, codeHash },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-
-    await sendVerificationMail(email, rawCode);
-    return res.status(200).json({ message: "Verification code sent" });
-  } catch (err) {
-    console.error("Signup error:", err);
-    if (err instanceof ApiError) return next(err);
-    return next(new ApiError(500, "Internal server error"));
+  if (await User.exists({ $or: [{ email }, { phone }] })) {
+    return next(new ApiError(409, "Email or phone already registered"));
   }
+  const passwordHash = await hashPassword(password);
+  await generateOtp(email, "signup", { name, phone, passwordHash });
+  res.json({ success: true, message: "Verification code sent" });
 };
 
-exports.verifySignup = async (req, res) => {
-  const { email, code } = req.body;
-  const record = await VerificationToken.findOne({ email });
-  if (!record) {
-    return res
-      .status(400)
-      .json({ message: "No pending signup for this email" });
-  }
-
-  const ageMs = Date.now() - record.updatedAt.getTime();
-  if (ageMs > 5 * 60 * 1000) {
-    await VerificationToken.deleteOne({ email });
-    return res
-      .status(400)
-      .json({ message: "Code expired. Please request a new one." });
-  }
-
-  const valid = await bcryptjs.compare(code, record.codeHash);
-  if (!valid) {
-    return res.status(400).json({ message: "Invalid code" });
-  }
-
-  let user;
+exports.verifySignup = async (req, res, next) => {
   try {
-    user = await new User({
-      name: record.name,
-      email: record.email,
-      phone: record.phone,
-      password: record.passwordHash,
+    const { email, code } = req.body;
+
+    // this now returns `{ name, email, phone, passwordHash }`
+    const rec = await verifyOtp(email, code, "signup");
+
+    // rec is never null, so you can immediately use it:
+    const user = await new User({
+      name: rec.name,
+      email: rec.email,
+      phone: rec.phone,
+      password: rec.passwordHash,
     }).save();
+
+    const token = signToken({ userId: user._id, role: user.role });
+    res.status(201).json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
   } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ message: "Error creating user", details: err.message });
+    next(new ApiError(400, err.message));
   }
-
-  const token = signToken({ userId: user._id, role: user.role });
-
-  await VerificationToken.deleteOne({ email });
-
-  res.status(201).json({
-    message: "User created",
-    token,
-    user: { id: user._id, name: user.name, email, role: user.role },
-  });
 };
 
 exports.login = async (req, res, next) => {
@@ -129,5 +79,61 @@ exports.login = async (req, res, next) => {
   } catch (err) {
     console.error("Login error:", err);
     return next(new ApiError(500, "Internal server error"));
+  }
+};
+
+exports.requestPasswordReset = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // 1) Check if user exists
+    const exists = await User.exists({ email });
+    if (!exists) {
+      // 2a) If not, tell them to register
+      return next(new ApiError(404, "Email not found. Please register first."));
+    }
+
+    // 3) Otherwise, generate & send the OTP
+    await generateOtp(email, "forgot-password");
+
+    // 4) And respond success
+    return res.json({
+      success: true,
+      message: "Reset code sent to your email.",
+    });
+  } catch (err) {
+    // any unexpected errors
+    console.error("Forgot-password error:", err);
+    return next(new ApiError(500, "Internal server error"));
+  }
+};
+
+// --- forgot password: verify OTP only ---
+exports.verifyPasswordOTP = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    await verifyOtp(email, code, "forgot-password");
+    res.json({ success: true, message: "OTP verified" });
+  } catch (err) {
+    next(new ApiError(400, err.message));
+  }
+};
+
+// --- forgot password: reset new password ---
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { email, newPassword, confirmNewPassword } = req.body;
+
+    if (newPassword !== confirmNewPassword) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Passwords do not match" });
+    }
+    const hash = await hashPassword(newPassword);
+    await User.updateOne({ email }, { password: hash });
+
+    return res.json({ success: true, message: "Password updated" });
+  } catch (err) {
+    next(new ApiError(400, err.message));
   }
 };

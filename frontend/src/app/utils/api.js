@@ -38,3 +38,36 @@ export async function loginUser({ email, password, recaptchaToken, recaptchaV2To
   }
   return body;
 }
+
+export async function requestPasswordReset(email) {
+  const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message);
+  return body;
+}
+
+export async function verifyPasswordOTP(email, code) {
+  const res = await fetch(`${API_BASE}/api/auth/forgot-password/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code }),
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message);
+  return body;
+}
+
+export async function resetPassword(email, code, newPassword, confirmNewPassword) {
+  const res = await fetch(`${API_BASE}/api/auth/forgot-password/reset`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code, newPassword, confirmNewPassword }),
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message);
+  return body;
+}
