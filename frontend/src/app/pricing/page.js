@@ -15,9 +15,6 @@ const PricingPage = () => {
     <div className="bg-black min-h-screen px-4 py-10 bg-[linear-gradient(to_bottom,#000000,#33C6F4)] bg-fixed">
       <Navbar />
       <Header />
-      <div className="flex justify-center">
-        <PricingToggle />
-      </div>
       <PricingSection />
       <ReviewsSection />
       <IncludedSection />

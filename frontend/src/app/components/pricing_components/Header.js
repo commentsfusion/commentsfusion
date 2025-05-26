@@ -8,8 +8,11 @@ const Header = () => {
         <h1 className="text-4xl md:text-5xl font-extrabold">
           Discover your <span className="text-sky-400 italic">ideal plan</span>
         </h1>
-        <p className="text-2xl mt-12">Try it for 30 days experience the difference with no commitment.</p>
+        <p className="text-2xl mt-12">
+          Try it for 30 days experience the difference with no commitment.
+        </p>
       </div>
+
       <div className="mt-10 w-full bg-black rounded-3xl px-6 py-6 flex items-center justify-between gap-4">
         {/* Left: Install Button */}
         <div className="flex-shrink-0">
@@ -32,12 +35,13 @@ const Header = () => {
         </div>
       </div>
 
-      <div className="absolute -bottom-4 right-8 w-27 h-28">
+      {/* Sticky Bouncing Bot Image */}
+      <div className="fixed bottom-4 right-4 w-[150px] h-[150px] z-50 animate-bounce">
         <Image
           src="/images/chatBotIcon.svg"
-          alt="Demo"
-          width={128}
-          height={128}
+          alt="Chatbot Icon"
+          width={100}
+          height={100}
           className="rounded-full object-cover"
         />
       </div>

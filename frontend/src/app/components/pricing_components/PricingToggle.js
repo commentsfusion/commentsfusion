@@ -1,11 +1,8 @@
 'use client';
-import { useState } from 'react';
 
-const PricingToggle = () => {
-  const [isYearly, setIsYearly] = useState(false);
-
+const PricingToggle = ({ isYearly, setIsYearly }) => {
   return (
-    <div className="w-full flex justify-start mb-6 mt-4"> {/* Changed container */}
+    <div className="w-full flex justify-start mb-6 mt-4">
       <div className="flex items-center gap-2 bg-gray-800 p-1 rounded-full">
         <button
           className={`px-6 py-2 rounded-full text-sm ${
