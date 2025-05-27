@@ -34,7 +34,7 @@ function recaptchaFallback(actionName) {
       }
 
       score = typeof data.score === "number" ? data.score : 0;
-      //score = 0.1;(For Testing)
+      //score = 0.4;(For Testing)
     } else {
       score = SOFT;
     }
@@ -43,7 +43,7 @@ function recaptchaFallback(actionName) {
     if (score < EXTREME) {
       return res.status(403).json({
         success: false,
-        message: `User Blocked due to reCAPTCHA`,
+        message: `User Access Denied`,
       });
     }
 

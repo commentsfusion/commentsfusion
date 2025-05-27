@@ -1,6 +1,6 @@
 // src/utils/mailer.js
 const nodemailer = require('nodemailer');
-const config = require('../config');
+const config = require('../config/config');
 
 const transporter = nodemailer.createTransport({
   host: config.email.smtp.host,
@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 async function sendVerificationMail(toEmail, code) {
   await transporter.sendMail({
-    from: config.email.from,
+    from: config.email.smtp.auth.user,
     to: toEmail,
     subject: 'Your verification code',
     text: `Your signup code is ${code}. It expires in 5 minutes.`,

@@ -4,10 +4,15 @@ const config = require("../config/config");
 async function verifyToken(token, expectedAction) {
   if (!token) throw new Error("No reCAPTCHA token provided");
 
+  const secret = config.recaptcha.secretKey;
+  if (!secret) throw new Error('reCAPTCHA secret key missing in config');
+
   const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `secret=${encodeURIComponent(config.RECAPTCHA_SECRET_KEY)}&response=${encodeURIComponent(token)}`,
+    body: `secret=${encodeURIComponent(secret)}&response=${encodeURIComponent(
+      token
+    )}`,
   });
   const data = await res.json();
 
