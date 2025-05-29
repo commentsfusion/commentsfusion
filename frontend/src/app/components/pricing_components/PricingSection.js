@@ -59,7 +59,7 @@ const monthlyPlans = [
       "Daily & real-time monitoring update",
       "Social signals - updated daily",
       "Priority support (24 hours)",
-      "Advanced AI model (GPT-4.0)"
+      "Advanced AI model (GPT-4o)"
     ]
   },
   {
@@ -73,7 +73,7 @@ const monthlyPlans = [
       "Daily & real-time monitoring update",
       "Social signals - updated daily",
       "Priority support (24 hours)",
-      "Advanced AI models (GPT-4.0, GPT-4.5)"
+      "Advanced AI models (GPT-4o, GPT-4, GPT-4.5)"
     ]
   },
   {
@@ -87,7 +87,7 @@ const monthlyPlans = [
       "Social signals - updated twice daily",
       "Priority support (24 hours)",
       "Early access to Beta features",
-      "Advanced AI models (Google Gemini, GPT-4.0, GPT-4.5)"
+      "Advanced AI models (Google Gemini, GPT-4o, GPT-4, GPT-4.5)"
     ]
   }
 ];
@@ -97,12 +97,12 @@ const PricingSection = () => {
   const plans = isYearly ? yearlyPlans : monthlyPlans;
 
   return (
-    <div>
+    <div className="px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 2xl:px-20">
       {/* Only one toggle below, remove any extra toggle from parent or page layout if present */}
       <PricingToggle isYearly={isYearly} setIsYearly={setIsYearly} />
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-10">
         {plans.map((plan, idx) => (
-          <PricingCard key={plan.title} {...plan} />
+          <PricingCard key={plan.title} {...plan} isYearly={isYearly} />
         ))}
       </div>
     </div>

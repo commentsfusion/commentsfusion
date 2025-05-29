@@ -99,7 +99,7 @@ const FaqSection = () => {
                 </div>
                 <div className="text-center mt-12">
                     <p className="text-lg md:text-4xl font-semibold">Got more questions?</p>
-                    <button className="mt-4 px-10 py-4 bg-white text-black rounded-full text-xl font-semibold hover:bg-gray-200 transition">
+                    <button className="mt-4 px-10 py-4 bg-white text-black rounded-full text-xl font-medium hover:bg-gray-200 transition font-lato">
                         Check out our Help & Strategy Hub
                     </button>
                 </div>
