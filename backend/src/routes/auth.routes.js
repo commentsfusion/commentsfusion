@@ -17,7 +17,7 @@ const {
   requestPasswordReset,
   verifyPasswordOTP,
   resetPassword
-} = require("../controllers/authController");
+} = require("../controllers/auth.controller");
 const passport = require("passport");
 const { signToken } = require("../utils/auth");
 const rateLimit = require("express-rate-limit");
