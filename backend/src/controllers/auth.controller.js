@@ -1,0 +1,137 @@
+// controllers/auth.controller.js
+const httpStatus = require('http-status').default;
+const { validationResult } = require('express-validator');
+const ApiError = require('../utils/apiError');
+const { hashPassword, signToken, comparePassword } = require('../utils/auth');
+const { generateOtp, verifyOtp } = require('../services').authService; 
+const User = require('../models/user');
+
+exports.sendVerificationCode = async (req, res, next) => {
+  try {
+    const { name, email, phone, password } = req.body;
+
+    if (await User.exists({ $or: [{ email }, { phone }] })) {
+      return next(new ApiError(httpStatus.CONFLICT, 'Email or phone already registered'));
+    }
+
+    const passwordHash = await hashPassword(password);
+
+    await generateOtp(email, 'signup', { name, phone, passwordHash });
+
+    return res.json({ success: true, message: 'Verification code sent' });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+exports.verifySignup = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+
+    const rec = await verifyOtp(email, code, 'signup');
+
+    const user = await new User({
+      name:     rec.name,
+      email:    rec.email,
+      phone:    rec.phone,
+      password: rec.passwordHash,
+    }).save();
+
+    const token = signToken({ userId: user._id, role: user.role });
+
+    return res.status(httpStatus.CREATED).json({
+      success: true,
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (err) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, err.message));
+  }
+};
+
+exports.login = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ApiError(httpStatus.BAD_REQUEST, errors.array()[0].msg));
+    }
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(new ApiError(httpStatus.UNAUTHORIZED, 'Invalid credentials'));
+    }
+
+    if (!user.password) {
+      return next(
+        new ApiError(
+          httpStatus.FORBIDDEN,
+          'This account is linked via Google. Please sign in with Google or register first.'
+        )
+      );
+    }
+
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return next(new ApiError(httpStatus.UNAUTHORIZED, 'Invalid credentials'));
+    }
+
+    const token = signToken({ userId: user._id, role: user.role });
+    return res.json({
+      message: 'Logged in',
+      token,
+      user: { id: user._id, name: user.name, email, role: user.role },
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    return next(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error'));
+  }
+};
+
+exports.requestPasswordReset = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const exists = await User.exists({ email });
+    if (!exists) {
+      return next(new ApiError(httpStatus.NOT_FOUND, 'Email not found. Please register first.'));
+    }
+
+    await generateOtp(email, 'forgot-password');
+
+    return res.json({
+      success: true,
+      message: 'Reset code sent to your email.',
+    });
+  } catch (err) {
+    console.error('Forgot-password error:', err);
+    return next(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error'));
+  }
+};
+
+exports.verifyPasswordOTP = async (req, res, next) => {
+  try {
+    const { email, code } = req.body;
+    await verifyOtp(email, code, 'forgot-password');
+    return res.json({ success: true, message: 'OTP verified' });
+  } catch (err) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, err.message));
+  }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { email, newPassword, confirmNewPassword } = req.body;
+    if (newPassword !== confirmNewPassword) {
+      return next(new ApiError(httpStatus.BAD_REQUEST, 'Passwords do not match'));
+    }
+
+    const hash = await hashPassword(newPassword);
+    await User.updateOne({ email }, { password: hash });
+
+    return res.json({ success: true, message: 'Password updated' });
+  } catch (err) {
+    return next(new ApiError(httpStatus.BAD_REQUEST, err.message));
+  }
+};
