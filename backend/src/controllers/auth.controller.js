@@ -1,52 +1,52 @@
-// controllers/auth.controller.js
-const httpStatus = require('http-status').default;
-const { validationResult } = require('express-validator');
-const ApiError = require('../utils/apiError');
-const { hashPassword, signToken, comparePassword } = require('../utils/auth');
-const { generateOtp, verifyOtp } = require('../services').authService; 
-const User = require('../models/user');
+  // controllers/auth.controller.js
+  const httpStatus = require('http-status').default;
+  const { validationResult } = require('express-validator');
+  const ApiError = require('../utils/apiError');
+  const { hashPassword, signToken, comparePassword } = require('../utils/auth');
+  const {authService} = require('../services');
+  const User = require('../models/user');
 
-exports.sendVerificationCode = async (req, res, next) => {
-  try {
-    const { name, email, phone, password } = req.body;
+  exports.sendVerificationCode = async (req, res, next) => {
+    try {
+      const { name, email, phone, password } = req.body;
 
-    if (await User.exists({ $or: [{ email }, { phone }] })) {
-      return next(new ApiError(httpStatus.CONFLICT, 'Email or phone already registered'));
+      if (await User.exists({ $or: [{ email }, { phone }] })) {
+        return next(new ApiError(httpStatus.CONFLICT, 'Email or phone already registered'));
+      }
+
+      const passwordHash = await hashPassword(password);
+
+      await authService.generateOtp(email, 'signup', { name, phone, passwordHash });
+
+      return res.json({ success: true, message: 'Verification code sent' });
+    } catch (err) {
+      return next(err);
     }
+  };
 
-    const passwordHash = await hashPassword(password);
+  exports.verifySignup = async (req, res, next) => {
+    try {
+      const { email, code } = req.body;
 
-    await generateOtp(email, 'signup', { name, phone, passwordHash });
+      const rec = await authService.verifyOtp(email, code, 'signup');
 
-    return res.json({ success: true, message: 'Verification code sent' });
-  } catch (err) {
-    return next(err);
-  }
-};
+      const user = await new User({
+        name:     rec.name,
+        email:    rec.email,
+        phone:    rec.phone,
+        password: rec.passwordHash,
+      }).save();
 
-exports.verifySignup = async (req, res, next) => {
-  try {
-    const { email, code } = req.body;
+      const token = signToken({ userId: user._id, role: user.role });
 
-    const rec = await verifyOtp(email, code, 'signup');
-
-    const user = await new User({
-      name:     rec.name,
-      email:    rec.email,
-      phone:    rec.phone,
-      password: rec.passwordHash,
-    }).save();
-
-    const token = signToken({ userId: user._id, role: user.role });
-
-    return res.status(httpStatus.CREATED).json({
-      success: true,
-      token,
-      user: { id: user._id, name: user.name, email: user.email },
-    });
-  } catch (err) {
-    return next(new ApiError(httpStatus.BAD_REQUEST, err.message));
-  }
+      return res.status(httpStatus.CREATED).json({
+        success: true,
+        token,
+        user: { id: user._id, name: user.name, email: user.email },
+      });
+    } catch (err) {
+      return next(new ApiError(httpStatus.BAD_REQUEST, err.message));
+    }
 };
 
 exports.login = async (req, res, next) => {
@@ -98,7 +98,7 @@ exports.requestPasswordReset = async (req, res, next) => {
       return next(new ApiError(httpStatus.NOT_FOUND, 'Email not found. Please register first.'));
     }
 
-    await generateOtp(email, 'forgot-password');
+    await authService.generateOtp(email, 'forgot-password');
 
     return res.json({
       success: true,
@@ -113,7 +113,7 @@ exports.requestPasswordReset = async (req, res, next) => {
 exports.verifyPasswordOTP = async (req, res, next) => {
   try {
     const { email, code } = req.body;
-    await verifyOtp(email, code, 'forgot-password');
+    await authService.verifyOtp(email, code, 'forgot-password');
     return res.json({ success: true, message: 'OTP verified' });
   } catch (err) {
     return next(new ApiError(httpStatus.BAD_REQUEST, err.message));
