@@ -11,7 +11,9 @@ require('./src/utils/passport_setup');
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
+
 connectDatabase();
 
 app.use(
@@ -34,7 +36,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api/auth', authRoutes);
-app.use('/wp-json/csfn/v1', profileRoutes);
+app.use('/api/profile', profileRoutes);
 app.use(apiErrorHandler); 
 
 const PORT = process.env.PORT || 5000;

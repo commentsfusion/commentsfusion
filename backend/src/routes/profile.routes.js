@@ -5,7 +5,7 @@ const {profileController} = require('../controllers');
 
 const router = express.Router();
 
-router.post("/check-user-exists", asyncHandler(profileController.checkUserExists));
+//router.post("/check-user-exists", asyncHandler(profileController.checkUserExists));
 
 router.post("/extract-profile-data", asyncHandler(profileController.extractProfileData));
 

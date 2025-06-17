@@ -2,9 +2,9 @@
 const httpStatus = require('http-status').default;
 const ApiError = require('../utils/apiError');
 
-const {profileServices} = require('../services');
+const {profileService} = require('../services');
 
-exports.checkUserExists = async (req, res, next) => {
+/*exports.checkUserExists = async (req, res, next) => {
   try {
     // assume you have req.user set by your auth middleware
     const userId = req.user._id;
@@ -14,13 +14,15 @@ exports.checkUserExists = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
+};*/
 
 exports.extractProfileData = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    //const userId = req.user._id;
     const { userID: linkedinUsername, html } = req.body;
-    const profile = await profileServices.upsertProfileData(userId, linkedinUsername, html);
+    //const profile = await profileServices.upsertProfileData(userId, linkedinUsername, html);
+
+    const profile = await profileService.upsertProfileData(linkedinUsername, html);
     res.json(profile);
   } catch (err) {
     next(err);
@@ -36,7 +38,7 @@ exports.generateReply = async (req, res, next) => {
       prompt,
       comment,
     } = req.body;
-    const reply = await profileServices.generateReply({
+    const reply = await profileService.generateReply({
       userId,
       targetLinkedInUsername,
       postContent,
