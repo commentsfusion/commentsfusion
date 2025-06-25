@@ -29,6 +29,7 @@ export async function verifySignup({ email, code }) {
 export async function loginUser({ email, password, recaptchaToken, recaptchaV2Token }) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
+    credentials: 'include',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token}),
   });

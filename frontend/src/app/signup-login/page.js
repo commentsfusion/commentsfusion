@@ -213,9 +213,10 @@ export default function AuthPage() {
         return;
       }
 
-      if (!result.token) {
+      // no longer needed as we are setting up the cookies now
+      /*if (!result.token) {
         throw new Error("No token returned from login API");
-      }
+      }*/
 
       localStorage.setItem("token", result.token);
       toast.success("Logged in!");
