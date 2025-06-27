@@ -51,8 +51,8 @@ export default function Main_Handle({
         <div className="  flex flex-col justify-center  gap-6">
           {Data.map((item, index) => (
             <div key={index}>
-              <div className="flex justify-center">
-                <div className="  p-3 w-[94%] h-[34px] border-2 border-white rounded-[5px] flex items-center">
+              <div className="flex justify-center cursor-pointer">
+                <div className="  p-3 w-[94%] h-[34px] border-2 border-white rounded-[5px] flex items-center hover:border-[#33C6F4] transition-all duration-300 ease-in-out">
                   <p className="font-normal">{item.p}</p>
                 </div>
               </div>
@@ -65,8 +65,8 @@ export default function Main_Handle({
         <div className=" flex flex-col justify-center mt-4 gap-6">
           {Data2.map((item, index) => (
             <div key={index}>
-              <div className="flex justify-center">
-                <div className="  p-3 w-[94%] h-[32px] border-2 border-white rounded-[5px] flex items-center">
+              <div className="flex justify-center cursor-pointer">
+                <div className="  p-3 w-[94%] h-[32px] border-2 border-white rounded-[5px] flex items-center hover:border-[#33C6F4] transition-all duration-300 ease-in-out">
                   <p className="font-normal">{item.p}</p>
                 </div>
               </div>

@@ -1,5 +1,5 @@
 "use client";
-
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 export default function Card({ cardData }) {
@@ -34,14 +34,20 @@ export default function Card({ cardData }) {
           </svg>
         </div>
       </div>
-      <div className="flex flex-wrap justify-center mt-6 gap-6">
+       
+      <div className="flex flex-wrap justify-center mt-9 gap-6">
+        
         {cardData.map((item, index) => (
+         
           <div
             key={index}
             onClick={() => router.push(`/help/${item.id}`)}
             className="cursor-pointer"
           >
-            <div className=" bg-[#000000CC] opacity-85  mt-3 p-[18px] pb-2  flex w-[290px] h-[185px] border border-blue-300 rounded-[10px]">
+             <motion.div
+         whileTap={{ scale: 0.95 }}
+         >
+            <div className=" bg-[#000000CC] opacity-85   p-[18px] pb-2  flex w-[290px] h-[185px] border border-blue-300 rounded-[10px] hover:scale-104 transition-transform duration-300 ease-in-out">
               <img
                 src={item.logo}
                 alt="Logo"
@@ -52,7 +58,7 @@ export default function Card({ cardData }) {
 
               <div className="flex flex-col">
                 <h1
-                  className={`ml-4 mt-1  text-[14px] font-bold ${
+                  className={`ml-4 mt-1  text-[14px] font-bold  ${
                     [2, 5].includes(index) || index >= cardData.length - 3
                       ? "pt-1.5"
                       : ""
@@ -64,7 +70,7 @@ export default function Card({ cardData }) {
                 <div
                   className={`w-[255px] h-[90px] bg-[#33C6F470] p-3 mt-4 ml-[-29px]  rounded-[10px]  ${
                     [2, 5].includes(index) || index >= cardData.length - 3
-                      ? "mt-5"
+                      ? "mt-7"
                       : ""
                   } `}
                 >
@@ -72,9 +78,12 @@ export default function Card({ cardData }) {
                 </div>
               </div>
             </div>
+            </motion.div>
           </div>
+        
         ))}
       </div>
+      
     </>
   );
 }
