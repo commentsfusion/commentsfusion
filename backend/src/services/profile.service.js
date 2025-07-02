@@ -3,17 +3,17 @@ const ApiError = require('../utils/apiError');
 const httpStatus = require('http-status').default;
 const { JSDOM } = require('jsdom');
 const OpenAI = require('openai');
+const config = require('../config/config');
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: config.openai.apiKey });
+
+console.log("🤖 [profile.service] config.openai.apiKey = ", config.openai.apiKey);
 
 async function checkUserExists(userId, linkedinUsername) {
   const exists = await Profile.exists({ user: userId, linkedinUsername });
   return Boolean(exists);
 }
 
-/**
- * Parse the LinkedIn profile HTML into fields and upsert into Mongo.
- */
 async function upsertProfileData(/*userId,*/ linkedinUsername, html) {
   const dom = new JSDOM(html);
   const doc = dom.window.document;

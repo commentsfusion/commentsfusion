@@ -4,7 +4,6 @@ const Joi = require("joi");
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
-// 1) Define your environment variables and their validation rules
 const envSchema = Joi.object({
   NODE_ENV: Joi.string()
     .valid("production", "development", "test")
@@ -37,11 +36,15 @@ const envSchema = Joi.object({
     .description("Use TLS/SSL for SMTP?"),
   SMTP_USER: Joi.string().required().description("SMTP auth user"),
   SMTP_PASS: Joi.string().required().description("SMTP auth password"),
+
+  OPENAI_API_KEY: Joi.string()
+    .pattern(/^sk-/)
+    .required()
+    .description("OpenAI API key"),
 })
-  .unknown() // allow other vars if you need
+  .unknown()
   .required();
 
-// 2) Validate process.env against the schema
 const { value: envVars, error } = envSchema
   .prefs({ errors: { label: "key" } })
   .validate(process.env);
@@ -49,13 +52,12 @@ if (error) {
   throw new Error(`❌ Config validation error: ${error.message}`);
 }
 
-// 3) Export a structured config object
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
 
   mongo: {
-    uri: envVars.MONGO_URI_DEV
+    uri: envVars.MONGO_URI_DEV,
   },
 
   jwt: {
@@ -77,6 +79,9 @@ module.exports = {
         pass: envVars.SMTP_PASS,
       },
     },
+  },
+  openai: {
+    apiKey: envVars.OPENAI_API_KEY,
   },
 };
 

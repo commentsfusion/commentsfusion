@@ -89,8 +89,10 @@ exports.login = async (req, res, next) => {
     return res
       .cookie("auth_token", token, {
         httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "none" : "lax",
+        //secure: isProd,
+        //sameSite: isProd ? "none" : "lax",
+        secure: false,
+        sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       })
       .json({

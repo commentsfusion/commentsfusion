@@ -1,8 +1,8 @@
 // src/controllers/profile.controller.js
-const httpStatus = require('http-status').default;
-const ApiError = require('../utils/apiError');
+const httpStatus = require("http-status").default;
+const ApiError = require("../utils/apiError");
 
-const {profileService} = require('../services');
+const { profileService } = require("../services");
 
 /*exports.checkUserExists = async (req, res, next) => {
   try {
@@ -22,7 +22,10 @@ exports.extractProfileData = async (req, res, next) => {
     const { userID: linkedinUsername, html } = req.body;
     //const profile = await profileServices.upsertProfileData(userId, linkedinUsername, html);
 
-    const profile = await profileService.upsertProfileData(linkedinUsername, html);
+    const profile = await profileService.upsertProfileData(
+      linkedinUsername,
+      html
+    );
     res.json(profile);
   } catch (err) {
     next(err);
@@ -47,6 +50,16 @@ exports.generateReply = async (req, res, next) => {
     });
     res.json({ reply });
   } catch (err) {
-    next(err);
+    //next(err);
+
+    console.error("generateReply error:", err);
+
+    // If it’s the OpenAI “quota exceeded” RateLimitError
+    if (err.code === "insufficient_quota" || err.status === 429) {
+      return res.status(429).json({ error: err.error?.message || err.message });
+    }
+
+    // For any other failure, give a generic message
+    return res.status(500).json({ error: "An unexpected error occurred" });
   }
 };

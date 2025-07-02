@@ -1,4 +1,8 @@
-require('dotenv').config();
+//require('dotenv').config();
+require('dotenv').config({
+  path: require('path').join(__dirname, './.env'),
+  override: true
+});
 const express = require('express');
 const session = require('express-session');   
 const cors = require('cors');
