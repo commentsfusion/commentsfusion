@@ -1,5 +1,6 @@
 // models/Profile.js
 const mongoose = require("mongoose");
+const commentSchema = require("./comments");
 
 const profileSchema = new mongoose.Schema({
   user: {
@@ -20,6 +21,23 @@ const profileSchema = new mongoose.Schema({
   location: String,
   about: String,
   services: String,
+
+  connections: {
+    type: Number,
+    default: 0,
+    description: "Number of LinkedIn connections",
+  },
+  followers: {
+    type: Number,
+    default: 0,
+    description: "Number of LinkedIn followers",
+  },
+
+  comments: {
+    type: [commentSchema],
+    default: [],
+    description: 'Array of comments associated with this profile',
+  },
 
   experience: [
     {

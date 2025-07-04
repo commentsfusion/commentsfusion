@@ -7,14 +7,12 @@ const config = require('../config/config');
 
 const openai = new OpenAI({ apiKey: config.openai.apiKey });
 
-console.log("🤖 [profile.service] config.openai.apiKey = ", config.openai.apiKey);
-
 async function checkUserExists(userId, linkedinUsername) {
   const exists = await Profile.exists({ user: userId, linkedinUsername });
   return Boolean(exists);
 }
 
-async function upsertProfileData(/*userId,*/ linkedinUsername, html) {
+async function upsertProfileData(userId, linkedinUsername, html) {
   const dom = new JSDOM(html);
   const doc = dom.window.document;
 
@@ -23,6 +21,12 @@ async function upsertProfileData(/*userId,*/ linkedinUsername, html) {
   const tagLine = doc.querySelector('.top-card-background-hero-image + .ph5 div.text-body-medium.break-words')?.textContent.trim() || '';
   const location = doc.querySelector('.top-card-background-hero-image + .ph5 span.text-body-small.inline.break-words')?.textContent.trim() || '';
   const about = doc.querySelector('#about ~ .display-flex.ph5.pv3 span[aria-hidden]')?.textContent.trim() || '';
+
+  const topCardList = doc.querySelectorAll('.pv-top-card--list > li');
+  const connections = topCardList[2]?.textContent.trim() || '';
+  
+  const followersEl = doc.querySelector('.pv-top-card--list-bullet > li');
+  const followers = followersEl?.textContent.trim() || '';
 
   // Helper to extract list items and join
   function extractList(selector, transform = node => node.textContent.trim()) {
@@ -71,6 +75,8 @@ async function upsertProfileData(/*userId,*/ linkedinUsername, html) {
     tag_line: tagLine,
     location,
     about,
+    connections,
+    followers,
     services: services.join(' • '),
     experience,
     education,
@@ -81,17 +87,24 @@ async function upsertProfileData(/*userId,*/ linkedinUsername, html) {
   };
 
   const profile = await Profile.findOneAndUpdate(
-    { /*user: userId,*/ linkedinUsername },
+     { user: userId, linkedinUsername },
+     {
+       $set: { ...data, linkedinUsername },
+       $setOnInsert: { user: userId },
+       $currentDate: { updatedAt: true }
+     },
+     { upsert: true, new: true, setDefaultsOnInsert: true }
+   );
+
+  /*const profile = await Profile.findOneAndUpdate(
+    { user: userId, linkedinUsername },
     { $set: data, $currentDate: { updatedAt: true } },
     { upsert: true, new: true, setDefaultsOnInsert: true }
-  );
+  );*/
 
   return profile;
 }
 
-/**
- * Generate an AI-powered reply using both your profile & target’s profile.
- */
 async function generateReply({ userId, targetLinkedInUsername, postContent, promptTone, commentThread }) {
   // load my profile
   const myProfile = await Profile.findOne({ user: userId });

@@ -20,4 +20,10 @@ router.post(
   asyncHandler(profileController.generateReply)
 );
 
+router.get(
+  '/exists/:linkedinUsername',
+  protect,
+  asyncHandler(profileController.checkProfileExists)
+);
+
 module.exports = router;
