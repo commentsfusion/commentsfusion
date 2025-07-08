@@ -9,7 +9,7 @@ export default function LinkedIn_EngagementStrategy() {
   return (
   <>
   {/* <div> */}
-  <div className="bg-black min-h-screen px-4 py-10 bg-[linear-gradient(to_bottom,#000000,#33C6F4)] bg-fixed relative z-[1]">
+  <div className="bg-black min-h-screen px-4 py-10   bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed relative z-[1]">
   <Navbar />
   <StrategyCard />
   <PeopleLinkedin />

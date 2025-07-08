@@ -33,9 +33,9 @@ export default function FeaturesSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl font-bold mb-4">
+          <h2 className="text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-3xl">
             Powerful Features to Supercharge Your <br/>
-            <span className="text-white">Client Acquisition</span>
+            <span className="text-[#33C6F4]">Client Acquisition</span>
           </h2>
         </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

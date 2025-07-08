@@ -12,7 +12,7 @@ import Footer from "../components/landingPage_components/Footer";
 function Features() {
   return (
 <>
- <div className="bg-black min-h-screen  py-10 bg-[linear-gradient(to_bottom,_#000000_45%,_#33C6F4_100%)] bg-fixed ">
+ <div className="bg-black min-h-screen  py-10 bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed ">
 <Navbar/>
 <Linkedin_Guaranteed/>
 <FeaturesCards/>

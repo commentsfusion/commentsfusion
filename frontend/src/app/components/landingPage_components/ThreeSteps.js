@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 
 export default function ThreeSteps() {
   return (
-    <section className="text-white px-2 sm:px-6">
-      <div className="max-w-4xl mx-auto text-center mb-10 sm:mb-16">
+    <section className="text-white px-2 sm:px-6 ">
+
+      <div className="max-w-4xl mx-auto text-center mb-10 max-lg:mb-4 max-lg:mt-[-150px]  ">
         <motion.h3
           initial={{ opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-2xl sm:text-5xl font-bold"
+          className="text-5xl font-bold max-lg:text-4xl max-md:text-3xl text-[#33C6F4]"
         >
           3 Simple Steps To Create
         </motion.h3>
@@ -18,13 +19,29 @@ export default function ThreeSteps() {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl sm:text-5xl font-bold"
+          className="text-5xl max-lg:text-4xl max-md:text-3xl font-bold"
         >
           Highly Engaging Comments
         </motion.h2>
       </div>
 
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12">
+
+{/* <  maxlg heaing  */}
+      <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+         <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl text-center   font-bold ">
+            <span className="text-cyan-400 text-4xl max-lg:text-xl max-md:text-xl">➞</span>
+            AI-Powered Smart Commenting for LinkedIn
+          </h2>
+          </motion.div>
+
+
+
+
+      <div className=" max-w-7xl mx-auto flex  lg:flex-row items-center mt-15 max-lg:mt-2 justify-between gap-8 sm:gap-12">
         {/* Text Section */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -32,33 +49,33 @@ export default function ThreeSteps() {
           transition={{ duration: 0.6 }}
           className="flex-1"
         >
-          <h2 className="text-white text-3xl md:text-4xl font-bold mb-6 flex items-center gap-3">
-            <span className="text-cyan-400 text-4xl">➞</span>
+          <h2 className=" text-white text-4xl  max-lg:hidden   font-bold mb-6 flex items-center gap-3 ">
+            <span className="text-cyan-400 text-4xl max-lg:text-xl max-md:text-xl">➞ </span>
             AI-Powered Smart Commenting for LinkedIn
           </h2>
 
-          <p className="text-gray-300 text-lg mb-6">
-            Boost your engagement effortlessly with the Smart Comment button!
+          <p className=" text-lg max-lg:text-[17px] max-md:text-[13px] max-lg:mb-4 mb-6  ">
+             Boost your engagement effortlessly with the Smart Comment button!
             Let AI generate personalized, relevant comments in just one click.
           </p>
 
-          <ul className="space-y-4 text-base text-gray-300 mb-8">
-            <li>🔹 <strong>Instant Engagement</strong> – A smart comment button under every post</li>
-            <li>🔹 <strong>Customizable Tones</strong> – Choose from enlightenment, insight, self intro and convert to DM</li>
-            <li>🔹 <strong>Automated Outreach</strong> – Engage with 50+ posts daily while staying authentic</li>
-            <li>🔹 <strong>Targeted Interactions</strong> – Connect with industry leaders & prospects instantly</li>
+          <ul className="space-y-4 text-base mb-8 max-lg:mb-4 max-lg:text-[15px] max-md:text-[13px]">
+            <li>🔹 Instant Engagement A smart comment button under every post</li>
+            <li>🔹 Customizable Tones Choose from enlightenment, insight, self intro and convert to DM</li>
+            <li>🔹 Automated Outreach Engage with 50+ posts daily while staying authentic</li>
+            <li>🔹 Targeted Interactions Connect with industry leaders & prospects instantly</li>
           </ul>
 
-          <p className="text-lg mb-4">Click, Comment, Convert! Let AI handle engagement while you focus on closing deals.</p>
+          <p className="text-lg max-lg:text-[16px] max-md:text-[13px] max-lg:mb-[-10px]">Click, Comment, Convert! Let AI handle engagement while you focus on closing deals.</p>
 
-          <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 ">
-            <img
-              src="/images/landing-page/chrome.svg"
-              alt="Chrome Icon"
-              className="w-5 h-5 inline-block align-middle"
-            />
-            Download Free Chrome Extension
-          </button>
+            <button className="cursor-pointer max-lg:hidden   bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3     rounded-full transition duration-300 shadow-md   gap-2 mx-auto my-6 w-full sm:w-auto">
+        <img
+          src="/images/landing-page/chrome.svg"
+          alt="Chrome Icon"
+          className="w-5 h-5 inline-block align-middle mr-1.5 mt-[-3.5px]"
+        />
+        Download Free Chrome Extension
+      </button>
         </motion.div>
 
         {/* Image Section */}
@@ -79,6 +96,22 @@ export default function ThreeSteps() {
           </div>
         </motion.div>
       </div>
+      {/* <  maxlg btn  */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+           <button className="cursor-pointer hidden max-lg:block mt-8   bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3  max-lg:text-[13px] max-md:text-[12px] max-md:px-4 max-md:py-3  rounded-full transition duration-300 shadow-md   gap-2 mx-auto my-6 w-full sm:w-auto">
+        <img
+          src="/images/landing-page/chrome.svg"
+          alt="Chrome Icon"
+          className="w-5 h-5 inline-block align-middle mr-1.5 mt-[-3.5px]"
+        />
+        Download Free Chrome Extension
+      </button>
+      
+      </motion.div>
     </section>
   );
 }

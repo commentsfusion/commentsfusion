@@ -12,7 +12,7 @@ import FaqSection from "../components/pricing_components/FAQSection";
 const PricingPage = () => {
   return (
     
-    <div className="bg-black min-h-screen px-4 py-10 bg-[linear-gradient(to_bottom,#000000,#33C6F4)] bg-fixed">
+    <div className="bg-black min-h-screen px-4 py-10 bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed">
       <Navbar />
       <Header />
       <PricingSection />
@@ -21,7 +21,6 @@ const PricingPage = () => {
       <StrategicCommentingSection/>
       <SocialInsightsSection/>
       <FaqSection />
-      {/* Add any additional sections here */}
       <Footer/>
 
     </div>

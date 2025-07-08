@@ -1,3 +1,4 @@
+
 import Layout from "../components/layout";
 import Card from "../components/help_components/card";
 export default function HelpPage({

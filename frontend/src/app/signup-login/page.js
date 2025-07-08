@@ -495,7 +495,7 @@ export default function AuthPage() {
           strategy="afterInteractive"
         />
       </>
-      <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,#000000,#33C6F4)]">
+      <div className="relative min-h-screen flex bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)]">
         <ToastContainer
           position="top-right"
           autoClose={5000}

@@ -6,16 +6,16 @@ export default function HeroText() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
-      className="text-center max-w-3xl z-10 mt-45 mx-auto px-4 sm:px-0"
+      className="text-center max-w-3xl z-10 mt-45 mx-auto px-4 sm:px-0 max-md:w-[80%] max-lg:mt-40  max-md:mt-35"
     >
-      <h1 className="text-3xl sm:text-5xl font-bold leading-tight">
+      <h1 className="text-5xl font-bold leading-tight max-lg:text-4xl max-md:text-3xl ">
         Automate 200+ Comments & Turn
         <span className="text-[#33C6F4]"> Engagement to Revenue !</span>
       </h1>
-      <p className="mt-6 text-base sm:text-lg text-gray-300">
+      <p className="mt-6 text-lg text-gray-300  max-lg:text-[17px]  max-md:text-[14px] max-md:mt-4">
         Never miss a client! Automate comments, Capture leads,<br className="hidden sm:block" />Grow with AI.
       </p>
-      <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-3 sm:px-6 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 mx-auto my-6 w-full sm:w-auto">
+      <button className="cursor-pointer bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3  max-lg:text-[13px] max-md:text-[12px] max-md:px-3 max-md:py-2.5  rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 mx-auto my-6 w-full sm:w-auto">
         <img
           src="/images/landing-page/chrome.svg"
           alt="Chrome Icon"
@@ -23,7 +23,7 @@ export default function HeroText() {
         />
         Download Free Chrome Extension
       </button>
-      <p className="mt-3 text-xs sm:text-sm text-gray-200">No credit card required</p>
+      <p className="mt-3 text-sm text-gray-200 max-md:text-[14px]">No credit card required</p>
     </motion.div>
   );
 }
