@@ -161,7 +161,7 @@ const StrategicCommentingSection = () => {
           Prospects Monitoring
         </div>
         <div className="overflow-hidden">
-          <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))] text-white text-sm font-semibold"></div>
+          {/* <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))] text-white text-sm font-semibold"></div> */}
           <div className="text-white text-sm mt-5">
             {prospectsFeatures.map((feature, idx) => (
               <div key={idx} className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
