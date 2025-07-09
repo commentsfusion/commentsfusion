@@ -30,6 +30,7 @@ export default function Navbar() {
               key={idx}
               href={ item === "Pricing" ? "/pricing" : item === "Features" ? "/features" : item === "About us"  ? "/about-us" : item === "Contact us" ? "/contact-us" : "/"}
               className="text-white hover:text-cyan-400 transition-colors text-base font-medium max-lg:text-[15.5px] max-md:text-[14px] "
+              
             >
               {item}
             </Link>
