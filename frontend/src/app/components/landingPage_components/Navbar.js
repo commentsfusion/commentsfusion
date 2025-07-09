@@ -28,7 +28,8 @@ export default function Navbar() {
           {["Home", "Features", "Pricing", "About us", "Contact us"].map((item, idx) => (
             <Link
               key={idx}
-              href={item === "Pricing" ? "/pricing" : item === "Features" ? "/features" : item === "Home" ? "/" : "#"}
+              // href={item === "Pricing" ? "/pricing" : item === "Features" ? "/features" : item === "Home" ? "/" : "#"}
+              href={ item === "Pricing" ? "/pricing" : item === "Features" ? "/features" : item === "About us"  ? "/about-us" : item === "Contact us" ? "/contact-us" : "/"}
               className="text-white hover:text-cyan-400 transition-colors text-base font-medium"
             >
               {item}
@@ -55,7 +56,8 @@ export default function Navbar() {
           {["Home", "Features", "Pricing", "About us", "Contact us"].map((item, idx) => (
             <Link
               key={idx}
-              href={item === "Pricing" ? "/pricing" :  item === "Features" ? "/features" : item === "Home" ? "/" : "#"}
+              // href={item === "Pricing" ? "/pricing" :  item === "Features" ? "/features" : item === "Home" ? "/" : "#"}
+              href={item === "Pricing" ? "/pricing" : item === "Features" ? "/features" : item === "About us" ? "/about-us"  : item === "Contact us"  ? "/contact-us" : "/" }
               className="text-white hover:text-cyan-400 transition-colors text-base font-medium"
               onClick={() => setMobileOpen(false)}
             >
