@@ -10,14 +10,7 @@ const {
 const {
   handleValidationErrors,
 } = require("../middleware/handleValidationErrors");
-const {
-  sendVerificationCode,
-  verifySignup,
-  login,
-  requestPasswordReset,
-  verifyPasswordOTP,
-  resetPassword
-} = require("../controllers/auth.controller");
+const {authController} = require('../controllers');
 const passport = require("passport");
 const { signToken } = require("../utils/auth");
 const rateLimit = require("express-rate-limit");
@@ -42,7 +35,7 @@ router.post(
   ...sendCodeRules,
   handleValidationErrors,
   recaptchaFallback("signup"),
-  asyncHandler(sendVerificationCode)
+  asyncHandler(authController.sendVerificationCode)
 );
 
 router.post(
@@ -50,7 +43,7 @@ router.post(
   attemptLimiter,
   ...verifyOTPRules,
   handleValidationErrors,
-  asyncHandler(verifySignup)
+  asyncHandler(authController.verifySignup)
 );
 
 router.post(
@@ -59,7 +52,7 @@ router.post(
   ...loginRules,
   handleValidationErrors,
   recaptchaFallback("login"),
-  asyncHandler(login)
+  asyncHandler(authController.login)
 );
 
 router.get(
@@ -84,7 +77,7 @@ router.post(
   attemptLimiter,
   ...forgotPasswordRules,
   handleValidationErrors,
-  asyncHandler(requestPasswordReset)
+  asyncHandler(authController.requestPasswordReset)
 );
 
 router.post(
@@ -92,7 +85,7 @@ router.post(
   attemptLimiter,
   ...verifyOTPRules,
   handleValidationErrors,
-  asyncHandler(verifyPasswordOTP)
+  asyncHandler(authController.verifyPasswordOTP)
 );
 
 router.post(
@@ -100,7 +93,7 @@ router.post(
   attemptLimiter,
   ...resetPasswordRules,
   handleValidationErrors,
-  asyncHandler(resetPassword)
+  asyncHandler(authController.resetPassword)
 );
 
 module.exports = router;
