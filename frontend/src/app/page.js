@@ -13,22 +13,26 @@ import AIGeneratedSmartComments from "./components/landingPage_components/AIGene
 import MonitorEngagement from "./components/landingPage_components/MonitorEngagement";
 import FAQSection from "./components/landingPage_components/FAQSection";
 import Footer from "./components/landingPage_components/Footer";
+import NewfeaturesSection from "./components/landingPage_components/newfeaturesSection";
+import PeopleReviews from "./components/landingPage_components/peopleReviews";
 
 export default function HomePage() {
   return (
-    <main className="bg-[linear-gradient(to_bottom,#000000,#33C6F4)] bg-fixed">
+    <main className="bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed overflow-x-hidden">
       <Navbar />
-      <section className="min-h-screen flex flex-col justify-center items-center text-white relative overflow-hidden">
+      <section className="min-h-screen flex flex-col justify-center items-center text-white relative overflow-hidden ">
         <HeroText />
         <DecorativeBirds />
         <Reviews />
       </section>
-      <FeaturesSection />
+      {/* <FeaturesSection /> */}
+      <NewfeaturesSection/>
       <LeadConversionFlow />
       <ThreeSteps/>
       <OneClickCommenting/>
       <AIGeneratedSmartComments/>
       <MonitorEngagement/>
+      <PeopleReviews/>
       <FAQSection/>
       <Footer/>
     </main>

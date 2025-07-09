@@ -5,27 +5,27 @@ import { motion } from "framer-motion";
 function Multi_userPlan() {
   return (
     <div>
-      <h1 className="text-5xl font-bold text-center pt-35 ">
+      <h1 className="text-5xl font-bold text-center pt-35 max-lg:text-4xl max-md:text-3xl">
         Multi-User Plan{" "}
       </h1>
-      <h2 className="text-[23px] mt-3 font-bold text-center">
+      <h2 className="text-[23px] mt-3 font-bold text-center max-lg:text-[20px] max-md:text-[18px]">
         Designed for agencies, communities, and business networks
       </h2>
-      <div className="flex justify-evenly mt-8 gap-34">
-        <img src="images/features/downleftArrow.svg" className="w-10 h-10" />
-        <img src="images/features/downrightArrow.svg" className="w-10 h-10" />
+      <div className="flex justify-evenly mt-8 gap-[8%] max-lg:gap-[30%] ">
+        <img src="images/features/downleftArrow.svg" className="w-10 h-10 max-lg:w-8 max-lg:h-8" />
+        <img src="images/features/downrightArrow.svg" className="w-10 h-10 max-lg:w-8 max-lg:h-8" />
       </div>
 
 
-      <div className="flex justify-center gap-34 mt-7">
+      <div className="flex justify-center gap-34 max-lg:gap-[15%] mt-7 max-lg:mt-5">
 
-      <div className="relative w-60 h-60  ">
+      <div className="relative w-60 h-60 max-lg:w-52 max-lg:h-52 max-md:w-46 max-md:h-46">
         <img
           src="images/features/hexagon.svg"
           className="w-full h-full"
           alt="hexagon"
         />
-        <div className="absolute inset-0 flex items-center text-center text-[15px] justify-center mt-1 text-white font-semibold">
+        <div className="absolute inset-0 flex items-center text-center text-[16px] justify-center mt-1 text-white max-lg:text-[14px] max-md:text-[12.5px]">
           Get unlimited client
           <br />
           access to our LinkedIn
@@ -40,16 +40,16 @@ function Multi_userPlan() {
         </div>
       </div>
 
-      <img src="/images/features/eqauls.svg" className="w-13 "/>
+      <img src="/images/features/eqauls.svg" className="w-13 max-lg:w-10 "/>
 
 
-       <div className="relative w-60 h-60  ">
+       <div className="relative w-60 h-60  max-lg:w-52 max-lg:h-52 max-md:w-46 max-md:h-46">
         <img
           src="images/features/hexagon.svg"
           className="w-full h-full"
           alt="hexagon"
         />
-        <div className="absolute inset-0 flex items-center  text-[15px] text-center justify-center mt-1 text-white font-semibold">
+        <div className="absolute inset-0 flex items-center  text-[16px] text-center justify-center mt-1 text-white max-lg:text-[14px] max-md:text-[12.5px]">
           This isn’t limited to
           <br />
          LinkedIn coaches or
@@ -66,7 +66,8 @@ function Multi_userPlan() {
 
       </div>
       <motion.div whileTap={{ scale: 0.95 }}>
-        <button className="w-[380px] h-[38px] italic bg-[linear-gradient(to_right,#33C6F4,#1E738E)] flex justify-center items-center  text-[16px] rounded-[10px] mt-10 cursor-pointer mx-auto font-semibold	hover:scale-104  transition-transform duration-300 ease-in-out">
+        <button className="w-[330px] h-[38px] max-lg:h-[35px] max-lg:w-[300px] max-md:w-[260px] bg-[linear-gradient(to_right,#33C6F4,#1E738E)] flex justify-center items-center italic  text-[17px] max-lg:text-[16px] max-md:text-[15px] rounded-[10px] mt-12 max-lg:mt-8  cursor-pointer mx-auto font-semibold	hover:scale-104  transition-transform duration-300 ease-in-out">
+
          Explore Team Plans
         </button>
       </motion.div>
@@ -76,9 +77,4 @@ function Multi_userPlan() {
 }
 
 export default Multi_userPlan;
-//  <div className="relative w-40 h-40 mx-auto">
-//   <img src="images/features/hexagon.svg" className="w-full h-full" alt="hexagon" />
-//   <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
-//     Your Text
-//   </div>
-// </div>
+

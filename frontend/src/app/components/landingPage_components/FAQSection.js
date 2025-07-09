@@ -35,11 +35,11 @@ export default function FAQSection() {
 
   return (
     <section className="text-white py-12 sm:py-20 px-2 sm:px-6">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-between gap-8 sm:gap-12">
+      <div className="max-w-7xl mx-auto flex flex-row items-start justify-between gap-12 ">
 
         {/* FAQ Content */}
         <div className="w-full lg:w-2/3">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center lg:text-left mb-8 sm:mb-12">
+          <h2 className="text-5xl max-lg:text-4xl max-md:text-3xl  font-bold text-center  mb-8">
             FAQ's
           </h2>
 
@@ -50,20 +50,20 @@ export default function FAQSection() {
                 className="border border-white/30 rounded-xl transition-all duration-300"
               >
                 <button
-                  className="w-full text-left p-5 flex items-center gap-4 text-white font-semibold text-lg hover:bg-white/10"
+                  className="w-full text-left p-5 max-md:py-3.5 max-md:px-4 flex rounded-xl items-center gap-4 max-md:gap-2 text-white font-semibold text-lg hover:bg-white/10"
                   onClick={() => toggleFAQ(index)}
                 >
                   <span className="text-2xl text-cyan-400">
                     {openIndex === index ? "−" : "+"}
                   </span>
-                  <span>{faq.question}</span>
+                  <span className="text-[18px] max-lg:text-[15px] max-md:text-[13px]">{faq.question}</span>
                 </button>
                 {openIndex === index && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="p-5 pt-0 text-gray-300 text-base leading-relaxed"
+                    className="p-5 pt-0text-[15.5px] max-lg:text-[14px] max-md:text-[13px]"
                   >
                     {faq.answer}
                   </motion.div>
@@ -75,7 +75,7 @@ export default function FAQSection() {
 
         {/* Bot Image with Floating Animation */}
         <motion.div
-          className="w-full lg:w-1/3 flex justify-center items-start pt-6 lg:pt-20"
+          className=" lg:w-1/3 flex justify-center items-start pt-45 "
           animate={{
             y: [0, -180, 0],
           }}
@@ -88,7 +88,7 @@ export default function FAQSection() {
           <img
             src="images/landing-page/faq-bot.svg"
             alt="FAQ Bot"
-            className="w-full max-w-xs sm:w-[420px] sm:h-[300px] object-contain"
+            className=" w-[420px] max-lg:w-[240px] max-md:w-[175px] h-[300px] object-contain"
           />
         </motion.div>
       </div>

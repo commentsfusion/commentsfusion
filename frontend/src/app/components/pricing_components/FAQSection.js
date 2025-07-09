@@ -67,7 +67,7 @@ const FaqSection = () => {
     };
 
     return (
-        <section className="w-full -mt-5 px-25 mb-25 mt-20">
+        <section className="w-full -mt-5  mb-25 mt-20">
             <div className="w-full bg-[#0D1A20] text-white rounded-[2rem] p-8 md:p-12 shadow-xl">
                 <h2 className="text-2xl md:text-5xl font-bold text-center mb-6">FAQ’s</h2>
                 <div className="divide-y divide-white/50">

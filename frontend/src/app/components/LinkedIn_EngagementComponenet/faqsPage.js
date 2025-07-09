@@ -26,8 +26,8 @@ export default function FaqsPage({ currentPage }) {
       transition={{ duration: 0.8 }}
     >
       <div className="w-full flex flex-col items-center pt-24 gap-6">
-        <div className="w-[60%] bg-[#000000] opacity-80 rounded-[10px] py-10 pb-16 px-8 text-white">
-          <h1 className="text-center text-3xl font-bold text-white mb-4">
+        <div className="w-[90%] max-lg:w-[94%] max-md:w-[95%] bg-[#000000] opacity-80 rounded-[60px] py-10 pb-16 px-8 text-white">
+          <h1 className="text-center text-[42px] max-lg:text-[34px] max-md:text-[28px] font-bold text-white mb-4">
             FAQ’s
           </h1>
 
@@ -37,9 +37,9 @@ export default function FaqsPage({ currentPage }) {
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleFAQ(item.id)}
               >
-                <h2 className="text-lg">{item.title}</h2>
+                <h2 className="text-[19.5px] max-lg:text-[17px] max-md:text-[15px]">{item.title}</h2>
                 <img
-                  className={`w-6 h-6 transform transition-transform duration-300 ${
+                  className={`w-6 h-6 max-md:w-5 max-md:h-5  transform transition-transform duration-300 ${
                     openId === item.id ? "rotate-180" : ""
                   }`}
                   src="/images/LinkedIn_EngagementStrategy/downArrow.svg"
@@ -51,7 +51,7 @@ export default function FaqsPage({ currentPage }) {
 
               {openId === item.id && (
                 <div>
-                  <h2 className="mt-3 transition-opacity duration-300 mb-7 pr-15">
+                  <h2 className="mt-3 transition-opacity duration-300 mb-7 pr-15 max-lg:text-[13.5px] max-md:text-[12px]">
                     {item.Description}
                   </h2>
                   <hr className="my-3 border-gray-400" />

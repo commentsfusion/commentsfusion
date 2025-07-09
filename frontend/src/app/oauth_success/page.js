@@ -21,7 +21,7 @@ export default function OAuthSuccessPage() {
       className="
         min-h-screen
         flex items-center justify-center
-        bg-[linear-gradient(to_bottom,#000000,#33C6F4)] bg-fixed
+        bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed
       "
     >
       <div

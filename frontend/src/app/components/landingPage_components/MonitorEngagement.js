@@ -1,16 +1,24 @@
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function MonitorEngagement() {
   return (
     <section className="text-white py-12 sm:py-20 px-2 sm:px-6">
       <div className="max-w-7xl mx-auto flex flex-col items-center gap-8 sm:gap-12">
         {/* Heading */}
-        <h2 className="text-white text-2xl sm:text-4xl md:text-5xl font-bold text-center">
-          Monitor Engagement & <span className="text-white">Prospects</span>
+         <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+         
+        >
+        <h2 className="text-white text-5xl max-lg:text-4xl max-md:text-3xl font-bold text-center">
+          Monitor Engagement & <span className="text-[#33C6F4]">Prospects</span>
         </h2>
+        </motion.div>
 
         {/* Text */}
-        <p className="text-gray-300 text-base sm:text-lg leading-relaxed text-center max-w-3xl">
+        <p className=" text-lg w-[87%] max-lg:text-[16px] max-md:text-[13px] max-lg:w-[95%] ">
           Stay ahead by tracking and aggregating all your LinkedIn interactions in one place. Leverage AI-powered insights to analyze engagement, track AI-generated comments, and receive real-time notifications when someone interacts with your posts. Gain actionable analytics on likes, replies, and overall performance to refine your strategy and boost visibility. With secure data handling and AI-driven suggestions, you can optimize your engagement approach, build meaningful connections.
         </p>
 
@@ -27,14 +35,14 @@ export default function MonitorEngagement() {
         </div>
 
         {/* Button */}
-        <button className="bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-4 py-3 sm:px-6 rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 mx-auto my-6 w-full sm:w-auto">
-          <img
-            src="/images/landing-page/chrome.svg"
-            alt="Chrome Icon - Download the free Chrome extension for enhanced LinkedIn engagement tracking."
-            className="w-5 h-5 inline-block align-middle"
-          />
-          Download Free Chrome Extension
-        </button>
+         <button className="cursor-pointer bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3  max-lg:text-[13px] max-md:text-[12px] max-md:px-3 max-md:py-2.5  rounded-full transition duration-300 shadow-md flex items-center justify-center gap-2 mx-auto my-6 w-full sm:w-auto">
+        <img
+          src="/images/landing-page/chrome.svg"
+          alt="Chrome Icon"
+          className="w-5 h-5 inline-block align-middle"
+        />
+        Download Free Chrome Extension
+      </button>
       </div>
     </section>
   );

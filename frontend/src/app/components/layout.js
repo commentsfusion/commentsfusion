@@ -9,12 +9,13 @@ export default function Layout({ children }) {
     <div
       className="
         flex flex-col h-screen text-white
-        bg-[linear-gradient(to_bottom,#000000,#33C6F4)]
+       bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)]
         bg-cover bg-center max-h-screen
         overflow-y-auto
         p-4
         space-y-4
       "
+      // old bg     bg-[linear-gradient(to_bottom,#000000,#33C6F4)]
     >
       {/* Full-width Topbar */}
       <header className="w-full">
