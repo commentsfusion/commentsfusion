@@ -1,9 +1,9 @@
 "use client";
-import React from "react";
 import { useParams } from "next/navigation";
-
 import Main_Handle from "src/app/components/help_components/handle";
 import Layout from "src/app/components/layout";
+import MobileLayout from "src/app/components/mobileLayout";
+import { useEffect, useState } from "react";
 
 const allData = [
   {
@@ -12,10 +12,10 @@ const allData = [
     secondTitle: "This brief guide will assist you in getting started.",
     Data: [
       { p: "Consultation Hours." },
-      { p: "Enable your account and link the Chrome extension with your LinkedIn profile."},
+      { p: "Enable your account and link the Chrome extension with your LinkedIn."},
       { p: "Instructions for Leveraging Comments Fusion on LinkedIn." },
       { p: "Steps to Create and Update Communication Tones." },
-      { p: "I’ve connected with prospects. How should I proceed?" },
+      { p: "I've connected with prospects. How should I proceed?" },
       { p: "Guidelines for Sending Your First LinkedIn Message." },
       {
         id: 7,
@@ -46,7 +46,7 @@ const allData = [
     title: "Segment, Track, and Cultivate",
     secondTitle:
       "Ensure timely prospect outreach and cultivate relationships that convert into revenue",
-    thirdTitle: "Oversight and Coordination of Multiple LinkedIn Accounts",
+    thirdTitle: " Coordination of Multiple LinkedIn Accounts",
 
     Data: [
       { p: "What Does Prospect Monitoring Involve and How Is It Implemented?" },
@@ -57,7 +57,7 @@ const allData = [
     ],
     Data2: [
       {
-        p: "Does Comments Fusion allow managing multiple LinkedIn accounts under one login?",
+        p: "Does it allow managing multiple LinkedIn accounts under one login?",
       },
       { p: "Coordinate and Manage Several LinkedIn Accounts." },
       { p: "Multiple Users Overseeing the Same LinkedIn Account." },
@@ -92,10 +92,10 @@ const allData = [
         p: "Steps to Disable the LinkedIn Newsfeed Announcement Notification.",
       },
       {
-        p: "Steps to Configure Your Native Language as the Default for Comment Creation.",
+        p: "Steps to Configure Your native language as the default.",
       },
       {
-        p: "an Comments Fusion Be Used Across Multiple Social Media Platforms?",
+        p: "Can Comments Fusion Be Used Across Multiple Social Media Platforms?",
       },
       {
         p: "How to Ensure Your Chrome Extension and Edge Add-On Are Up to Date.",
@@ -139,14 +139,14 @@ const allData = [
 
     Data: [
       {
-        p: "Connect HubSpot + Comments Fusion + LinkedIn = Effortless Lead Generation.",
+        p: "Comments Fusion + LinkedIn = Effortless Lead Generation.",
       },
       {
         p: "Supercharge LinkedIn Prospecting with Pipedrive and Comments Fusion.",
       },
       { p: "Level Up LinkedIn Engagement with Hootsuite and Comments Fusion." },
       {
-        p: "Zoho CRM + Comments Fusion + LinkedIn = Smarter Prospecting, Faster Conversions.",
+        p: "Comments Fusion + LinkedIn = Smarter Prospecting, Faster Conversions.",
       },
     ],
     Data2: [
@@ -168,15 +168,15 @@ const allData = [
       },
       { p: "What Is the Status of My Account Post-Trial?" },
       { p: "Can I Request an Extension for My Free Trial?" },
-      { p: "Want to Use a New Email? Here’s How to Update It." },
+      { p: "Want to Use a New Email? Here's How to Update It." },
       { p: "How Do I Change or Recover My Password?" },
       { p: "Steps to Permanently Close Your Account." },
       { p: "Easily Remove the Comments Fusion Extension from Your Browser." },
     ],
     Data2: [
       { p: "How to Retrieve Billing Documents from Your Account." },
-      { p: "Want to Switch Your Comments Fusion Plan? Here’s How." },
-      { p: "Want to Cancel Your Subscription? Here’s How." },
+      { p: "Want to Switch Your Comments Fusion Plan? Here's How." },
+      { p: "Want to Cancel Your Subscription? Here's How." },
       { p: "Steps to Modify Your Billing Details." },
     ],
   },
@@ -188,9 +188,9 @@ const allData = [
 
     Data: [
       { p: "Where Can I Find and Use My Subscribed Premium Features?" },
-      { p: "What’s the Purpose of Syncing My Account?" },
+      { p: "What's the Purpose of Syncing My Account?" },
       {
-        p: "Prospect activity isn’t updating on the platform how can I resolve this?",
+        p: "Prospect activity isn't updating on the platform how can I resolve this?",
       },
       { p: "Why Am I Unable to Add Additional Leads to My Monitoring List?" },
       { p: "The Extension Is No Longer Functioning. How Can I Fix It?" },
@@ -203,8 +203,18 @@ const allData = [
 
 export default function HelpPage() {
   const { handle } = useParams();
-  const selectedData = allData.find((item) => item.id === handle);
+  const [isDesktop, setIsDesktop] = useState(true);
 
+  useEffect(() => {
+    const checkSize = () => setIsDesktop(window.innerWidth >= 1024);
+    checkSize();
+    window.addEventListener("resize", checkSize);
+    return () => window.removeEventListener("resize", checkSize);
+  }, []);
+
+  if (!handle) return null;
+
+  const selectedData = allData.find((item) => item.id === handle);
 
   if (!selectedData) {
     return (
@@ -214,17 +224,21 @@ export default function HelpPage() {
     );
   }
 
+  const LayoutComponent = isDesktop ? Layout : MobileLayout;
+
   return (
-    <Layout>
-      <Main_Handle
-        title={selectedData.title}
-        secondTitle={selectedData.secondTitle}
-        thirdTitle={selectedData.thirdTitle}
-        fourTitle={selectedData.fourTitle}
-        fifthTitle={selectedData.fifthTitle}
-        Data={selectedData.Data}
-        Data2={selectedData.Data2}
-      />
-    </Layout>
+    <LayoutComponent>
+      <div className="w-full max-w-screen-sm mx-auto px-4 py-4 overflow-x-hidden overflow-y-auto">
+        <Main_Handle
+          title={selectedData.title}
+          secondTitle={selectedData.secondTitle}
+          thirdTitle={selectedData.thirdTitle}
+          fourTitle={selectedData.fourTitle}
+          fifthTitle={selectedData.fifthTitle}
+          Data={selectedData.Data}
+          Data2={selectedData.Data2}
+        />
+      </div>
+    </LayoutComponent>
   );
 }

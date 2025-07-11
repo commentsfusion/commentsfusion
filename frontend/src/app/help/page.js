@@ -1,6 +1,9 @@
-
+"use client";
+import { useEffect, useState } from "react";
 import Layout from "../components/layout";
+import MobileLayout from "../components/mobileLayout";
 import Card from "../components/help_components/card";
+
 export default function HelpPage({
   cardData = [
     {
@@ -16,7 +19,7 @@ export default function HelpPage({
       p: "Discover how to tailor your tone to suit various communication styles and engagement types.",
     },
     {
-       id: "Segment",
+      id: "Segment",
       logo: "/images/help/third.svg",
       Title: "Segment, Track, and Cultivate",
       p: "Proactively engage prospects early and guide them toward revenue generating opportunities.",
@@ -31,7 +34,7 @@ export default function HelpPage({
       id: "browserAdd",
       logo: "/images/help/fifth.svg",
       Title: "Browser Add-on for Chrome and Edge",
-      p: "Integrate Comments Fusion within LinkedIn for a unified experiene.",
+      p: "Integrate Comments Fusion within LinkedIn for a unified experience.",
     },
     {
       id: "enhanceProfile",
@@ -43,10 +46,10 @@ export default function HelpPage({
       id: "platformLinkages",
       logo: "/images/help/seventh.svg",
       Title: "Platform Linkages",
-      p: "Integrate your favourite software with comments fusion for maximum productivity rephrase.",
+      p: "Integrate your favourite software with Comments Fusion for maximum productivity.",
     },
     {
-       id: "profileMembership",
+      id: "profileMembership",
       logo: "/images/help/eight.svg",
       Title: "Profile & Membership",
       p: "Update Your Account and Subscription Details.",
@@ -59,9 +62,31 @@ export default function HelpPage({
     },
   ],
 }) {
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsDesktop(window.innerWidth >= 1024); 
+    };
+
+    checkScreen();
+
+    window.addEventListener("resize", checkScreen);
+
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  if (isDesktop) {
+    return (
+      <Layout>
+        <Card cardData={cardData} />
+      </Layout>
+    );
+  }
+
   return (
-    <Layout>
+    <MobileLayout>
       <Card cardData={cardData} />
-    </Layout>
+    </MobileLayout>
   );
 }
