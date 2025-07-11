@@ -37,9 +37,9 @@ export default function Footer() {
           <div className="flex-1 mb-8 ">
             <h3 className="text-lg font-bold mb-4 max-lg:text-[16px] max-md:text-[14px]">Legals</h3>
             <ul className="space-y-6 max-lg:space-y-4  text-sm max-lg:text-[13px] max-md:text-[11px]">
-              <li><a href="#" >Terms & Condition</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Return & Refund</a></li>
+              <li><a href="/terms">Terms & Condition</a></li>
+              <li><a href="/privacy">Privacy Policy</a></li>
+              <li><a href="/returns">Return & Refund</a></li>
             </ul>
           </div>
           {/* Divider */}
