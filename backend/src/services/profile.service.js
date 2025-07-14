@@ -170,7 +170,7 @@ Write a 1–2 sentence comment that is preferably under 30 words:
 - Prefer to pick up a specific detail from the post and make the comment revolve around it
 - Use a relaxed, conversational tone as if speaking to an old friend. Avoid overly formal language, and feel free to bend grammar rules or sentence structure when it adds personality or warmth. Keep it human, easygoing, and real unless instructed otherwise.
 
-Only return the comment text. No extra explanation.` += toneInstruction;
+Only return the comment text. No extra explanation.` + toneInstruction;
 
   const resp = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
