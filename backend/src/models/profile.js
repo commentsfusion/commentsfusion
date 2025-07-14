@@ -62,7 +62,6 @@ const profileSchema = new mongoose.Schema({
 
   projects: [String],
   skills: [String],
-  posts: [String],
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

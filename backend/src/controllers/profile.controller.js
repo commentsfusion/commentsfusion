@@ -1,6 +1,8 @@
 // src/controllers/profile.controller.js
 const ApiError = require('../utils/apiError');
 const httpStatus = require('http-status').default;
+const fs = require("fs");
+const path = require("path");
 
 const { profileService } = require("../services");
 
@@ -23,6 +25,18 @@ exports.extractProfileData = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { userID: linkedinUsername, html } = req.body;
+
+    // —————————————
+    // TEMP DEBUG: dump the raw HTML
+    const debugDir = path.resolve(__dirname, "../../debug-html");
+    if (!fs.existsSync(debugDir)) {
+      fs.mkdirSync(debugDir);
+    }
+    const filename = path.join(debugDir, `${linkedinUsername}.html`);
+    fs.writeFileSync(filename, html, "utf-8");
+    console.log(`📝 Wrote debug HTML to ${filename}`);
+    // —————————————
+
     const profile = await profileService.upsertProfileData(
       userId,
       linkedinUsername,
