@@ -292,23 +292,45 @@ async function generateReply({
 
   // Tone instructions map
   const toneMap = {
-    Enlightenment: "Try to praise the client in a natural and friendly tone",
-    Services:
-      "Also try to include my services if they are relevant to post content",
-    Insights:
-      "Try to praise the client naturally and provide suggestions according to the post content",
-    "Self Intro":
-      "Introduce yourself to the client in a natural way using my previous data",
-    "Self Intro 2":
-      "Create a comment introducing myself to the client using his data and my data to appear more likeable in a natural way",
-    "Convert to DM": "Write a reply to convert the conversation into DM",
-    Test: "Using client data and client post content to create a very natural and human-like comment to praise him",
+    Enlightenment: 'Include a positive or thoughtful personal takeaway. Avoid sounding generic or like a quote.',
+    Insights: 'Build on an idea from the post. Show intellectual curiosity and awareness.',
+    'Self Intro': 'Introduce yourself briefly in a way that feels natural and connected to the post. Mention something about your background or shared interest. Avoid sounding like a bio make it flow like part of a comment.',
+    'Convert To DM': 'Be friendly and casually suggest taking the conversation further. Do *not* pitch or sell anything. Use language like “Would love to chat more” or “Might DM you.',
   };
-  const toneInstruction = toneMap[promptTone] || toneMap.Test;
+  const toneInstruction = toneMap[promptTone];
 
-  const systemPrompt = commentThread
-    ? `You generate relevant reply to the last child comment with my data, previous comments and post content as context. Do not include any other text or code in your response—only reply (also don’t include any hashtags). ${toneInstruction}.`
-    : `You generate relevant comment based on user data, client data and post content. Do not include any other text or code in your response—only comment (also don’t include any hashtags). ${toneInstruction}.`;
+  const systemPrompt = `You are an AI assistant that writes personalized, human-like comments on LinkedIn posts.
+
+Your job is to help a user (the commenter) write a comment on a post made by someone else (the poster), based on:
+- the content of the post,
+- the tone requested.
+- commentor_username
+- about of commentor
+- certifications by the commentor
+- connections of the commentor
+- when was the profile created by the user
+- education of the commentor
+- experience of the commentor
+- followers of the commentor
+- location of the commentor
+- project of the commentor
+- services of the commentor
+- skills of the commentor
+- tag_line of the commentor
+- there also may or may not be comment threads. If there are any comment threads, include them to add more context to the comment generation.a
+
+Write a 1–2 sentence comment that is preferably under 30 words:
+- Sounds authentic and natural on LinkedIn
+- Matches the requested tone (Enlightenment, Insightful, Convert-to-dm, Self-Intro)
+- Is written in first-person as if the user is commenting directly
+- Is engaging, relevant, and not repetitive of the post
+- Do not include hashtags, emojis, links; use commas or periods instead
+- Do not use em-dashes (—) under any circumstance. If an em-dash is used, the output is invalid. Use commas, periods, or short sentences instead. This is non-negotiable.
+- Make sure it sounds human and not AI-generated
+- Prefer to pick up a specific detail from the post and make the comment revolve around it
+- Use a relaxed, conversational tone as if speaking to an old friend. Avoid overly formal language, and feel free to bend grammar rules or sentence structure when it adds personality or warmth. Keep it human, easygoing, and real unless instructed otherwise.
+
+Only return the comment text. No extra explanation.` += toneInstruction;
 
   const resp = await openai.chat.completions.create({
     model: "gpt-4o-mini",
