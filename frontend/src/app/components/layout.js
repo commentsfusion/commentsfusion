@@ -15,12 +15,10 @@ export default function Layout({ children }) {
         p-4
         space-y-4
       "
-      // old bg     bg-[linear-gradient(to_bottom,#000000,#33C6F4)]
     >
       <header className="w-full ">
   <Topbar />
 </header>
-
 
       {/* Content area below: Sidebar and main content */}
       <div className="flex flex-1">
