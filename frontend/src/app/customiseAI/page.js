@@ -190,19 +190,6 @@ if (screenType === "tablet") {
       </div>
     </div>
 
-           <motion.div
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className="absolute bottom-4 right-4"
-    >
-      <Image
-        src="/images/customise_AI/faq-bot.svg"
-        alt="Chatbot Mascot"
-        width={70}
-        height={70}
-      />
-    </motion.div>
       </div>
     </MobileLayout>
 
@@ -227,19 +214,7 @@ if (screenType === "mobile") {
         />
         <h1 className="text-2xl font-semibold text-white">Customize AI</h1>
       </div>
-      <button
-        style={{ boxShadow: "0 2px 5px 3px #33C6F4" }}
-        className="inline-flex items-center justify-center space-x-1 bg-[#33C6F4] 
-        text-white px-1.5 py-1 rounded-[8px] font-medium text-sm "
-      >
-        <Image
-          src="/images/customise_AI/plusIcon.svg"
-          alt="Add Tone Icon"
-          width={8}
-          height={8}
-        />
-        <span>Add tone</span>
-      </button>
+      
     </div>
 
     <p className="mt-4 text-slate-300 text-sm mb-4" >
