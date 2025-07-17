@@ -46,7 +46,10 @@ export default function MobileSidebar() {
        {/* LinkedIn Icon Header */}
     <div className="flex items-center space-x-4 mt-2 ml-4">
       <Image src="/images/sidebar/linkedIcon.svg" alt="LinkedIn" width={36} height={36} />
-      <p className="text-lg font-bold">LinkedIn</p>
+    <p className="text-[12px] italic">
+  Connected with <span className="text-xl not-italic font-bold">LinkedIn</span>
+</p>
+
     </div>
 
 
