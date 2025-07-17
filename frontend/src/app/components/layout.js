@@ -1,28 +1,24 @@
-import Sidebar from './sidenav';
-import Topbar from './topBar';
-import Image from 'next/image';
+import Sidebar from "./sidenav";
+import Topbar from "./topBar";
+import Image from "next/image";
 import "../../../styles/globals.css";
-
 
 export default function Layout({ children }) {
   return (
     <div
       className="
         flex flex-col h-screen text-white
-       bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)]
+        bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)]
         bg-cover bg-center max-h-screen
         overflow-y-auto
         p-4
         space-y-4
       "
-      // old bg     bg-[linear-gradient(to_bottom,#000000,#33C6F4)]
     >
       <header className="w-full ">
-  <Topbar />
-</header>
+        <Topbar />
+      </header>
 
-
-      {/* Content area below: Sidebar and main content */}
       <div className="flex flex-1">
         <Sidebar />
         <main className="flex-1 p-6 overflow-auto bg-transparent">

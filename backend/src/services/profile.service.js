@@ -12,8 +12,52 @@ async function checkUserExists(userId, linkedinUsername) {
   return Boolean(exists);
 }
 
-async function upsertProfileData(userId, linkedinUsername, html) {
+function extractConnectionsCountFromHtml(html) {
   const dom = new JSDOM(html);
+  const doc = dom.window.document;
+
+  const selectors = [
+    '[data-test-id="connections-count"]',
+    ".artdeco-tab__badge",
+    ".mn-tab__badge",
+    '[aria-label*="connection"]',
+    'span[aria-label*="connection"]',
+    ".network-tab-count",
+    ".mn-connections-count",
+  ];
+
+  for (const selector of selectors) {
+    const element = doc.querySelector(selector);
+    if (element) {
+      const text = element.textContent.trim();
+      const match = text.match(/(\d+)/);
+      if (match) {
+        return parseInt(match[1], 10);
+      }
+    }
+  }
+
+  const allElements = doc.querySelectorAll("*");
+  for (const element of allElements) {
+    const text = element.textContent;
+    if (text && /\d+\s+connection/i.test(text)) {
+      const match = text.match(/(\d+)\s+connection/i);
+      if (match) {
+        return parseInt(match[1], 10);
+      }
+    }
+  }
+
+  return 0;
+}
+
+async function upsertProfileData(
+  userId,
+  linkedinUsername,
+  profileHtml,
+  networkHtml
+) {
+  const dom = new JSDOM(profileHtml);
   const doc = dom.window.document;
 
   const name =
@@ -37,15 +81,6 @@ async function upsertProfileData(userId, linkedinUsername, html) {
       .querySelector("#about ~ .display-flex.ph5.pv3 span[aria-hidden]")
       ?.textContent.trim() || "";
 
-  const rawConn = (() => {
-    const link = doc.querySelector(
-      'a[href*="/search/results/people/?connectionOf"]'
-    );
-    if (link) return link.textContent.trim();
-    const lis = doc.querySelectorAll(".pv-top-card--list > li");
-    return lis[1]?.textContent.trim() || "";
-  })();
-
   const rawFoll = (() => {
     const li = doc.querySelector(".pv-top-card--list-bullet li");
     if (li) return li.textContent.trim();
@@ -55,13 +90,7 @@ async function upsertProfileData(userId, linkedinUsername, html) {
     return span?.textContent.trim() || "";
   })();
 
-  const toNumber = (str) => {
-    const digits = str.replace(/[^0-9]/g, "");
-    return digits ? parseInt(digits, 10) : 0;
-  };
-
-  const connections = toNumber(rawConn);
-  const followers = toNumber(rawFoll);
+  const followers = parseInt(rawFoll.replace(/[^0-9]/g, ""), 10) || 0;
 
   function extractList(
     selector,
@@ -71,12 +100,10 @@ async function upsertProfileData(userId, linkedinUsername, html) {
     return nodes.map(transform).filter(Boolean);
   }
 
-  // Services
   const services = extractList(
     "#services ~ div li.pvs-list__item--with-top-padding div span.visually-hidden strong"
   );
 
-  // Experience entries
   const experience = Array.from(
     doc.querySelectorAll("#experience ~ div > ul > li.artdeco-list__item")
   ).map((li) => {
@@ -95,7 +122,6 @@ async function upsertProfileData(userId, linkedinUsername, html) {
     return { role, at };
   });
 
-  // Education entries
   const education = Array.from(
     doc.querySelectorAll("#education ~ div > ul > li.artdeco-list__item")
   ).map((li) => {
@@ -114,7 +140,6 @@ async function upsertProfileData(userId, linkedinUsername, html) {
     return { place, degree };
   });
 
-  // Certifications entries
   const certifications = Array.from(
     doc.querySelectorAll(
       "#licenses_and_certifications ~ div > ul > li.artdeco-list__item"
@@ -135,104 +160,108 @@ async function upsertProfileData(userId, linkedinUsername, html) {
     return { certificate, issuer };
   });
 
-  // Projects (just text)
   const projects = extractList(
     "#projects ~ div > ul > li.artdeco-list__item span.visually-hidden"
   );
 
-  // Skills (just text)
   const skills = extractList(
     "#skills ~ div > ul > li.artdeco-list__item span.visually-hidden"
   );
 
-  // Build data object mirroring PHP
-  const data = {
-    name,
-    tag_line: tagLine,
-    location,
-    about,
-    connections,
-    followers,
-    services: services.join(" • "),
-    experience,
-    education,
-    certifications,
-    projects: projects.join(" • "),
-    skills: skills.join(" • "),
+  let profile = await Profile.findOneAndUpdate(
+    { user: userId, linkedinUsername },
+    {
+      $set: {
+        name,
+        tag_line: tagLine,
+        location,
+        about,
+        followers,
+        services: services.join(" • "),
+        experience,
+        education,
+        certifications,
+        projects: projects.join(" • "),
+        skills: skills.join(" • "),
+      },
+      $setOnInsert: { user: userId },
+      $currentDate: { updatedAt: true },
+    },
+    { upsert: true, new: true }
+  );
+
+  const connectionsCount = extractConnectionsCountFromHtml(networkHtml);
+
+  profile = await Profile.findOneAndUpdate(
+    { user: userId, linkedinUsername },
+    {
+      $set: { connections: connectionsCount },
+      $currentDate: { updatedAt: true },
+    },
+    { new: true }
+  );
+
+  return profile;
+}
+
+async function updateConnectionsCount(userId, linkedinUsername, html) {
+  const dom = new JSDOM(html);
+  const doc = dom.window.document;
+
+  const extractConnectionsCount = () => {
+    const selectors = [
+      '[data-test-id="connections-count"]',
+      ".artdeco-tab__badge",
+      ".mn-tab__badge",
+      '[aria-label*="connection"]',
+      'span[aria-label*="connection"]',
+      ".network-tab-count",
+      ".mn-connections-count",
+    ];
+
+    for (const selector of selectors) {
+      const element = doc.querySelector(selector);
+      if (element) {
+        const text = element.textContent.trim();
+        const match = text.match(/(\d+)/);
+        if (match) {
+          return parseInt(match[1], 10);
+        }
+      }
+    }
+
+    const allElements = doc.querySelectorAll("*");
+    for (const element of allElements) {
+      const text = element.textContent;
+      if (text && /\d+\s+connection/i.test(text)) {
+        const match = text.match(/(\d+)\s+connection/i);
+        if (match) {
+          return parseInt(match[1], 10);
+        }
+      }
+    }
+
+    return 0;
   };
+
+  const connectionsCount = extractConnectionsCount();
+
   const profile = await Profile.findOneAndUpdate(
     { user: userId, linkedinUsername },
     {
-      $set: { ...data, linkedinUsername },
-      $setOnInsert: { user: userId },
+      $set: {
+        connections: connectionsCount,
+      },
       $currentDate: { updatedAt: true },
     },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
-  /*const profile = await Profile.findOneAndUpdate(
-    { user: userId, linkedinUsername },
-    { $set: data, $currentDate: { updatedAt: true } },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
-  );*/
-
+  console.log(
+    `Updated connections count for ${linkedinUsername}: ${connectionsCount}`
+  );
   return profile;
 }
-
-async function fetchExactConnections(userID) {
-  try {
-    const url = `https://www.linkedin.com/search/results/people/?connectionOf=${userID}&connectionLevel=F`;
-
-    const resp = await fetch(url, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Csrf-Token": "ajax",
-        "X-RestLi-Protocol-Version": "2.0.0",
-        Accept: "application/json",
-      },
-    });
-    if (!resp.ok) {
-      console.warn("fetchExactConnections: network error", resp.status);
-      return 0;
-    }
-    const html = await resp.text();
-
-    const dom = new JSDOM(html);
-    const parser = new dom.window.DOMParser();
-
-    const doc = parser.parseFromString(html, "text/html");
-
-    let totalEl = doc.querySelector(
-      "h3.search-results-container__total-results"
-    );
-    if (!totalEl) {
-      totalEl = doc.querySelector("span.search-results-container__total");
-    }
-    if (!totalEl) {
-      console.warn("fetchExactConnections: could not find total element");
-      return 0;
-    }
-
-    const text = totalEl.textContent || "";
-    const m = text.match(/([\d,]+)/);
-    if (!m) {
-      console.warn("fetchExactConnections: no digits in text:", text);
-      return 0;
-    }
-    const digits = m[1].replace(/,/g, "");
-    return parseInt(digits, 10);
-  } catch (err) {
-    console.error("fetchExactConnections error:", err);
-    return 0;
-  }
-}
-
-(async () => {
-  const myUserID = "ayesha-nazneen-690283271";
-  const exactCount = await fetchExactConnections(myUserID);
-  console.log("Exact connections:", exactCount);
-})();
 
 async function generateReply({
   userId,
@@ -292,14 +321,19 @@ async function generateReply({
 
   // Tone instructions map
   const toneMap = {
-    Enlightenment: 'Include a positive or thoughtful personal takeaway. Avoid sounding generic or like a quote.',
-    Insights: 'Build on an idea from the post. Show intellectual curiosity and awareness.',
-    'Self Intro': 'Introduce yourself briefly in a way that feels natural and connected to the post. Mention something about your background or shared interest. Avoid sounding like a bio make it flow like part of a comment.',
-    'Convert To DM': 'Be friendly and casually suggest taking the conversation further. Do *not* pitch or sell anything. Use language like “Would love to chat more” or “Might DM you.',
+    Enlightenment:
+      "Include a positive or thoughtful personal takeaway. Avoid sounding generic or like a quote.",
+    Insights:
+      "Build on an idea from the post. Show intellectual curiosity and awareness.",
+    "Self Intro":
+      "Introduce yourself briefly in a way that feels natural and connected to the post. Mention something about your background or shared interest. Avoid sounding like a bio make it flow like part of a comment.",
+    "Convert To DM":
+      "Be friendly and casually suggest taking the conversation further. Do *not* pitch or sell anything. Use language like “Would love to chat more” or “Might DM you.",
   };
   const toneInstruction = toneMap[promptTone];
 
-  const systemPrompt = `You are an AI assistant that writes personalized, human-like comments on LinkedIn posts.
+  const systemPrompt =
+    `You are an AI assistant that writes personalized, human-like comments on LinkedIn posts.
 
 Your job is to help a user (the commenter) write a comment on a post made by someone else (the poster), based on:
 - the content of the post,
@@ -347,5 +381,6 @@ Only return the comment text. No extra explanation.` + toneInstruction;
 module.exports = {
   checkUserExists,
   upsertProfileData,
+  updateConnectionsCount,
   generateReply,
 };
