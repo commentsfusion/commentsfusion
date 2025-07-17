@@ -251,16 +251,7 @@ export default function Home() {
       </div>
     </div>
 <hr/>
-    {/* Performance Tracker */}
-    <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-2xl p-4">
-      <div className="text-center mb-3">
-        <p className="text-lg font-semibold">
-           Performance Tracker
-        </p>
-        <p className="text-xs text-white/70">
-          Optimize your outreach by tracking which targets drive the most engagement.
-        </p>
-      </div>
+   
 
       <div className="space-y-3">
         {[
