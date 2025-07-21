@@ -2,6 +2,11 @@
 const mongoose = require("mongoose");
 const commentSchema = require("./comments");
 
+const snapshotSchema = new mongoose.Schema({
+  count: Number,
+  timestamp: { type: Date, default: Date.now },
+});
+
 const profileSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -33,10 +38,13 @@ const profileSchema = new mongoose.Schema({
     description: "Number of LinkedIn followers",
   },
 
+  connectionSnapshots: { type: [snapshotSchema], default: [] },
+  followerSnapshots: { type: [snapshotSchema], default: [] },
+
   comments: {
     type: [commentSchema],
     default: [],
-    description: 'Array of comments associated with this profile',
+    description: "Array of comments associated with this profile",
   },
 
   experience: [
@@ -63,9 +71,10 @@ const profileSchema = new mongoose.Schema({
   projects: [String],
   skills: [String],
 
+  lastFetchedAt: { type: Date, default: null },
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  lastFetchedAt: { type: Date, default: null },
 });
 
 profileSchema.index({ user: 1 }, { unique: true });

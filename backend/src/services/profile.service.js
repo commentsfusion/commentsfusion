@@ -7,6 +7,8 @@ const config = require("../config/config");
 
 const openai = new OpenAI({ apiKey: config.openai.apiKey });
 
+const SEVEN_DAYS = 1 * 24 * 3600 * 1000; // currently 1 day in development
+
 async function checkUserExists(userId, linkedinUsername) {
   const exists = await Profile.exists({ user: userId, linkedinUsername });
   return Boolean(exists);
@@ -57,6 +59,16 @@ async function upsertProfileData(
   profileHtml,
   networkHtml
 ) {
+  let profile = await Profile.findOne({ user: userId, linkedinUsername });
+  const now = Date.now();
+
+  if (profile && profile.lastFetchedAt) {
+    const elapsed = now - profile.lastFetchedAt.getTime();
+    if (elapsed < SEVEN_DAYS) {
+      return profile;
+    }
+  }
+
   const dom = new JSDOM(profileHtml);
   const doc = dom.window.document;
 
@@ -168,38 +180,35 @@ async function upsertProfileData(
     "#skills ~ div > ul > li.artdeco-list__item span.visually-hidden"
   );
 
-  let profile = await Profile.findOneAndUpdate(
+  const connectionsCount = extractConnectionsCountFromHtml(networkHtml);
+
+  profile = await Profile.findOneAndUpdate(
     { user: userId, linkedinUsername },
     {
       $set: {
+        user: userId,
         name,
         tag_line: tagLine,
         location,
         about,
         followers,
+        connections: connectionsCount,
         services: services.join(" • "),
         experience,
         education,
         certifications,
         projects: projects.join(" • "),
         skills: skills.join(" • "),
+        lastFetchedAt: now,
       },
-      $setOnInsert: { user: userId },
       $currentDate: { updatedAt: true },
     },
     { upsert: true, new: true }
   );
 
-  const connectionsCount = extractConnectionsCountFromHtml(networkHtml);
-
-  profile = await Profile.findOneAndUpdate(
-    { user: userId, linkedinUsername },
-    {
-      $set: { connections: connectionsCount },
-      $currentDate: { updatedAt: true },
-    },
-    { new: true }
-  );
+  profile.followerSnapshots.push({ count: followers, timestamp: now });
+  profile.connectionSnapshots.push({ count: connectionsCount, timestamp: now });
+  await profile.save();
 
   return profile;
 }
@@ -253,8 +262,7 @@ async function updateConnectionsCount(userId, linkedinUsername, html) {
         connections: connectionsCount,
       },
       $currentDate: { updatedAt: true },
-    },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
+    }
   );
 
   console.log(
