@@ -56,7 +56,6 @@ exports.generateReply = async (req, res, next) => {
     });
     res.json({ reply });
   } catch (err) {
-
     console.error("generateReply error:", err);
 
     if (err.code === "insufficient_quota" || err.status === 429) {

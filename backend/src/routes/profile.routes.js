@@ -6,8 +6,6 @@ const { protect } = require("../middleware/auth");
 
 const router = express.Router();
 
-//router.post("/check-user-exists", protect, asyncHandler(profileController.checkUserExists));
-
 router.post(
   "/extract-profile-data",
   protect,
