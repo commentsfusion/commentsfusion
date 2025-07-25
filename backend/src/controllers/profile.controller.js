@@ -1,8 +1,6 @@
 // src/controllers/profile.controller.js
 const ApiError = require("../utils/apiError");
 const httpStatus = require("http-status").default;
-const fs = require("fs");
-const path = require("path");
 
 const { profileService } = require("../services");
 
@@ -10,9 +8,12 @@ exports.checkProfileExists = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { linkedinUsername } = req.params;
+    const isPersonal = req.query.isPersonal === "true";
+
     const exists = await profileService.checkUserExists(
       userId,
-      linkedinUsername
+      linkedinUsername,
+      isPersonal
     );
     res.json({ exists, message: exists ? "Exists" : "Not found" });
   } catch (err) {
@@ -23,13 +24,19 @@ exports.checkProfileExists = async (req, res, next) => {
 exports.extractProfileData = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const { userID: linkedinUsername, profileHtml, networkHtml } = req.body;
+    const {
+      userID: linkedinUsername,
+      profileHtml,
+      networkHtml,
+      isPersonal = true,
+    } = req.body;
 
     const profile = await profileService.upsertProfileData(
       userId,
       linkedinUsername,
       profileHtml,
-      networkHtml
+      networkHtml,
+      isPersonal
     );
 
     res.json(profile);

@@ -9,8 +9,16 @@ const openai = new OpenAI({ apiKey: config.openai.apiKey });
 
 const SEVEN_DAYS = 1 * 24 * 3600 * 1000; // currently 1 day in development
 
-async function checkUserExists(userId, linkedinUsername) {
-  const exists = await Profile.exists({ user: userId, linkedinUsername });
+async function checkUserExists(userId, linkedinUsername, isPersonal = true) {
+  let query;
+
+  if (isPersonal) {
+    query = { user: userId, linkedinUsername };
+  } else {
+    query = { user: null, linkedinUsername };
+  }
+
+  const exists = await Profile.exists(query);
   return Boolean(exists);
 }
 
@@ -57,12 +65,23 @@ async function upsertProfileData(
   userId,
   linkedinUsername,
   profileHtml,
-  networkHtml
+  networkHtml,
+  isPersonal = true
 ) {
-  let profile = await Profile.findOne({ user: userId, linkedinUsername });
+  let profile;
+  let query;
+
   const now = Date.now();
 
-  if (profile && profile.lastFetchedAt) {
+  if (isPersonal) {
+    query = { user: userId, linkedinUsername };
+    profile = await Profile.findOne(query);
+  } else {
+    query = { user: null, linkedinUsername };
+    profile = await Profile.findOne(query);
+  }
+
+  if (isPersonal && profile && profile.lastFetchedAt) {
     const elapsed = now - profile.lastFetchedAt.getTime();
     if (elapsed < SEVEN_DAYS) {
       return profile;
@@ -182,29 +201,36 @@ async function upsertProfileData(
 
   const connectionsCount = extractConnectionsCountFromHtml(networkHtml);
 
-  profile = await Profile.findOneAndUpdate(
-    { user: userId, linkedinUsername },
-    {
-      $set: {
-        user: userId,
-        name,
-        tag_line: tagLine,
-        location,
-        about,
-        followers,
-        connections: connectionsCount,
-        services: services.join(" • "),
-        experience,
-        education,
-        certifications,
-        projects: projects.join(" • "),
-        skills: skills.join(" • "),
-        lastFetchedAt: now,
-      },
-      $currentDate: { updatedAt: true },
+  const profileData = {
+    $set: {
+      linkedinUsername,
+      name,
+      tag_line: tagLine,
+      location,
+      about,
+      followers,
+      connections: isPersonal ? connectionsCount : 0,
+      services: services.join(" • "),
+      experience,
+      education,
+      certifications,
+      projects: projects.join(" • "),
+      skills: skills.join(" • "),
+      lastFetchedAt: now,
     },
-    { upsert: true, new: true }
-  );
+    $currentDate: { updatedAt: true },
+  };
+
+  if (isPersonal) {
+    profileData.$set.user = userId;
+  } else {
+    profileData.$set.user = null;
+  }
+
+  profile = await Profile.findOneAndUpdate(query, profileData, {
+    upsert: true,
+    new: true,
+  });
 
   profile.followerSnapshots.push({ count: followers, timestamp: now });
   profile.connectionSnapshots.push({ count: connectionsCount, timestamp: now });
@@ -287,6 +313,14 @@ async function generateReply({
   if (targetLinkedInUsername) {
     targetProfile = await Profile.findOne({
       linkedinUsername: targetLinkedInUsername,
+      user: { $ne: null },
+    });
+  }
+
+  if (!targetProfile) {
+    targetProfile = await Profile.findOne({
+      linkedinUsername: targetLinkedInUsername,
+      user: null,
     });
   }
 

@@ -1,6 +1,5 @@
 // models/Profile.js
 const mongoose = require("mongoose");
-const commentSchema = require("./comments");
 
 const snapshotSchema = new mongoose.Schema({
   count: Number,
@@ -11,14 +10,14 @@ const profileSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
+    default: null,
   },
 
   linkedinUsername: {
     type: String,
     required: true,
     trim: true,
-    index: true,
   },
 
   name: String,
@@ -32,6 +31,7 @@ const profileSchema = new mongoose.Schema({
     default: 0,
     description: "Number of LinkedIn connections",
   },
+
   followers: {
     type: Number,
     default: 0,
@@ -40,12 +40,6 @@ const profileSchema = new mongoose.Schema({
 
   connectionSnapshots: { type: [snapshotSchema], default: [] },
   followerSnapshots: { type: [snapshotSchema], default: [] },
-
-  comments: {
-    type: [commentSchema],
-    default: [],
-    description: "Array of comments associated with this profile",
-  },
 
   experience: [
     {
@@ -77,6 +71,6 @@ const profileSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-profileSchema.index({ user: 1 }, { unique: true });
+profileSchema.index({ user: 1, linkedinUsername: 1 }, { unique: true });
 
 module.exports = mongoose.model("Profile", profileSchema);
