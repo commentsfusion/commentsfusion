@@ -1,4 +1,3 @@
-// models/Profile.js
 const mongoose = require("mongoose");
 
 const snapshotSchema = new mongoose.Schema({

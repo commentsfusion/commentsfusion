@@ -1,6 +1,7 @@
-// src/controllers/profile.controller.js
 const ApiError = require("../utils/apiError");
 const httpStatus = require("http-status").default;
+const Profile = require("../models/profile");
+const { SEVEN_DAYS } = require("../services/profile.service");
 
 const { profileService } = require("../services");
 
@@ -10,11 +11,18 @@ exports.checkProfileExists = async (req, res, next) => {
     const { linkedinUsername } = req.params;
     const isPersonal = req.query.isPersonal === "true";
 
-    const exists = await profileService.checkUserExists(
-      userId,
-      linkedinUsername,
+    const profile = await Profile.findOne(
       isPersonal
+        ? { user: userId, linkedinUsername }
+        : { user: null, linkedinUsername }
     );
+
+    let exists = Boolean(profile);
+    if (isPersonal && profile && profile.lastFetchedAt) {
+      const age = Date.now() - profile.lastFetchedAt.getTime();
+      if (age >= SEVEN_DAYS) exists = false;
+    }
+
     res.json({ exists, message: exists ? "Exists" : "Not found" });
   } catch (err) {
     next(err);

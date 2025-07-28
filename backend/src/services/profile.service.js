@@ -7,7 +7,7 @@ const config = require("../config/config");
 
 const openai = new OpenAI({ apiKey: config.openai.apiKey });
 
-const SEVEN_DAYS = 1 * 24 * 3600 * 1000; // currently 1 day in development
+exports.SEVEN_DAYS = 1 * 24 * 3600 * 1000; // currently 1 day in development
 
 async function checkUserExists(userId, linkedinUsername, isPersonal = true) {
   let query;

@@ -1,4 +1,3 @@
-// src/routes/profile.routes.js
 const express = require("express");
 const { asyncHandler } = require("../middleware/errorHandler");
 const { profileController } = require("../controllers");
