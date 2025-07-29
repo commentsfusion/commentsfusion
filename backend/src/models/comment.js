@@ -1,5 +1,5 @@
 // models/Comment.js
-const { string } = require("joi");
+//const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
@@ -17,7 +17,7 @@ const commentSchema = new mongoose.Schema(
       description: "Whose (prospect) profile this comment was left on",
     },
     post: {
-      type: string,
+      type: String,
       required: true,
       description: "The content of post"
     },
