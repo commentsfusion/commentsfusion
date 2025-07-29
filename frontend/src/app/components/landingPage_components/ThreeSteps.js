@@ -4,22 +4,23 @@ import { motion } from "framer-motion";
 
 export default function ThreeSteps() {
   return (
-    <section className="text-white px-2 sm:px-6 ">
+    <section className="text-white px-2 sm:px-6 max-md:mx-4 max-sm:mx-6 ">
 
-      <div className="max-w-4xl mx-auto text-center mb-10 max-lg:mb-4 max-lg:mt-[-150px]  ">
+      <div className="max-w-4xl mx-auto text-center mb-10 max-lg:mb-4 max-lg:mt-[-150px] max-md:mt-[6] max-md:mb-6  ">
         <motion.h3
           initial={{ opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-5xl font-bold max-lg:text-4xl max-md:text-3xl text-[#33C6F4]"
+          className="text-5xl font-bold max-lg:text-4xl max-md:text-xl text-[#33C6F4] max-md:text-white "
         >
-          3 Simple Steps To Create
+          3  Simple
+       Steps To Create
         </motion.h3>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-5xl max-lg:text-4xl max-md:text-3xl font-bold"
+          className="text-5xl max-lg:text-4xl max-md:text-3xl font-bold max-md:text-xl max-md:mt-4 max-md:text-[#33C6F4]"
         >
           Highly Engaging Comments
         </motion.h2>
@@ -32,8 +33,10 @@ export default function ThreeSteps() {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-         <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl text-center   font-bold ">
-            <span className="text-cyan-400 text-4xl max-lg:text-xl max-md:text-xl">➞</span>
+         <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl 
+         max-md:text-lg text-center max-md:mb-4 
+           font-bold ">
+            <span className="text-cyan-400 text-4xl max-lg:text-xl max-md:text-xl ">➞</span>
             AI-Powered Smart Commenting for LinkedIn
           </h2>
           </motion.div>
@@ -41,8 +44,8 @@ export default function ThreeSteps() {
 
 
 
-      <div className=" max-w-7xl mx-auto flex  lg:flex-row items-center mt-15 max-lg:mt-2 justify-between gap-8 sm:gap-12">
-        {/* Text Section */}
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center mt-2 justify-between gap-8 sm:gap-12">
+ {/* Text Section */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}

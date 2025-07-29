@@ -12,7 +12,9 @@ import FaqSection from "../components/pricing_components/FAQSection";
 const PricingPage = () => {
   return (
     
-    <div className="bg-black min-h-screen px-4 py-10 bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed">
+    <div className="min-h-screen w-full overflow-x-hidden 
+    bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] 
+    bg-fixed  max-md:p-2">
       <Navbar />
       <Header />
       <PricingSection />

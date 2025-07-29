@@ -40,32 +40,33 @@ function NewfeaturesSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-        <h2 className="text-center text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-3xl">
+        <h2 className="text-center text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-2xl max-md:mt-[-150px]">
           Powerful Features to Supercharge Your <br />
           <span className="text-[#33C6F4]">Client Acquisition</span>
         </h2>
         </motion.div>
-
-        <div className="flex flex-wrap justify-center gap-x-30 mt-10 max-lg:gap-x-0 max-lg:mt-30">
+        <div className="flex flex-wrap justify-center gap-x-30 mt-10 max-lg:gap-x-0 max-lg:mt-30 
+                        max-md:flex-col max-md:items-center max-md:gap-y-8">
           {features.map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ 
-                duration: 0.8, 
-                delay: index * 0.2,
+                duration: 0.4, 
+                delay: index * 0.01,
                 type: "spring",
                 stiffness: 120 
               }}
-            
-            
-    className={`w-96 max-lg:w-87 bg-[#000000] h-75 max-lg:h-67 max-md:w-68 max-md:h-55  mt-20 max-lg:mt-0 rounded-[30px] shadow-[0_0_10px_#33C6F4,_10px_0_10px_#33C6F4,_-10px_0_10px_#33C6F4,_0_10px_10px_#33C6F4,_0_-10px_10px_#33C6F4] flex flex-col items-center py-11 px-7 max-lg:px-4 max-lg:py-6 max-md:px-3 hover:scale-104  transition-transform duration-300 ease-in-out
-    ${index === 0 ? "max-lg:mr-[-15px]" : ""}
-    ${index === 1 ? "max-lg:mt-50 max-lg:ml-[-15px] max-md:mt-46" : ""}
-    ${index === 2 ? "max-lg:mt-[-60px] max-lg:mr-[-15px] max-md:mt-[-40px]" : ""}
-    ${index === 3 ? "max-lg:mt-37 max-lg:ml-[-15px]" : ""}
-  `}
+              className={`w-96 max-lg:w-87 bg-[#000000] h-75 max-lg:h-67 max-md:w-68 max-md:h-55  
+                mt-20 max-lg:mt-0 rounded-[30px] shadow-[0_0_10px_#33C6F4,_10px_0_10px_#33C6F4,_-10px_0_10px_#33C6F4,_0_10px_10px_#33C6F4,_0_-10px_10px_#33C6F4] 
+                flex flex-col items-center py-11 px-7 max-lg:px-4 max-lg:py-6 max-md:px-3 
+                hover:scale-104 transition-transform duration-300 ease-in-out
+                max-md:mb-4
+                ${index === 0 ? "max-lg:mr-[-15px] max-md:mr-0" : ""}
+                ${index === 1 ? "max-lg:mt-50 max-lg:ml-[-15px] max-md:mt-0 max-md:ml-0" : ""}
+                ${index === 2 ? "max-lg:mt-[-60px] max-lg:mr-[-15px] max-md:mt-0 max-md:mr-0" : ""}
+                ${index === 3 ? "max-lg:mt-37 max-lg:ml-[-15px] max-md:mt-0 max-md:ml-0" : ""}`}
             >
               <Image
                 src={item.icon}
@@ -75,7 +76,8 @@ function NewfeaturesSection() {
                 className="w-11 max-md:w-9"
               />
               <h1 className="text-center text-2xl max-lg:text-[21px] mt-7 max-md:mt-4">{item.title}</h1>
-              <p className="text-center text-[14px] max-lg:text-[13px] max-md:text-[12px] mt-5 max-md:mt-3">{item.description}</p>
+              <p className="text-center text-[14px] max-lg:text-[13px] max-md:text-[12px] 
+              mt-5 max-md:mt-3">{item.description}</p>
             
             </motion.div>
           ))}

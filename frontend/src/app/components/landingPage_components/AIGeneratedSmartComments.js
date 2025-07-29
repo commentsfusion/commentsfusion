@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 export default function AIGeneratedSmartComments() {
   return (
      <>
-       <section className="text-white px-2 sm:px-6 mt-15 max-lg:mt-17 ">
+       <section className="text-white px-2 sm:px-6 mt-15 max-lg:mt-17 max-md:mx-4 max-sm:mx-6">
         <motion.div
                  initial={{ opacity: 0, x: -40 }}
                  whileInView={{ opacity: 1, x: 0 }}
                  transition={{ duration: 0.6 }}
                >
-                <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl text-center   font-bold ">
+                <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl text-center max-md:text-lg  font-bold ">
                    <span className="text-cyan-400 text-4xl max-lg:text-xl max-md:text-xl">➞</span>
                    AI Generated Smart Comments
                  </h2>
@@ -20,8 +20,7 @@ export default function AIGeneratedSmartComments() {
        
        
        
-             <div className=" max-w-7xl mx-auto flex  lg:flex-row items-center mt-2 justify-between gap-8 sm:gap-12">
-               {/* Text Section */}
+             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center mt-2 justify-between gap-8 sm:gap-12">
                <motion.div
                  initial={{ opacity: 0, x: -40 }}
                  whileInView={{ opacity: 1, x: 0 }}

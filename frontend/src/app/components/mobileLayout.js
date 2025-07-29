@@ -65,7 +65,7 @@ export default function MobileLayout({ children }) {
                 />
               </svg>
             </button>
-          <Link href="/main_dashboard"
+          <Link href="/"
            className="flex flex-col items-center gap-1 hover:scale-105 transition-transform duration-200 ease-in-out">
             <Image
               src="/images/topbar/logo.svg"
@@ -78,8 +78,6 @@ export default function MobileLayout({ children }) {
               Comments with solution
             </div>
           </Link>
-
-            {/* Profile Circle & Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}

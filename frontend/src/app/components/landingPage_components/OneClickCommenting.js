@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 export default function OneClickSmartCommenting() {
   return (
     <>
-    <section className="text-white px-2 sm:px-6 mt-15 max-lg:mt-17 ">
+    <section className="text-white px-2 sm:px-6 mt-15 max-lg:mt-17 max-md:mx-4 max-sm:mx-6 ">
      <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-             <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl text-center   font-bold ">
+             <h2 className="hidden max-lg:block text-white mt-8  text-4xl max-lg:text-2xl text-center max-md:text-lg  font-bold ">
                 <span className="text-cyan-400 text-4xl max-lg:text-xl max-md:text-xl">➞</span>
                 One-Click Smart Commenting
               </h2>
@@ -20,9 +20,8 @@ export default function OneClickSmartCommenting() {
     
     
     
-          <div className=" max-w-7xl mx-auto flex  lg:flex-row items-center mt-2 justify-between gap-8 sm:gap-12">
-            {/* Text Section */}
-            <motion.div
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center mt-2 justify-between gap-8 sm:gap-12">
+ <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -56,15 +55,15 @@ export default function OneClickSmartCommenting() {
           </button>
             </motion.div>
     
-            {/* Image Section */}
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex-1 flex justify-center w-full mt-8 lg:mt-0"
+              className="flex-1 flex justify-center w-full mt-8 lg:mt-0 order-last"
+
             >
-              <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2 max-w-full sm:max-w-[460px] w-full">
-                <Image
+             <div className="rounded-xl overflow-hidden shadow-md border border-cyan-400 p-2 max-w-full sm:max-w-[460px] w-full">
+               <Image
                   src="/images/landing-page/smart-commenting.gif"
                   alt="Smart Commenting Demo"
                   width={320}
@@ -74,13 +73,15 @@ export default function OneClickSmartCommenting() {
               </div>
             </motion.div>
           </div>
-          {/* <  maxlg btn  */}
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-               <button className="cursor-pointer hidden max-lg:block mt-8  bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3  max-lg:text-[13px] max-md:text-[12px] max-md:px-4 max-md:py-3  rounded-full transition duration-300 shadow-md   gap-2 mx-auto my-6 w-full sm:w-auto">
+               <button className="cursor-pointer hidden max-lg:block mt-8 
+                bg-cyan-500 hover:bg-cyan-400 text-white font-semibold px-6 py-3  
+                max-lg:text-[13px] max-md:text-[12px] max-md:px-4 max-md:py-3  
+                rounded-full transition duration-300 shadow-md   gap-2 mx-auto my-6 w-full sm:w-auto">
             <img
               src="/images/landing-page/chrome.svg"
               alt="Chrome Icon"
