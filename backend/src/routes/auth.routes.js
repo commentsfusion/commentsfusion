@@ -16,6 +16,9 @@ const { signToken } = require("../utils/auth");
 const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
 const recaptchaFallback = require("../middleware/recaptchaFallback");
+const { getUserDetails } = require('../controllers/auth.controller');  
+const { protect } = require("../middleware/auth");
+
 
 const attemptLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -95,5 +98,12 @@ router.post(
   handleValidationErrors,
   asyncHandler(authController.resetPassword)
 );
+
+router.post('/logout', (req, res) => {
+  res.clearCookie("auth_token");
+  res.status(200).json({ message: 'Logged out successfully' });
+});
+
+router.get('/user', protect, getUserDetails);
 
 module.exports = router;

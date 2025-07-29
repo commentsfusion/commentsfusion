@@ -72,3 +72,22 @@ export async function resetPassword(email, code, newPassword, confirmNewPassword
   if (!res.ok) throw new Error(body.message);
   return body;
 }
+
+
+export async function fetchUserDetails() {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/user`, {
+      method: 'GET',
+      credentials: 'include',  
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch user details');
+    }
+
+    const data = await res.json();
+    return data;  
+  } catch (error) {
+    throw new Error(`Error fetching user details: ${error.message}`);
+  }
+}
