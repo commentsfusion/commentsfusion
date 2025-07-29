@@ -12,8 +12,11 @@ export default function MonitorEngagement() {
           transition={{ duration: 0.8 }}
          
         >
-        <h2 className="text-white text-5xl max-lg:text-4xl max-md:text-3xl font-bold text-center">
-          Monitor Engagement & <span className="text-[#33C6F4]">Prospects</span>
+        <h2 className="text-white text-5xl max-lg:text-4xl  font-bold text-center
+        max-md:text-[26px]">
+         <span className="text-white sm:text-[#33C6F4] max-md:text-[20px]"> Monitor Engagement & Prospects</span>
+
+
         </h2>
         </motion.div>
 

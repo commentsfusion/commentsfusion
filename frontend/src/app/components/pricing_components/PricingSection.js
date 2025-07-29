@@ -99,10 +99,8 @@ const PricingSection = () => {
   return (
     <div className="px-4 sm:px-0 md:px-1 lg:px-5 xl:px-35 2xl:px-20">
 
-      {/* Only one toggle below, remove any extra toggle from parent or page layout if present */}
       <PricingToggle isYearly={isYearly} setIsYearly={setIsYearly} />
-      {/* <div className="grid md:grid-cols-3 gap-10"> */}
-      <div className="grid grid-cols-3 gap-9 max-lg:gap-4 max-md:gap-2">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
         {plans.map((plan, idx) => (
           <PricingCard key={plan.title} {...plan} isYearly={isYearly} />
         ))}

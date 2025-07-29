@@ -6,7 +6,7 @@ export default function HeroText() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
-      className="text-center max-w-3xl z-10 mt-45 mx-auto px-4 sm:px-0 max-md:w-[80%] max-lg:mt-40  max-md:mt-35"
+      className="text-center max-w-3xl z-10 mt-45 mx-auto px-4 sm:px-0 max-md:w-[80%] max-lg:mt-40  max-md:mt-0"
     >
       <h1 className="text-5xl font-bold leading-tight max-lg:text-4xl max-md:text-3xl ">
         Automate 200+ Comments & Turn
