@@ -1,9 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
 
-
-
-
 export default function PeopleLinkedin() {
   const allData = [
     {
@@ -114,14 +111,6 @@ export default function PeopleLinkedin() {
     </>
   );
 }
-
-
-
-
-
-
-
-
 
 
 

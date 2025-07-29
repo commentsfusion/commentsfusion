@@ -20,7 +20,7 @@ function GroupPlan() {
       mlDiv: "mr-135 max-lg:mr-105 max-md:mr-95",
       mtDiv: "mt-36 max-lg:mt-28",
     },
-     {
+    {
       img: "images/features/logoStructure/Structurethird.svg",
       heading: "Marketing Agencies",
       text: `Position yourself as the go-to partner by integrating LinkedIn visibility into your strategy offering.`,
@@ -47,7 +47,7 @@ function GroupPlan() {
       mlDiv: "ml-120 max-lg:ml-100 max-md:ml-88",
       mtDiv: "mt-128 max-lg:mt-103",
     },
-     {
+    {
       img: "images/features/logoStructure/structureSixth.svg",
       heading: "Commerce Networks",
       text: `Empower local businesses by boosting visibility and credibility for their leaders.`,
@@ -56,7 +56,7 @@ function GroupPlan() {
       mlDiv: "mr-125 max-lg:mr-105 max-md:mr-95",
       mtDiv: "mt-159 max-lg:mt-127",
     },
-     {
+    {
       img: "images/features/logoStructure/structureSeventh.svg",
       heading: "Startup Networks & Incubators",
       text: `Give your founders the connections and trust they need to lead and grow.`,
@@ -65,38 +65,40 @@ function GroupPlan() {
       mlDiv: "ml-120 max-lg:ml-100 max-md:ml-88",
       mtDiv: "mt-189 max-lg:mt-155",
     },
-    
   ];
 
   return (
     <>
-      <h1 className="text-5xl font-bold text-center mt-35 max-lg:text-4xl max-md:text-3xl">
+      <h1 className="text-5xl font-bold text-center mt-45 max-lg:text-4xl max-md:text-3xl">
         Who benefits from the
         <span className="text-[#33C6F4]"> Group Plan</span>?
       </h1>
+      <div className="overflow-x-auto mb-0">
+      <div className="relative flex justify-center mt-20 mb-0 origin-top scale-100 max-lg:scale-[0.80] max-md:scale-[0.60]">
+          <img
+            src="images/features/logoStructure/logoStructure.svg"
+            className="w-67 max-lg:w-55"
+          />
 
-      <div className="relative flex justify-center mt-25 ">
-        <img
-          src="images/features/logoStructure/logoStructure.svg"
-          className="w-67 max-lg:w-55"
-        />
-
-        {groupItems.map((item, index) => (
-          <React.Fragment key={index}>
-            <img
-              src={item.img}
-              className={`w-17 max-lg:w-14 absolute ${item.mrImg} ${item.mtImg} hover:scale-107 transition-transform duration-300 ease-in-out`}
-            />
-
-            <div className={`absolute w-100 max-lg:w-80 max-md:w-70 ml-18 ${item.mtDiv} ${item.mlDiv}`}>
-              <h1 className="text-[#33C6F4] text-2xl font-bold absolute max-lg:text-xl max-md:text-lg">
-                {item.heading}
-              </h1>
-
-              <p className="mt-8 max-lg:text-[14px] max-md:text-[12px]">{item.text}</p>
-            </div>
-          </React.Fragment>
-        ))}
+          {groupItems.map((item, index) => (
+            <React.Fragment key={index}>
+              <img
+                src={item.img}
+                className={`w-17 max-lg:w-14 absolute ${item.mrImg} ${item.mtImg} hover:scale-107 transition-transform duration-300 ease-in-out`}
+              />
+              <div
+                className={`absolute w-100 max-lg:w-80 max-md:w-70 ml-18 ${item.mtDiv} ${item.mlDiv}`}
+              >
+                <h1 className="text-[#33C6F4] text-2xl font-bold absolute max-lg:text-xl max-md:text-lg">
+                  {item.heading}
+                </h1>
+                <p className="mt-8 max-lg:text-[14px] max-md:text-[12px]">
+                  {item.text}
+                </p>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </>
   );

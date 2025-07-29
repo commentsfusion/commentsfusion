@@ -27,16 +27,16 @@ function Msgbox() {
   ];
   return (
     <div>
-      <h1 className="text-5xl font-bold text-center pt-35 max-lg:text-4xl max-md:text-3xl ">How it Works ? </h1>
+      <h1 className="text-5xl font-bold text-center pt-25 max-lg:text-4xl max-md:text-3xl mb-10 ">How it Works ? </h1>
 
-      <div className="flex justify-center gap-x-30 gap-y-4 px-3 max-lg:gap-x-15 max-md:gap-x-8 max-lg:gap-y-0 max-lg:px-0  flex-wrap ">
+      <div className="flex justify-center md:ml-4 gap-x-100 gap-y-4 px-6 max-lg:gap-x-15 max-md:gap-x-8 
+      max-lg:gap-y-0 max-lg:px-0 flex-wrap">
         {msgData.map((item, index) => (
           <div
-            key={index}
-           className={`flex hover:scale-105 transition-transform duration-300 ease-in-out 
-  ${index === 2 ? "mt-8 max-lg:mt-5" : index === 3 ? "mt-8 max-lg:mt-5" : "mt-15 max-lg:mt-12"}`}
+      key={index}
+      className="flex hover:scale-105 transition-transform duration-300 ease-in-out mt-6 max-md:mt-4 mb-6 max-md:mb-4"
+    >
 
-          >
             <div className="w-[395px] h-[220px] max-lg:w-[320px] max-lg:h-[180px] max-md:w-[260px] max-md:h-[150px] bg-[linear-gradient(to_top_left,_#4194A7_20%,_#33C6F4_100%)] rounded-3xl px-4 py-3 border-2  ">
               <h1 className="text-[25px] font-bold max-lg:text-[21px] max-md:text-[18px]">{item.title}</h1>
               <p className="text-[15px] mt-5 max-lg:text-[13px] max-lg:mt-3 max-md:mt-2  max-md:text-[12px]">{item.discription}</p>

@@ -111,77 +111,119 @@ const StrategicCommentingSection = () => {
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
+return (
+  <section className="w-full px-2 sm:px-4 py-10">
+    <div className="mb-16">
 
-  return (
-    <section className="w-full max-w-none px-0 md:px-0 lg:px-0 py-10">
-      {/* Strategic Commenting Section */}
-      <div className="mb-16">
-        <div className="bg-white text-black text-2xl max-lg:text-xl max-md:text-lg font-semibold px-6 py-2 max-lg:px-4 max-lg:py-1.5 max-md:py-1 rounded-[12px] mb-0 shadow-sm">
-          Strategic Commenting
-        </div>
-        <div className="overflow-hidden">
-          <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] text-white text-sm font-semibold"></div>
-          <div className="text-white text-sm mt-5 ">
-            {/* Row: Unlimited GenAI comments */}
-            <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
-              <div className="p-4 border-r border-white/50 bg-transparent max-lg:text-[13px] max-md:text-[12.5px]">Unlimited GenAI comments</div>
-              {plans.map((plan, idx) => (
-                <div key={idx} className={`p-4 flex justify-center items-center  text-center ${idx !== plans.length - 1 ? 'border-r border-white/50' : ''}`}>
-                  {plan.comments ? renderCheckIcon() : renderCrossIcon()}
-                </div>
-              ))}
-            </div>
-            {/* Row: GenAI models */}
-            <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
-              <div className="p-4 border-r border-white/50 bg-transparent max-lg:text-[13px]">GenAI models</div>
-              {plans.map((plan, idx) => (
-                <div key={idx} className={`p-4 whitespace-pre-line text-center text-xs max-md:text-[11px]  text-white/90 ${idx !== plans.length - 1 ? 'border-r border-white/50' : ''}`}>{plan.models}</div>
-              ))}
-            </div>
-            {/* Row: Custom tones */}
-            <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
-              <div className="p-4 border-r border-white/50 bg-transparent max-lg:text-[13px]">Custom tones</div>
-              {plans.map((plan, idx) => (
-                <div key={idx} className={`p-4 text-center text-white/90 text-xs max-md:text-[11px] ${idx !== plans.length - 1 ? 'border-r border-white/50' : ''}`}>{plan.tones}</div>
-              ))}
-            </div>
-            {/* Row: Character Limit */}
-            <div className="grid  grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
-              <div className="p-4 border-r border-white/50 bg-transparent max-lg:text-[13px]">Custom tones character limit</div>
-              {plans.map((plan, idx) => (
-                <div key={idx} className={`p-4 text-center text-white/90 text-xs max-md:text-[11px] ${idx !== plans.length - 1 ? 'border-r border-white/50' : ''}`}>{plan.charLimit}</div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="bg-white text-black text-2xl font-semibold px-6 py-2 
+                      rounded-[12px] mb-0 shadow-sm max-lg:text-xl max-md:text-lg
+                      max-lg:py-1.5 max-md:py-2 max-lg:px-4"> 
+              Strategic Commenting
       </div>
-      {/* Prospects Monitoring Section */}
-      <div className="mb-16">
-        <div className="bg-white text-black text-2xl font-semibold px-6 py-2   rounded-[12px] mb-0 shadow-sm max-lg:text-xl max-md:text-lg max-lg:py-1.5 max-md:py-1 max-lg:px-4">
-          Prospects Monitoring
-        </div>
-        <div className="overflow-hidden">
-          {/* <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))] text-white text-sm font-semibold"></div> */}
-          <div className="text-white text-sm mt-5">
-            {prospectsFeatures.map((feature, idx) => (
-              <div key={idx} className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
-                <div className="p-4 border-r border-white/50 bg-transparent max-lg:text-[13px] max-md:text-[12.5px]">{feature.label}</div>
-                {prospectsPlans.map((plan, pidx) => (
-                  <div key={pidx} className={`p-4 text-center text-white/90 flex justify-center items-center text-xs max-md:text-[11px] ${pidx !== prospectsPlans.length - 1 ? 'border-r border-white/50' : ''}`}>
-                    {typeof plan[feature.key] === 'boolean'
-                      ? plan[feature.key]
-                        ? renderCheckIcon()
-                        : renderCrossIcon()
-                      : plan[feature.key]}
-                  </div>
-                ))}
+        <div className="block md:hidden grid grid-cols-[120px_repeat(4,1fr)] w-full mt-5 text-white
+        text-xs sm:text-sm font-bold border-b border-white/50 pb-2">
+        <div className="text-left px-1 sm:px-2">Feature</div>
+        <div className="text-center">Free</div>
+        <div className="text-center">Starter</div>
+        <div className="text-center">Premium</div>
+        <div className="text-center">Agency</div>
+      </div>
+
+      <div className="text-white text-sm mt-5">
+        {[
+          { label: "Unlimited GenAI comments", key: "comments", isIcon: true },
+          { label: "GenAI models", key: "models" },
+          { label: "Custom tones", key: "tones" },
+          { label: "Custom tones character limit", key: "charLimit" }
+        ].map((feature, rowIdx) => (
+
+          <div
+            key={rowIdx}
+            className="grid
+             grid-cols-[120px_repeat(4,1fr)]
+             md:grid-cols-[160px_repeat(4,1fr)]
+             lg:grid-cols-[160px_repeat(4,1fr)]
+              w-full text-xs sm:text-sm"
+          >
+            <div className=" p-3 sm:p-5 border-r border-white/50 text-left 
+            break-words text-[12px] sm:text-[13px] max-md:px-1 max-md:w-30">
+              {feature.label}
+            </div>
+
+            {plans.map((plan, idx) => (
+              
+              <div
+                key={idx}
+                className={`pl-2 p-2 max-md:px-1 max-md:py-5 max-md:ml-0 text-center flex justify-center 
+                   break-words ${
+                  idx !== plans.length - 1 ? "border-r border-white/50"
+                   : ""
+                }`}
+              >
+                {feature.isIcon
+                  ? plan[feature.key]
+                    ? renderCheckIcon()
+                    : renderCrossIcon()
+                  : plan[feature.key]}
               </div>
             ))}
           </div>
-        </div>
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
 
+    {/* Prospects Monitoring Section */}
+    <div className="mb-16">
+      <div className="bg-white text-black text-2xl font-semibold px-6 py-2 
+                      rounded-[12px] mb-0 shadow-sm max-lg:text-xl max-md:text-lg
+                      max-lg:py-1.5 max-md:py-2 max-lg:px-4"> 
+              Prospects Monitoring
+      </div>
+          <div className="block md:hidden grid grid-cols-[120px_repeat(4,1fr)] w-full mt-5 text-white
+        text-xs sm:text-sm font-bold border-b border-white/50 pb-2">
+        <div className="text-left px-1 sm:px-2">Feature</div>
+        <div className="text-center">Free</div>
+        <div className="text-center">Starter</div>
+        <div className="text-center">Premium</div>
+        <div className="text-center">Agency</div>
+      </div>
+      <div className="text-white text-sm mt-5">
+        {prospectsFeatures.map((feature, idx) => (
+          <div
+            key={idx}
+            className="grid
+             grid-cols-[120px_repeat(4,1fr)]
+             md:grid-cols-[160px_repeat(4,1fr)]
+             lg:grid-cols-[160px_repeat(4,1fr)]
+              w-full text-xs sm:text-sm"
+          >
+            <div className=" p-3 sm:p-5 border-r border-white/50 text-left 
+            break-words text-[12px] sm:text-[13px] max-md:px-1 max-md:w-30">
+              {feature.label}
+            </div>
+
+            {prospectsPlans.map((plan, pidx) => (
+              <div
+
+                key={pidx}
+                className={`pl-2 p-2 max-md:px-1 max-md:py-5 max-md:ml-0 text-center flex justify-center 
+                   break-words ${
+                  idx !== prospectsFeatures.length  ? "border-r border-white/50"
+                   : ""
+                }`}
+              >
+                {typeof plan[feature.key] === "boolean"
+                  ? plan[feature.key]
+                    ? renderCheckIcon()
+                    : renderCrossIcon()
+                  : plan[feature.key]}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+}
 export default StrategicCommentingSection;

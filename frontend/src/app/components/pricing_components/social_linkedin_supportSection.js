@@ -49,25 +49,47 @@ const SalesInsightsSection = () => {
   );
 
   return (
-    <section className="w-full max-w-none px-0 md:px-0 lg:px-0 -mt-10 ">
+  <section className="w-full px-2 sm:px-4 py-10 max-md:mt-[-50px] max-md:mb-[-50px]">
       {features.map((section, sIdx) => (
         <div key={sIdx} className="mb-16">
           {/* <div className="bg-white text-black text-xl md:text-2xl font-semibold px-6 py-2 rounded-[12px] mb-0 shadow-sm"> */}
-              <div className="bg-white text-black text-2xl font-semibold px-6 py-2   rounded-[12px] mb-0 shadow-sm max-lg:text-xl max-md:text-lg max-lg:py-1.5 max-md:py-1 max-lg:px-4">
+              <div className="bg-white text-black text-2xl font-semibold px-6 py-2 
+                rounded-[12px] mb-0 shadow-sm max-lg:text-xl max-md:text-lg
+                 max-lg:py-1.5 max-md:py-2 max-lg:px-4">
             {section.category}
           </div>
-          <div className="overflow-hidden">
-              {/* <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))] text-white text-sm font-semibold"> */}
-            {/* <div className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] text-white text-sm font-semibold"> */}
-            {/* </div> */}
+             <div className="block md:hidden grid grid-cols-[120px_repeat(4,1fr)] w-full mt-5 text-white
+        text-xs sm:text-sm font-bold border-b border-white/50 pb-2">
+        <div className="text-left px-1 sm:px-2">Feature</div>
+        <div className="text-center">Free</div>
+        <div className="text-center">Starter</div>
+        <div className="text-center">Premium</div>
+        <div className="text-center">Agency</div>
+      </div>
             <div className="text-white text-sm mt-5">
               {section.rows.map((feature, fIdx) => (
-                <div key={fIdx} className="grid grid-cols-[250px_repeat(4,minmax(100px,1fr))] max-lg:grid-cols-[200px_repeat(4,minmax(100px,1fr))] max-md:grid-cols-[190px_repeat(4,minmax(100px,1fr))]">
-                 
+                <div
+                 key={fIdx} 
+                 className="grid
+             grid-cols-[120px_repeat(4,1fr)]
+             md:grid-cols-[160px_repeat(4,1fr)]
+             lg:grid-cols-[160px_repeat(4,1fr)]
+              w-full text-xs sm:text-sm"
+          >
                   {/* <div className="p-4 border-r border-white/50 bg-transparent">{feature.label}</div> */}
-                    <div className="p-4 border-r border-white/50 bg-transparent max-lg:text-[13px] max-md:text-[12.5px]">{feature.label}</div>
+                    <div className="p-3 sm:p-5 border-r border-white/50 text-left 
+            break-words text-[12px] sm:text-[13px] max-md:px-1 max-md:w-30">
+              {feature.label}
+              </div>
                   {feature.values.map((value, idx) => (
-                    <div key={idx} className={` p-4 text-center text-white/90 flex justify-center items-center text-xs max-md:text-[11px] ${idx !== plans.length - 1 ? 'border-r border-white/50' : ''}`}>
+                     <div
+                key={idx}
+                className={`pl-2 p-2 max-md:px-1 max-md:py-5 max-md:ml-0 text-center flex justify-center 
+                   break-words ${
+                  idx !== plans.length - 1 ? "border-r border-white/50"
+                   : ""
+                }`}
+              >
                       {typeof value === 'boolean' ? (value ? renderCheckIcon() : renderCrossIcon()) : <span>{value}</span>}
                      
                     </div>
@@ -76,7 +98,6 @@ const SalesInsightsSection = () => {
               ))}
             </div>
           </div>
-        </div>
       ))}
     </section>
   );

@@ -9,10 +9,10 @@ import StrategicAdvantage from "../components/features_components/strategicAdvan
 import FaqsPage from "../components/LinkedIn_EngagementComponenet/faqsPage";
 import Footer from "../components/landingPage_components/Footer";
 
-function Features() {
+export default function Features() {
   return (
 <>
- <div className="bg-black min-h-screen  py-10 bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed ">
+ <div className="min-h-screen w-full overflow-x-hidden bg-[linear-gradient(to_bottom,_#000000_30%,_#33C6F4_100%)] bg-fixed">
 <Navbar/>
 <Linkedin_Guaranteed/>
 <FeaturesCards/>
@@ -29,7 +29,7 @@ function Features() {
   );
 }
 
-export default Features;
+
 
 
 

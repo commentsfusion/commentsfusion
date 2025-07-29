@@ -11,9 +11,9 @@ export default function Navbar() {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/30 to-black/10 backdrop-blur-md border-b border-white/30 shadow-[0_0_30px_rgba(255,255,255,0.2),0_0_12px_rgba(255,255,255,0.3),0_0_4px_rgba(255,255,255,0.4)]"
+      className="fixed top-0 left-0 right-0 z-50 w-full bg-gradient-to-b from-black/30 to-black/10 backdrop-blur-md border-b border-white/30 shadow-[0_0_30px_rgba(255,255,255,0.2),0_0_12px_rgba(255,255,255,0.3),0_0_4px_rgba(255,255,255,0.4)]"
     >
-      <nav className=" mx-auto flex justify-between items-center py-3.5 px-8 max-md:px-2.5 max-md:py-4 max-lg:px-3 ">
+      <nav className=" w-full flex justify-between items-center py-3.5 px-8 max-md:px-2.5 max-md:py-4 max-lg:px-3 ">
         <Link href="/" className="flex items-center">
           <Image
             src="/images/logo/logo.svg"
