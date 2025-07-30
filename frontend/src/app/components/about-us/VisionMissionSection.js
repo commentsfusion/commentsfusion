@@ -13,7 +13,6 @@ const VisionMissionSection = () => {
         </h2>
       </div>
 <div className="relative flex flex-col md:flex-row items-center justify-center min-h-[500px] gap-6 md:gap-16 lg:gap-24">
-  {/* First Card */}
   <div
     className="relative md:mr-[-16px] w-full md:w-[48%] rounded-[24px]
      p-4 sm:p-5 md:p-6 lg:p-8 text-sm sm:text-base md:text-xl lg:text-2xl 
@@ -32,7 +31,6 @@ const VisionMissionSection = () => {
       conversation.
     </span>
 
-    {/* Tail Pointer */}
     <div
       className="hidden md:block absolute bottom-[-40px] right-8 w-0 h-0"
       style={{
@@ -41,7 +39,6 @@ const VisionMissionSection = () => {
       }}
     ></div>
 
-    {/* Floating Bot */}
     <motion.div
       className="hidden lg:block absolute left-0 bottom-[-270px] z-20"
       animate={{
@@ -63,7 +60,6 @@ const VisionMissionSection = () => {
     </motion.div>
   </div>
 
-  {/* Second Card */}
   <div
     className="relative md:ml-[-16px] w-full md:w-[48%] rounded-[24px] 
      p-4 sm:p-5 md:p-6 lg:p-8 text-sm sm:text-base md:text-xl lg:text-2xl 
@@ -82,7 +78,6 @@ const VisionMissionSection = () => {
       interactions.
     </span>
 
-    {/* Tail Pointer */}
     <div
       className="hidden md:block absolute -top-10 left-8 w-0 h-0"
       style={{
@@ -91,7 +86,6 @@ const VisionMissionSection = () => {
       }}
     ></div>
 
-    {/* Floating Bot */}
     <motion.div
       className="hidden lg:block absolute right-0 top-[-220px] z-20"
       animate={{
@@ -114,7 +108,6 @@ const VisionMissionSection = () => {
   </div>
 </div>
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-1 mt-16 md:mt-32 items-center text-center md:text-left">
-  {/* Heading */}
   <div>
     <h3 className="text-3xl md:text-4xl font-bold leading-snug mb-4 md:mb-0 text-center max-md:mb-[-30px] lg:ml-100">
       Revolutionizing Conversations{' '}<br />
@@ -122,15 +115,11 @@ const VisionMissionSection = () => {
     </h3>
   </div>
 
-  {/* Horizontal Divider (Mobile only) */}
   <div className="block lg:hidden w-[90%] h-px bg-white mx-auto my-0 col-span-full mt-8" />
 
-  {/* Paragraph Text Section */}
   <div className="relative w-full">
-    {/* Vertical Divider (Desktop only) */}
     <div className="hidden lg:block absolute left-0 top-0 h-full border-l border-white"></div>
 
-    {/* Actual Text */}
     <div className="px-4 lg:pl-16 text-base md:text-2xl font-light leading-relaxed mt-10 lg:mt-0 text-white 
     max-lg:text-center max-sm:mt-[-4px] max-sm:mb-6">
       At <span className="font-bold">Comments Fusion</span>, we believe<br />

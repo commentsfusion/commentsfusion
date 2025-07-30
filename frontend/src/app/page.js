@@ -25,7 +25,6 @@ export default function HomePage() {
         <DecorativeBirds />
         <Reviews />
       </section>
-      {/* <FeaturesSection /> */}
       <NewfeaturesSection/>
       <LeadConversionFlow />
       <ThreeSteps/>
