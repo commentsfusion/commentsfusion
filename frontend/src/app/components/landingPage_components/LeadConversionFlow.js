@@ -188,7 +188,6 @@ export default function LeadConversionFlow() {
                     priority
                   />
                 </div>
-                
                 {idx < mobileSteps.length - 1 && (
                   <div className="relative w-8 h-4 my-0.5 mt-4 mb-[-36]">
                     <Image
