@@ -34,53 +34,52 @@ function NewfeaturesSection() {
   return (
     <>
       <div>
-          <motion.div
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-        <h2 className="text-center text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-2xl max-md:mt-[-150px]">
-          Powerful Features to Supercharge Your <br />
-          <span className="text-[#33C6F4]">Client Acquisition</span>
-        </h2>
+          <h2 className="text-center text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-2xl max-lg:mt-[-200px] max-md:mt-[-150px]">
+            Powerful Features to Supercharge Your <br />
+            <span className="text-[#33C6F4]">Client Acquisition</span>
+          </h2>
         </motion.div>
-        <div className="flex flex-wrap justify-center gap-x-30 mt-10 max-lg:gap-x-0 max-lg:mt-30 
-                        max-md:flex-col max-md:items-center max-md:gap-y-8">
-          {features.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ 
-                duration: 0.4, 
-                delay: index * 0.01,
-                type: "spring",
-                stiffness: 120 
-              }}
-              className={`w-96 max-lg:w-87 bg-[#000000] h-75 max-lg:h-67 max-md:w-68 max-md:h-55  
-                mt-20 max-lg:mt-0 rounded-[30px] shadow-[0_0_10px_#33C6F4,_10px_0_10px_#33C6F4,_-10px_0_10px_#33C6F4,_0_10px_10px_#33C6F4,_0_-10px_10px_#33C6F4] 
-                flex flex-col items-center py-11 px-7 max-lg:px-4 max-lg:py-6 max-md:px-3 
-                hover:scale-104 transition-transform duration-300 ease-in-out
-                max-md:mb-4
-                ${index === 0 ? "max-lg:mr-[-15px] max-md:mr-0" : ""}
-                ${index === 1 ? "max-lg:mt-50 max-lg:ml-[-15px] max-md:mt-0 max-md:ml-0" : ""}
-                ${index === 2 ? "max-lg:mt-[-60px] max-lg:mr-[-15px] max-md:mt-0 max-md:mr-0" : ""}
-                ${index === 3 ? "max-lg:mt-37 max-lg:ml-[-15px] max-md:mt-0 max-md:ml-0" : ""}`}
-            >
-              <Image
-                src={item.icon}
-                width={45}
-                height={30}
-                alt="Client Acquisition"
-                className="w-11 max-md:w-9"
-              />
-              <h1 className="text-center text-2xl max-lg:text-[21px] mt-7 max-md:mt-4">{item.title}</h1>
-              <p className="text-center text-[14px] max-lg:text-[13px] max-md:text-[12px] 
-              mt-5 max-md:mt-3">{item.description}</p>
-            
-            </motion.div>
-          ))}
+
+        <div className="px-2 sm:px-8 md:px-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10 md:gap-x-4 md:gap-y-14 mt-10 place-items-center">
+            {features.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.4,
+                  delay: index * 0.01,
+                  type: "spring",
+                  stiffness: 120,
+                }}
+                className="w-96 max-lg:w-80 max-md:w-72 bg-[#000000] h-auto rounded-[30px]
+                  shadow-[0_0_10px_#33C6F4,_10px_0_10px_#33C6F4,_-10px_0_10px_#33C6F4,_0_10px_10px_#33C6F4,_0_-10px_10px_#33C6F4] 
+                  flex flex-col items-center py-11 px-7 max-lg:px-4 max-lg:py-6 max-md:px-3 
+                  hover:scale-105 transition-transform duration-300 ease-in-out"
+              >
+                <Image
+                  src={item.icon}
+                  width={45}
+                  height={30}
+                  alt="Client Acquisition"
+                  className="w-11 max-md:w-9"
+                />
+                <h1 className="text-center text-2xl max-lg:text-[21px] mt-7 max-md:mt-4">
+                  {item.title}
+                </h1>
+                <p className="text-center text-[14px] max-lg:text-[13px] max-md:text-[12px] mt-5 max-md:mt-3">
+                  {item.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </>
