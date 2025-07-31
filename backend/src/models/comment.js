@@ -1,5 +1,4 @@
 // models/Comment.js
-//const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
