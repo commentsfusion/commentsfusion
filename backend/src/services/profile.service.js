@@ -7,7 +7,7 @@ const config = require("../config/config");
 
 const openai = new OpenAI({ apiKey: config.openai.apiKey });
 
-exports.SEVEN_DAYS = 1 * 24 * 3600 * 1000; // currently 1 day in development
+const SEVEN_DAYS = 1 * 24 * 3600 * 1000; // currently 1 day in development
 
 async function checkUserExists(userId, linkedinUsername, isPersonal = true) {
   let query;
@@ -395,7 +395,7 @@ Your job is to help a user (the commenter) write a comment on a post made by som
 - tag_line of the commentor
 - there also may or may not be comment threads. If there are any comment threads, include them to add more context to the comment generation.a
 
-Write a 1–2 sentence comment that is preferably under 30 words:
+Write a 1–2 sentence comment that is preferably under 20 words:
 - Sounds authentic and natural on LinkedIn
 - Matches the requested tone (Enlightenment, Insightful, Convert-to-dm, Self-Intro)
 - Is written in first-person as if the user is commenting directly
@@ -421,6 +421,7 @@ Only return the comment text. No extra explanation.` + toneInstruction;
 }
 
 module.exports = {
+  SEVEN_DAYS,
   checkUserExists,
   upsertProfileData,
   updateConnectionsCount,

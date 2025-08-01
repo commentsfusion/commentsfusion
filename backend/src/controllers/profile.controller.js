@@ -1,9 +1,8 @@
 const ApiError = require("../utils/apiError");
 const httpStatus = require("http-status").default;
 const Profile = require("../models/profile");
-const { SEVEN_DAYS } = require("../services/profile.service");
 
-const { profileService } = require("../services");
+const { profileService, SEVEN_DAYS } = require("../services");
 
 exports.checkProfileExists = async (req, res, next) => {
   try {
@@ -20,7 +19,9 @@ exports.checkProfileExists = async (req, res, next) => {
     let exists = Boolean(profile);
     if (isPersonal && profile && profile.lastFetchedAt) {
       const age = Date.now() - profile.lastFetchedAt.getTime();
-      if (age >= SEVEN_DAYS) exists = false;
+      if (age >= SEVEN_DAYS) {
+        exists = false;
+      }
     }
 
     res.json({ exists, message: exists ? "Exists" : "Not found" });

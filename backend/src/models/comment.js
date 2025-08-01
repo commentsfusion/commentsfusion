@@ -29,7 +29,7 @@ const commentSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "online", "failed"],
-      default: "pending",
+      default: "online",
       description: "The status of the comment",
     },
   },

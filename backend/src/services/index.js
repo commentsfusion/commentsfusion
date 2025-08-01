@@ -1,5 +1,10 @@
+const profileService = require('./profile.service');
+const commentService = require('./comment.service');
+const authService    = require('./auth.service');
+
 module.exports = {
-  authService:    require('./auth.service'),
-  profileService: require('./profile.service'),
-  commentService: require('./comment.service')
+  authService,
+  profileService,
+  commentService,
+  SEVEN_DAYS: profileService.SEVEN_DAYS,
 };
