@@ -10,6 +10,7 @@ const authRoutes = require('./src/routes/auth.routes');
 const profileRoutes = require('./src/routes/profile.routes');
 const userRoutes = require('./src/routes/user.routes');
 const commentRoutes = require('./src/routes/comment.routes');
+const dashboardRoutes = require('./src/routes/dashboard.routes');
 const connectDatabase = require("./src/utils/db");
 const { apiErrorHandler } = require('./src/middleware/errorHandler');
 const passport = require('passport');
@@ -48,6 +49,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/comment', commentRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use(apiErrorHandler); 
 
 const PORT = process.env.PORT || 5000;

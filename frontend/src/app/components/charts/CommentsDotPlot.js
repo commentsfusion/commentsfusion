@@ -9,50 +9,66 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-const rawData = [
-  { month: "Jan", value: 15 },
-  { month: "Feb", value: 25 },
-  { month: "Mar", value: 18 },
-  { month: "Apr", value: 30 },
-  { month: "May", value: 22 },
-  { month: "Jun", value: 35 },
-];
+export default function CommentsBarChart({ data = [] }) {
+  // Group data by month and sum up the values
+  const groupDataByMonth = (data) => {
+    const monthlyData = {};
 
-export default function CommentsBarChart() {
-  const data = {
-    labels: rawData.map((d) => d.month),
+    data.forEach((item) => {
+      if (item.x && (item.y || item.y === 0)) {
+        const date = new Date(item.x);
+        const monthKey = `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}`;
+        const monthLabel = date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+        });
+
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = {
+            label: monthLabel,
+            value: 0,
+            date: date,
+          };
+        }
+        monthlyData[monthKey].value += item.y;
+      }
+    });
+
+    return Object.values(monthlyData)
+      .sort((a, b) => b.date - a.date)
+      .slice(0, 6)
+      .reverse();
+  };
+
+  const monthlyData = groupDataByMonth(data);
+
+  const chartData = {
+    labels: monthlyData.map((item) => item.label),
     datasets: [
       {
-        data: rawData.map((d) => d.value),
-
-        // 1) Use a function so Chart.js will pass you the context,
-        //    and you can create a gradient that spans the chartArea
+        label: "Comments",
+        data: monthlyData.map((item) => item.value),
         backgroundColor: (ctx) => {
           const chart = ctx.chart;
           const { ctx: c, chartArea } = chart;
 
-          // chartArea might be undefined on initial render
           if (!chartArea) {
-            return null;
+            return "#33C6F4";
           }
 
-          // Create a vertical gradient from bottom → top
           const grad = c.createLinearGradient(
             0,
             chartArea.bottom,
             0,
             chartArea.top
           );
-          grad.addColorStop(0, "#33C6F4"); // bottom color
-          grad.addColorStop(1, "#2D578F"); // top color
+          grad.addColorStop(0, "#33C6F4");
+          grad.addColorStop(1, "#2D578F");
           return grad;
         },
-
-        // 2) Fix the bar width: you can also set these in options.scales.x
-        barThickness: 20, // exact pixel width
-        // OR (for relative sizing):
-        // barPercentage: 0.5,      // each bar is 50% of the category width
-        // categoryPercentage: 0.6, // each category gets 60% of the x-axis space
+        barThickness: 20,
       },
     ],
   };
@@ -73,7 +89,6 @@ export default function CommentsBarChart() {
         border: { display: true, color: "#444" },
         grid: { display: false },
         ticks: { display: true, padding: 0 },
-
         categoryPercentage: 0.1,
         barPercentage: 0.9,
       },
@@ -105,7 +120,7 @@ export default function CommentsBarChart() {
   return (
     <div className="h-48 w-full">
       <Bar
-        data={data}
+        data={chartData}
         options={options}
         style={{
           position: "absolute",

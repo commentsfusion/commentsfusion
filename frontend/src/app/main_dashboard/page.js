@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import MobileLayout from "../components/mobileLayout";
+import { getDashboardMetrics } from "../utils/api";
 
 const FollowersChart = dynamic(
   () => import("../components/charts/FollowersChart"),
@@ -20,18 +21,27 @@ const CommentsDotPlot = dynamic(
 );
 
 export default function Home() {
-  const followersCount = "1.4K";
-  const connectionsCount = "900";
-  const commentsCount = "35";
-
   const filters = [
     { label: "7d", value: "7d" },
     { label: "15d", value: "15d" },
     { label: "30d", value: "30d" },
   ];
-
-  const [selectedFilter, setSelectedFilter] = useState(filters[0].value);
+  const [selectedFilter, setSelectedFilter] = useState(filters[1].value);
   const [screenType, setScreenType] = useState("desktop");
+  const [metrics, setMetrics] = useState({
+    followersCount: 0,
+    followersSeries: [],
+    connectionsCount: 0,
+    connectionsSeries: [],
+    totalComments: 0,
+    commentsSeries: [],
+  });
+
+  useEffect(() => {
+    getDashboardMetrics(selectedFilter)
+      .then(setMetrics)
+      .catch((err) => console.error("Dashboard load error:", err));
+  }, [selectedFilter]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -78,10 +88,10 @@ export default function Home() {
               />
               <span className="text-lg font-medium">Followers</span>
             </div>
-            <span className="text-lg">{followersCount}</span>
+            <span className="text-lg">{metrics.followersCount}</span>
           </div>
           <div className="relative w-full h-48">
-            <FollowersChart />
+            <FollowersChart data={metrics.followersSeries} />
           </div>
         </div>
 
@@ -97,10 +107,10 @@ export default function Home() {
               />
               <span className="text-lg font-medium">Connections</span>
             </div>
-            <span className="text-lg">{connectionsCount}</span>
+            <span className="text-lg">{metrics.connectionsCount}</span>
           </div>
           <div className="relative w-full h-48">
-            <ConnectionsChart />
+            <ConnectionsChart data={metrics.connectionsSeries} />
           </div>
         </div>
 
@@ -116,10 +126,10 @@ export default function Home() {
               />
               <span className="text-lg font-medium">Comments</span>
             </div>
-            <span className="text-lg">{commentsCount}</span>
+            <span className="text-lg">{metrics.totalComments}</span>
           </div>
           <div className="relative w-full h-48">
-            <CommentsDotPlot />
+            <CommentsDotPlot data={metrics.commentsSeries} />
           </div>
         </div>
 
@@ -193,127 +203,143 @@ export default function Home() {
   );
 
   const renderMobile = () => (
-  <div className="space-y-4 px-2 pb-6">
-    {/* Followers */}
-    <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4 mb-10">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2 ">
-          <Image
-            src="/images/main_dashboard/followersIcon.svg"
-            alt="Followers Icon"
-            width={20}
-            height={20}
-          />
-          <span className="text-base font-medium">Followers</span>
+    <div className="space-y-4 px-2 pb-6">
+      {/* Followers */}
+      <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4 mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2 ">
+            <Image
+              src="/images/main_dashboard/followersIcon.svg"
+              alt="Followers Icon"
+              width={20}
+              height={20}
+            />
+            <span className="text-base font-medium">Followers</span>
+          </div>
+          <span className="text-base">1.4K</span>
         </div>
-        <span className="text-base">1.4K</span>
-      </div>
-      <div className="relative w-full h-48">
-        <FollowersChart />
-      </div>
-    </div>
-
-    {/* Connections */}
-    <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4 mb-10">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Image
-            src="/images/main_dashboard/connectionsIcon.svg"
-            alt="Connections Icon"
-            width={20}
-            height={20}
-          />
-          <span className="text-base font-medium">Connections</span>
+        <div className="relative w-full h-48">
+          <FollowersChart />
         </div>
-        <span className="text-base">900</span>
       </div>
-      <div className="relative w-full h-48">
-        <ConnectionsChart />
-      </div>
-    </div>
 
-    {/* Comments */}
-    <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4 mb-10">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Image
-            src="/images/main_dashboard/commentsIcon.svg"
-            alt="Comments Icon"
-            width={20}
-            height={20}
-          />
-          <span className="text-base font-medium">Comments</span>
+      {/* Connections */}
+      <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4 mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Image
+              src="/images/main_dashboard/connectionsIcon.svg"
+              alt="Connections Icon"
+              width={20}
+              height={20}
+            />
+            <span className="text-base font-medium">Connections</span>
+          </div>
+          <span className="text-base">900</span>
         </div>
-        <span className="text-base">35</span>
-      </div>
-      <div className="relative w-full h-48">
-        <CommentsDotPlot />
-      </div>
-    </div>
-<hr/>
-    {/* Performance Tracker */}
-    <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-2xl p-4">
-      <div className="text-center mb-3">
-        <p className="text-lg font-semibold">
-           Performance Tracker
-        </p>
-        <p className="text-xs text-white/70">
-          Optimize your outreach by tracking which targets drive the most engagement.
-        </p>
+        <div className="relative w-full h-48">
+          <ConnectionsChart />
+        </div>
       </div>
 
-      <div className="space-y-3">
-        {[
-          { name: "Balie Parker", followers: "1.3K", comments: 0, impressions: 0, date: "—" },
-          { name: "Brandon William", followers: "2.6K", comments: 0, impressions: 0, date: "—" },
-          { name: "Crista Munchkins", followers: "5K", comments: 0, impressions: 0, date: "—" },
-        ].map((user, i) => (
-          <div
-            key={i}
-            className="border border-white/10 rounded-xl px-4 py-3 bg-black/30"
-          >
-            <div className="flex items-center justify-between mb-2 text-xs text-white/60">
-              <span>No: {String(i + 1).padStart(2, "0")}</span>
-              <span>Latest: {user.date}</span>
-            </div>
+      {/* Comments */}
+      <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-xl shadow-lg p-4 mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Image
+              src="/images/main_dashboard/commentsIcon.svg"
+              alt="Comments Icon"
+              width={20}
+              height={20}
+            />
+            <span className="text-base font-medium">Comments</span>
+          </div>
+          <span className="text-base">35</span>
+        </div>
+        <div className="relative w-full h-48">
+          <CommentsDotPlot />
+        </div>
+      </div>
+      <hr />
+      {/* Performance Tracker */}
+      <div className="w-full bg-black/60 backdrop-blur-md border border-white/20 rounded-2xl p-4">
+        <div className="text-center mb-3">
+          <p className="text-lg font-semibold">Performance Tracker</p>
+          <p className="text-xs text-white/70">
+            Optimize your outreach by tracking which targets drive the most
+            engagement.
+          </p>
+        </div>
 
-            <div className="flex items-center space-x-3 mb-1">
-              <Image
-                src="/images/topbar/userIcon.svg"
-                alt={user.name}
-                width={30}
-                height={30}
-                className="rounded-full"
-              />
-              <div>
-                <p className="font-medium text-sm">{user.name}</p>
-                <p className="text-xs text-white/70">{user.followers} followers</p>
+        <div className="space-y-3">
+          {[
+            {
+              name: "Balie Parker",
+              followers: "1.3K",
+              comments: 0,
+              impressions: 0,
+              date: "—",
+            },
+            {
+              name: "Brandon William",
+              followers: "2.6K",
+              comments: 0,
+              impressions: 0,
+              date: "—",
+            },
+            {
+              name: "Crista Munchkins",
+              followers: "5K",
+              comments: 0,
+              impressions: 0,
+              date: "—",
+            },
+          ].map((user, i) => (
+            <div
+              key={i}
+              className="border border-white/10 rounded-xl px-4 py-3 bg-black/30"
+            >
+              <div className="flex items-center justify-between mb-2 text-xs text-white/60">
+                <span>No: {String(i + 1).padStart(2, "0")}</span>
+                <span>Latest: {user.date}</span>
+              </div>
+
+              <div className="flex items-center space-x-3 mb-1">
+                <Image
+                  src="/images/topbar/userIcon.svg"
+                  alt={user.name}
+                  width={30}
+                  height={30}
+                  className="rounded-full"
+                />
+                <div>
+                  <p className="font-medium text-sm">{user.name}</p>
+                  <p className="text-xs text-white/70">
+                    {user.followers} followers
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-between text-xs text-white/80">
+                <span>Comments: {user.comments}</span>
+                <span>Impressions: {user.impressions}</span>
               </div>
             </div>
+          ))}
+        </div>
 
-            <div className="flex justify-between text-xs text-white/80">
-              <span>Comments: {user.comments}</span>
-              <span>Impressions: {user.impressions}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex justify-center gap-3 mt-5">
-        <button className="p-2 bg-white/20 rounded-lg text-sm">&larr;</button>
-        <button className="w-8 h-8 bg-white/20 rounded-lg text-sm">1</button>
-        <button className="w-8 h-8 bg-white/20 rounded-lg text-sm">2</button>
-        <button className="p-2 bg-white/20 rounded-lg text-sm">&rarr;</button>
+        <div className="flex justify-center gap-3 mt-5">
+          <button className="p-2 bg-white/20 rounded-lg text-sm">&larr;</button>
+          <button className="w-8 h-8 bg-white/20 rounded-lg text-sm">1</button>
+          <button className="w-8 h-8 bg-white/20 rounded-lg text-sm">2</button>
+          <button className="p-2 bg-white/20 rounded-lg text-sm">&rarr;</button>
+        </div>
       </div>
     </div>
-  </div>
-);
-
-
-
+  );
 
   if (screenType === "desktop") return <Layout>{renderDesktop()}</Layout>;
-  if (screenType === "tablet") return <MobileLayout>{renderDesktop()}</MobileLayout>;
+  if (screenType === "tablet")
+    return <MobileLayout>{renderDesktop()}</MobileLayout>;
   return <MobileLayout>{renderMobile()}</MobileLayout>;
-
 }

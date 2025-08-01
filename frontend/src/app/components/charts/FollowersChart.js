@@ -16,21 +16,23 @@ ChartJS.register(
   Tooltip
 );
 
-const data = {
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  datasets: [
-    {
-      data: [400, 800, 600, 1200, 900, 1400],
-      borderColor: "#33C6F4",
-      borderWidth: 2,
-      fill: false,
-      pointRadius: 0,
-      pointHoverRadius: 6,
-    },
-  ],
-};
+export default function FollowersChart({ data = [] }) {
+  const chartData = {
+    labels: data.map((item, index) => item.label || `Day ${index + 1}`),
+    datasets: [
+      {
+        label: "Followers",
+        data: data.map((item) => item.value || item.count || item),
+        borderColor: "#3B82F6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.4,
+      },
+    ],
+  };
 
-export default function FollowersChart() {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -45,12 +47,12 @@ export default function FollowersChart() {
         offset: false,
         position: "bottom",
         border: { display: true, color: "#444" },
-        ticks: { display: true, padding: 0 },
+        ticks: { display: false, padding: 0 },
         grid: { display: false },
       },
       y: {
         border: { display: true, color: "#444" },
-        ticks: { display: false, padding: 0 },
+        ticks: { display: true, padding: 0 },
         grid: { display: false },
       },
     },
@@ -64,6 +66,34 @@ export default function FollowersChart() {
         padding: 6,
         position: "nearest",
         intersect: false,
+
+        callbacks: {
+          // `items` is an array of tooltip items—usually one per dataset
+          title: (items) => {
+            if (!items.length) return "";
+
+            // The raw label string:
+            const rawLabel = items[0].label;
+
+            // Try to parse as ISO date:
+            const d = new Date(rawLabel);
+            if (!isNaN(d)) {
+              // Format as e.g. "August 1, 2025"
+              return d.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            }
+            // Fallback:
+            return rawLabel;
+          },
+
+          label: (item) => {
+            // default label: "Followers: 586"
+            return `Followers: ${item.parsed.y}`;
+          },
+        },
       },
     },
 
@@ -76,7 +106,7 @@ export default function FollowersChart() {
   return (
     <div className="h-48 w-full">
       <Line
-        data={data}
+        data={chartData}
         options={options}
         style={{
           position: "absolute",
