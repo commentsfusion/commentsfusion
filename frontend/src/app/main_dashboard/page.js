@@ -157,7 +157,6 @@ export default function Home() {
             <span>No:</span>
             <span>Name:</span>
             <span>Comments count:</span>
-            <span>Impressions:</span>
             <span>Latest comment date:</span>
           </div>
 
@@ -185,7 +184,6 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-                <span>0</span>
                 <span>0</span>
               </div>
             ))}
@@ -216,10 +214,10 @@ export default function Home() {
             />
             <span className="text-base font-medium">Followers</span>
           </div>
-          <span className="text-base">1.4K</span>
+          <span className="text-base">{metrics.followersCount}</span>
         </div>
         <div className="relative w-full h-48">
-          <FollowersChart />
+          <FollowersChart data={metrics.followersSeries} />
         </div>
       </div>
 
@@ -235,10 +233,10 @@ export default function Home() {
             />
             <span className="text-base font-medium">Connections</span>
           </div>
-          <span className="text-base">900</span>
+          <span className="text-base">{metrics.connectionsCount}</span>
         </div>
         <div className="relative w-full h-48">
-          <ConnectionsChart />
+          <ConnectionsChart data={metrics.connectionsSeries} />
         </div>
       </div>
 
@@ -254,7 +252,7 @@ export default function Home() {
             />
             <span className="text-base font-medium">Comments</span>
           </div>
-          <span className="text-base">35</span>
+          <span className="text-base">{metrics.totalComments}</span>
         </div>
         <div className="relative w-full h-48">
           <CommentsDotPlot />

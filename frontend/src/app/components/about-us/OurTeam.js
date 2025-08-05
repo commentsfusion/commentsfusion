@@ -33,27 +33,29 @@ const OurTeamSection = () => {
             <span className="text-cyan-400">Murad Butt</span>{" "}
             <span className="text-white font-normal">
               is the visionary founder of
-              <span className="font-bold text-white"> Comments Fusion</span>, a dynamic
-              platform revolutionizing the way online conversations are managed and
-              engaged with. With a strong passion for digital innovation and community
-              engagement,
-              <span className="text-cyan-400"> Murad</span> launched Comments Fusion to
-              streamline comment management, amplify user interaction, and empower
-              creators, brands, and publishers to cultivate thriving online communities.
+              <span className="font-bold text-white"> Comments Fusion</span>, a
+              dynamic platform revolutionizing the way online conversations are
+              managed and engaged with. With a strong passion for digital
+              innovation and community engagement,
+              <span className="text-cyan-400"> Murad</span> launched Comments
+              Fusion to streamline comment management, amplify user interaction,
+              and empower creators, brands, and publishers to cultivate thriving
+              online communities.
             </span>
           </p>
           <p className="text-base md:text-lg text-white mb-2">
-            Under <span className="text-cyan-400">Murad’s</span> leadership,
-            <span className="font-bold"> Comments Fusion</span> is shaping the future of
-            comment systems by blending smart moderation tools, real-time analytics,
-            and seamless integration across platforms. His commitment to transparency,
-            user empowerment, and meaningful discourse drives the mission behind the
-            brand.
+            Under <span className="text-cyan-400">Murad&rsquo;s</span>{" "}
+            leadership,
+            <span className="font-bold"> Comments Fusion</span> is shaping the
+            future of comment systems by blending smart moderation tools,
+            real-time analytics, and seamless integration across platforms. His
+            commitment to transparency, user empowerment, and meaningful
+            discourse drives the mission behind the brand.
           </p>
           <p className="text-base md:text-lg text-white">
-            Whether you're a content creator, business, or publisher,
-            <span className="text-cyan-400"> Murad</span> is dedicated to making sure your
-            audience's voice is not only heard but valued.
+            Whether you&rsquo;re a content creator, business, or publisher,
+            <span className="text-cyan-400"> Murad</span> is dedicated to making
+            sure your audience&rsquo;s voice is not only heard but valued.
           </p>
         </div>
       </div>
@@ -80,22 +82,26 @@ const OurTeamSection = () => {
           <p className="text-base md:text-lg text-cyan-400 font-bold mb-2">
             <span className="text-cyan-400">Arslan Ashraf</span>{" "}
             <span className="text-white font-normal">
-              is the strategic co-founder of <span className="font-bold">Comments Fusion</span>,
-              bringing a sharp focus on product innovation, user experience, and technical
-              solutions. With a strong background in digital solutions and platform
-              development, Arslan co-founded Comments Fusion alongside Murad Butt to
-              transform how digital communities interact, moderate, and grow.
+              is the strategic co-founder of{" "}
+              <span className="font-bold">Comments Fusion</span>, bringing a
+              sharp focus on product innovation, user experience, and technical
+              solutions. With a strong background in digital solutions and
+              platform development, Arslan co-founded Comments Fusion alongside
+              Murad Butt to transform how digital communities interact,
+              moderate, and grow.
             </span>
           </p>
           <p className="text-base md:text-lg text-white mb-2">
-            Arslan plays a key role in shaping the platform’s core architecture and ensuring
-            it delivers impactful features and reliable systems. His vision and leadership
-            help bridge the gap between user needs and scalable tech solutions, making
-            Comments Fusion a go-to choice for businesses, publishers, and creators alike.
+            Arslan plays a key role in shaping the platform’s core architecture
+            and ensuring it delivers impactful features and reliable systems.
+            His vision and leadership help bridge the gap between user needs and
+            scalable tech solutions, making Comments Fusion a go-to choice for
+            businesses, publishers, and creators alike.
           </p>
           <p className="text-base md:text-lg text-white">
-            Together with Murad, Arslan is committed to building a platform that fosters
-            healthier conversations and empowers community-driven growth.
+            Together with Murad, Arslan is committed to building a platform that
+            fosters healthier conversations and empowers community-driven
+            growth.
           </p>
         </div>
       </div>
@@ -124,8 +130,8 @@ const OurTeamSection = () => {
         {/* Text Content */}
         <div className="max-w-2xl md:max-w-4xl mx-auto text-center z-20 relative">
           <p className="text-white text-base md:text-lg mb-2 md:mb-4 max-lg:mt-14">
-            Join thousands of professionals using Comments Fusion to connect smarter,
-            engage faster, and grow stronger right on LinkedIn.
+            Join thousands of professionals using Comments Fusion to connect
+            smarter, engage faster, and grow stronger right on LinkedIn.
           </p>
           <p className="text-white text-lg md:text-2xl font-bold mb-6 md:mb-8">
             Start your journey one smart comment at a time.

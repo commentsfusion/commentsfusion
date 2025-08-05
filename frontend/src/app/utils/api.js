@@ -116,7 +116,6 @@ export async function getDashboardMetrics(period = "7d") {
   return await res.json();
 }
 
-
 export async function sendContactMessage(data) {
   const res = await fetch(`${API_BASE}/api/contact-us`, {
     method: "POST",
@@ -127,4 +126,9 @@ export async function sendContactMessage(data) {
   const body = await res.json();
   if (!res.ok) throw new Error(body.message || "Failed to send contact message");
   return body;
+}
+export async function fetchComments() {
+  const res = await fetch("/api/comment/list-comments");
+  if (!res.ok) throw new Error("Failed to load comments");
+  return res.json();
 }

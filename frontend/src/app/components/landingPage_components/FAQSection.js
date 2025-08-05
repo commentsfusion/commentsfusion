@@ -36,11 +36,10 @@ export default function FAQSection() {
   return (
     <section className="text-white py-12 sm:py-20 px-2 sm:px-6">
       <div className="max-w-7xl mx-auto flex flex-row items-start justify-between gap-12 ">
-
         {/* FAQ Content */}
         <div className="w-full lg:w-2/3">
           <h2 className="text-5xl max-lg:text-4xl max-md:text-3xl  font-bold text-center  mb-8">
-            FAQ's
+            FAQ&rsquo;s
           </h2>
 
           <div className="space-y-6">
@@ -56,7 +55,9 @@ export default function FAQSection() {
                   <span className="text-2xl text-cyan-400">
                     {openIndex === index ? "−" : "+"}
                   </span>
-                  <span className="text-[18px] max-lg:text-[15px] max-md:text-[13px]">{faq.question}</span>
+                  <span className="text-[18px] max-lg:text-[15px] max-md:text-[13px]">
+                    {faq.question}
+                  </span>
                 </button>
                 {openIndex === index && (
                   <motion.div
