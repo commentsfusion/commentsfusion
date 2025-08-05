@@ -55,7 +55,7 @@ const OurTeamSection = () => {
           <p className="text-base md:text-lg text-white">
             Whether you&rsquo;re a content creator, business, or publisher,
             <span className="text-cyan-400"> Murad</span> is dedicated to making
-            sure your audience's voice is not only heard but valued.
+            sure your audience&rsquo;s voice is not only heard but valued.
           </p>
         </div>
       </div>
