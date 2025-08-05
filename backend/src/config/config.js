@@ -79,6 +79,7 @@ module.exports = {
         pass: envVars.SMTP_PASS,
       },
     },
+  contactUsEmail: envVars.CONTACT_US_EMAIL,
   },
   openai: {
     apiKey: envVars.OPENAI_API_KEY,

@@ -3,6 +3,7 @@ import Navbar from "../components/landingPage_components/Navbar";
 import Footer from "../components/landingPage_components/Footer";
 import { useState } from "react";
 import Image from "next/image";
+import { sendContactMessage } from "../utils/api"; 
 
 export default function ContactUs() {
   const [form, setForm] = useState({
@@ -12,14 +13,53 @@ export default function ContactUs() {
     message: "",
   });
 
+  const [errors, setErrors] = useState({
+    email: "",
+    phoneNo: "",
+  });
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const errors = {};
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(form.email)) {
+      errors.email = "Please enter a valid Gmail address.";
+    } else {
+      errors.email = "";
+    }
+
+   
+    const phoneRegex = /^\d{11}$/;
+    const trimmedPhoneNo = form.phoneNo.trim(); // Remove any extra spaces
+    if (!phoneRegex.test(trimmedPhoneNo)) {
+      errors.phoneNo = "Phone number must be exactly 11 digits.";
+    } else {
+      errors.phoneNo = "";
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0; // Return true if no errors
+  };
+
+
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", form);
-    setForm({ fullName: "", email: "", phoneNo: "", message: "" });
+
+     if (!validateForm()) {
+      return; 
+    }
+    
+
+    try {
+      const response = await sendContactMessage(form);  
+      setForm({ fullName: "", email: "", phoneNo: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting form:", error); 
+    }
   };
 
   return (
@@ -95,6 +135,7 @@ export default function ContactUs() {
                   onChange={handleChange}
                   className="w-full h-10 px-4 rounded-md border border-white/40 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
+                {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
               </div>
 
               <div>
@@ -112,6 +153,7 @@ export default function ContactUs() {
                   onChange={handleChange}
                   className="w-full h-10 px-4 rounded-md border border-white/40 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
+                {errors.phoneNo && <p className="text-red-500 text-xs">{errors.phoneNo}</p>}
               </div>
 
               <div>
