@@ -44,25 +44,30 @@ export default function ContactUs() {
           </div>
 
           <div className="relative z-10 flex flex-col md:flex-row gap-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 sm:p-12 text-white">
-
             {/* Text Section */}
             <div className="w-full md:w-1/2 space-y-5 px-2 sm:px-0">
-              <h2 className="text-2xl font-bold">We're Here to Help</h2>
+              <h2 className="text-2xl font-bold">We&rsquo;re Here to Help</h2>
               <p className="text-white/80 leading-relaxed">
-                Got a question, need support, or want to explore how Comments Fusion can help your team grow faster on LinkedIn? We'd love to hear from you.
+                Got a question, need support, or want to explore how Comments
+                Fusion can help your team grow faster on LinkedIn? We&rsquo;d
+                love to hear from you.
               </p>
               <p className="text-white/80 leading-relaxed hidden md:block">
-                Whether you're facing a technical issue, have feedback, or want to learn more about premium features, our team is just a message away.
+                Whether you&rsquo;re facing a technical issue, have feedback, or
+                want to learn more about premium features, our team is just a
+                message away.
               </p>
             </div>
 
             {/* Contact Form */}
-            <form
-              onSubmit={handleSubmit}
-              className="w-full md:w-1/2 space-y-5"
-            >
+            <form onSubmit={handleSubmit} className="w-full md:w-1/2 space-y-5">
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium mb-1">Full Name</label>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Full Name
+                </label>
                 <input
                   id="fullName"
                   name="fullName"
@@ -75,7 +80,12 @@ export default function ContactUs() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Email
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -88,7 +98,12 @@ export default function ContactUs() {
               </div>
 
               <div>
-                <label htmlFor="phoneNo" className="block text-sm font-medium mb-1">Phone Number</label>
+                <label
+                  htmlFor="phoneNo"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Phone Number
+                </label>
                 <input
                   id="phoneNo"
                   name="phoneNo"
@@ -100,7 +115,12 @@ export default function ContactUs() {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium mb-1">Message</label>
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Message
+                </label>
                 <textarea
                   id="message"
                   name="message"
@@ -120,8 +140,10 @@ export default function ContactUs() {
               </button>
             </form>
             <p className="text-white/80 leading-relaxed md:hidden">
-                Whether you're facing a technical issue, have feedback, or want to learn more about premium features, our team is just a message away.
-              </p>
+              Whether you&rsquo;re facing a technical issue, have feedback, or
+              want to learn more about premium features, our team is just a
+              message away.
+            </p>
           </div>
         </section>
         <Footer />
