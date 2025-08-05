@@ -30,6 +30,18 @@ async function createComment({
   return comment;
 }
 
+async function listComments(commenterId) {
+  return Comment.find({ commenter: commenterId })
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'receiverProfile',
+      select: 'name tag_line',
+    })
+    .lean();
+}
+
+
 module.exports = {
   createComment,
+  listComments
 };
