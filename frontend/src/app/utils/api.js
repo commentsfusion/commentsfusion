@@ -115,3 +115,16 @@ export async function getDashboardMetrics(period = "7d") {
   }
   return await res.json();
 }
+
+
+export async function sendContactMessage(data) {
+  const res = await fetch(`${API_BASE}/api/contact-us`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || "Failed to send contact message");
+  return body;
+}
