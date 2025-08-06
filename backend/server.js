@@ -29,7 +29,11 @@ connectDatabase();
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [
+    'process.env.FRONTEND_URL',
+    'https://commentsfusion-ekr7.vercel.app/',
+    'https://www.commentsfusion.com/'
+  ],
     methods: ['GET','POST','PUT','DELETE'],
     credentials: true,
   })
