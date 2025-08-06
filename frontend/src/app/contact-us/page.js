@@ -3,7 +3,7 @@ import Navbar from "../components/landingPage_components/Navbar";
 import Footer from "../components/landingPage_components/Footer";
 import { useState } from "react";
 import Image from "next/image";
-import { sendContactMessage } from "../utils/api"; 
+import { sendContactMessage } from "../utils/api";
 
 export default function ContactUs() {
   const [form, setForm] = useState({
@@ -32,7 +32,6 @@ export default function ContactUs() {
       errors.email = "";
     }
 
-   
     const phoneRegex = /^\d{11}$/;
     const trimmedPhoneNo = form.phoneNo.trim(); // Remove any extra spaces
     if (!phoneRegex.test(trimmedPhoneNo)) {
@@ -45,20 +44,18 @@ export default function ContactUs() {
     return Object.keys(errors).length === 0; // Return true if no errors
   };
 
-
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-     if (!validateForm()) {
-      return; 
+    if (!validateForm()) {
+      return;
     }
-    
 
     try {
-      const response = await sendContactMessage(form);  
+      const response = await sendContactMessage(form);
       setForm({ fullName: "", email: "", phoneNo: "", message: "" });
     } catch (error) {
-      console.error("Error submitting form:", error); 
+      console.error("Error submitting form:", error);
     }
   };
 
@@ -135,7 +132,9 @@ export default function ContactUs() {
                   onChange={handleChange}
                   className="w-full h-10 px-4 rounded-md border border-white/40 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-                {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-red-500 text-xs">{errors.email}</p>
+                )}
               </div>
 
               <div>
@@ -153,7 +152,9 @@ export default function ContactUs() {
                   onChange={handleChange}
                   className="w-full h-10 px-4 rounded-md border border-white/40 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-                {errors.phoneNo && <p className="text-red-500 text-xs">{errors.phoneNo}</p>}
+                {errors.phoneNo && (
+                  <p className="text-red-500 text-xs">{errors.phoneNo}</p>
+                )}
               </div>
 
               <div>

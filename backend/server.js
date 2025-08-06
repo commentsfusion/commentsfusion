@@ -33,7 +33,7 @@ app.use(
       "http://localhost:3001",
       "https://commentsfusion-ekr7.vercel.app",
       "https://www.commentsfusion.com",
-      "https://your-railway-app.railway.app",
+      "https://commentsfusion-production.up.railway.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
