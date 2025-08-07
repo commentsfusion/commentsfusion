@@ -127,11 +127,11 @@ export async function getDashboardMetrics(period = "7d") {
 //   if (!res.ok) throw new Error(body.message || "Failed to send contact message");
 //   return body;
 // }
-// export async function fetchComments() {
-//   const res = await fetch("/api/comment/list-comments");
-//   if (!res.ok) throw new Error("Failed to load comments");
-//   return res.json();
-// }
+export async function fetchComments() {
+  const res = await fetch("/api/comment/list-comments");
+  if (!res.ok) throw new Error("Failed to load comments");
+  return res.json();
+}
 
 export const sendContactMessage = async (data) => {
   try {
