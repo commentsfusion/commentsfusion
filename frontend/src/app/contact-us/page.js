@@ -18,42 +18,18 @@ export default function ContactUs() {
     phoneNo: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const validateForm = () => {
-    const errors = {};
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!emailRegex.test(form.email)) {
-      errors.email = "Please enter a valid Gmail address.";
-    } else {
-      errors.email = "";
-    }
-
-    const phoneRegex = /^\d{11}$/;
-    const trimmedPhoneNo = form.phoneNo.trim(); // Remove any extra spaces
-    if (!phoneRegex.test(trimmedPhoneNo)) {
-      errors.phoneNo = "Phone number must be exactly 11 digits.";
-    } else {
-      errors.phoneNo = "";
-    }
-
-    setErrors(errors);
-    return Object.keys(errors).length === 0; // Return true if no errors
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
 
+    // No validation, directly submit the form data
     try {
       const response = await sendContactMessage(form);
-      setForm({ fullName: "", email: "", phoneNo: "", message: "" });
+      setForm({ fullName: "", email: "", phoneNo: "", message: "" }); // Reset the form after submission
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -132,9 +108,6 @@ export default function ContactUs() {
                   onChange={handleChange}
                   className="w-full h-10 px-4 rounded-md border border-white/40 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-xs">{errors.email}</p>
-                )}
               </div>
 
               <div>
@@ -152,9 +125,6 @@ export default function ContactUs() {
                   onChange={handleChange}
                   className="w-full h-10 px-4 rounded-md border border-white/40 bg-transparent focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 />
-                {errors.phoneNo && (
-                  <p className="text-red-500 text-xs">{errors.phoneNo}</p>
-                )}
               </div>
 
               <div>
@@ -182,11 +152,6 @@ export default function ContactUs() {
                 Submit
               </button>
             </form>
-            <p className="text-white/80 leading-relaxed md:hidden">
-              Whether you&rsquo;re facing a technical issue, have feedback, or
-              want to learn more about premium features, our team is just a
-              message away.
-            </p>
           </div>
         </section>
         <Footer />
