@@ -19,3 +19,8 @@ exports.createComment = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.listComments = async (req, res, next) => {
+  const comments = await commentService.listComments(req.user._id);
+  res.json(comments);
+};

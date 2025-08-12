@@ -1,5 +1,4 @@
 // models/Comment.js
-//const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema(
@@ -30,7 +29,7 @@ const commentSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "online", "failed"],
-      default: "pending",
+      default: "online",
       description: "The status of the comment",
     },
   },

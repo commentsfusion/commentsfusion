@@ -1,27 +1,47 @@
 // services/commentService.js
-const Comment = require('../models/Comment');
-const Profile = require('../models/profile');
-const ApiError = require('../utils/apiError');
+const Comment = require("../models/comment");
+const Profile = require("../models/profile");
+const ApiError = require("../utils/apiError");
 
-async function createComment({ commenterId, receiverLinkedInUsername, postContent, commentText }) {
-  const receiverProfile = await Profile.findOne({
+async function createComment({
+  commenterId,
+  receiverLinkedInUsername,
+  postContent,
+  commentText,
+}) {
+  let receiverProfile = await Profile.findOne({
     linkedinUsername: receiverLinkedInUsername,
-    user: null
+    user: null,
   });
   if (!receiverProfile) {
-    throw new ApiError(404, 'Prospect profile not found');
+    receiverProfile = await Profile.create({
+      linkedinUsername: receiverLinkedInUsername,
+      user: null,
+    });
   }
 
   const comment = await Comment.create({
-    commenter:      commenterId,
+    commenter: commenterId,
     receiverProfile: receiverProfile._id,
-    post:           postContent,
-    commentText
+    post: postContent,
+    commentText,
   });
 
   return comment;
 }
 
+async function listComments(commenterId) {
+  return Comment.find({ commenter: commenterId })
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'receiverProfile',
+      select: 'name tag_line',
+    })
+    .lean();
+}
+
+
 module.exports = {
-  createComment
+  createComment,
+  listComments
 };

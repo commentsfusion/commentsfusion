@@ -26,12 +26,17 @@ export async function verifySignup({ email, code }) {
   return body;
 }
 
-export async function loginUser({ email, password, recaptchaToken, recaptchaV2Token }) {
+export async function loginUser({
+  email,
+  password,
+  recaptchaToken,
+  recaptchaV2Token,
+}) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
-    credentials: 'include',
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token}),
+    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token }),
   });
   const body = await res.json();
   if (!res.ok) {
@@ -62,7 +67,12 @@ export async function verifyPasswordOTP(email, code) {
   return body;
 }
 
-export async function resetPassword(email, code, newPassword, confirmNewPassword) {
+export async function resetPassword(
+  email,
+  code,
+  newPassword,
+  confirmNewPassword
+) {
   const res = await fetch(`${API_BASE}/api/auth/forgot-password/reset`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -73,21 +83,52 @@ export async function resetPassword(email, code, newPassword, confirmNewPassword
   return body;
 }
 
-
 export async function fetchUserDetails() {
   try {
     const res = await fetch(`${API_BASE}/api/auth/user`, {
-      method: 'GET',
-      credentials: 'include',  
+      method: "GET",
+      credentials: "include",
     });
 
     if (!res.ok) {
-      throw new Error('Failed to fetch user details');
+      throw new Error("Failed to fetch user details");
     }
 
     const data = await res.json();
-    return data;  
+    return data;
   } catch (error) {
     throw new Error(`Error fetching user details: ${error.message}`);
   }
+}
+
+export async function getDashboardMetrics(period = "7d") {
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/metrics?period=${period}`,
+    {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to fetch metrics: ${res.status} ${err}`);
+  }
+  return await res.json();
+}
+
+export async function sendContactMessage(data) {
+  const res = await fetch(`${API_BASE}/api/contact-us`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.message || "Failed to send contact message");
+  return body;
+}
+export async function fetchComments() {
+  const res = await fetch("/api/comment/list-comments");
+  if (!res.ok) throw new Error("Failed to load comments");
+  return res.json();
 }

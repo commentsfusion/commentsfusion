@@ -6,6 +6,13 @@ const { commentController } = require("../controllers");
 
 const router = express.Router();
 
-router.post("/save-comment", protect, asyncHandler(commentController.createComment));
+router.post(
+  "/save-comment",
+  protect,
+  asyncHandler(commentController.createComment)
+);
+
+router.get("/list-comments", protect, asyncHandler(commentController.listComments));
+
 
 module.exports = router;

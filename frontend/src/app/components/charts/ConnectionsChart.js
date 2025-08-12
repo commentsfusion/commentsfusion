@@ -16,21 +16,23 @@ ChartJS.register(
   Tooltip
 );
 
-const data = {
-  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  datasets: [
-    {
-      data: [200, 500, 300, 700, 600, 900],
-      borderColor: "#9F7AEA",
-      borderWidth: 2,
-      fill: false,
-      pointRadius: 0,
-      pointHoverRadius: 6,
-    },
-  ],
-};
+export default function ConnectionsChart({ data = [] }) {
+  const chartData = {
+    labels: data.map((item, index) => item.label || `Day ${index + 1}`),
+    datasets: [
+      {
+        label: "Connections",
+        data: data.map((item) => item.value || item.count || item),
+        borderColor: "#10B981",
+        backgroundColor: "rgba(16, 185, 129, 0.1)",
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        tension: 0.4,
+      },
+    ],
+  };
 
-export default function ConnectionsChart() {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -46,12 +48,12 @@ export default function ConnectionsChart() {
         position: "bottom",
         border: { display: true, color: "#444" },
         grid: { display: false },
-        ticks: { display: true, padding: 0 },
+        ticks: { display: false, padding: 0 },
       },
       y: {
         border: { display: true, color: "#444" },
-        grid: { display: false },
-        ticks: { display: false, padding: 0 },
+        grid: { display: true },
+        ticks: { display: true, padding: 0 },
       },
     },
 
@@ -64,6 +66,34 @@ export default function ConnectionsChart() {
         padding: 6,
         position: "nearest",
         intersect: false,
+
+        callbacks: {
+          // `items` is an array of tooltip items—usually one per dataset
+          title: (items) => {
+            if (!items.length) return "";
+
+            // The raw label string:
+            const rawLabel = items[0].label;
+
+            // Try to parse as ISO date:
+            const d = new Date(rawLabel);
+            if (!isNaN(d)) {
+              // Format as e.g. "August 1, 2025"
+              return d.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            }
+            // Fallback:
+            return rawLabel;
+          },
+
+          label: (item) => {
+            // default label: "Followers: 586"
+            return `Followers: ${item.parsed.y}`;
+          },
+        },
       },
     },
 
@@ -76,7 +106,7 @@ export default function ConnectionsChart() {
   return (
     <div className="h-48 w-full">
       <Line
-        data={data}
+        data={chartData}
         options={options}
         style={{
           position: "absolute",

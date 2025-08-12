@@ -5,7 +5,7 @@ import Topbar from '../components/topBar';
 import Sidebar from '../components/sidenav';
 import PricingCard from '../components/pricing_components/PricingCard';
 import PricingToggle from '../components/pricing_components/PricingToggle';
-import { fetchPlansData } from '../utils/api';  // Simulate fetching plans
+// import { fetchPlansData } from '../utils/api';  // Simulate fetching plans
 
 const SubscriptionPlanDashboard = () => {
   const [isYearly, setIsYearly] = useState(true);

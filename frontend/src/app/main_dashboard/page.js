@@ -5,21 +5,36 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import MobileLayout from "../components/mobileLayout";
+import { getDashboardMetrics } from "../utils/api";
 
 const FollowersChart = dynamic(() => import("../components/charts/FollowersChart"), { ssr: false });
 const ConnectionsChart = dynamic(() => import("../components/charts/ConnectionsChart"), { ssr: false });
 const CommentsDotPlot = dynamic(() => import("../components/charts/CommentsDotPlot"), { ssr: false });
 
 export default function Home() {
-  const [selectedFilter, setSelectedFilter] = useState("7d");
-  const [screenType, setScreenType] = useState("desktop");
-  
   const filters = [{ label: "7d", value: "7d" }, { label: "15d", value: "15d" }, { label: "30d", value: "30d" }];
+  const [selectedFilter, setSelectedFilter] = useState(filters[1].value);
+  const [screenType, setScreenType] = useState("desktop");
+
   const users = [
     { name: "Balie Parker", followers: "1.3K" },
     { name: "Brandon William", followers: "2.6K" },
     { name: "Crista Munchkins", followers: "5K" }
   ];
+  const [metrics, setMetrics] = useState({
+    followersCount: 0,
+    followersSeries: [],
+    connectionsCount: 0,
+    connectionsSeries: [],
+    totalComments: 0,
+    commentsSeries: [],
+  });
+
+  useEffect(() => {
+    getDashboardMetrics(selectedFilter)
+      .then(setMetrics)
+      .catch((err) => console.error("Dashboard load error:", err));
+  }, [selectedFilter]);
 
   useEffect(() => {
     const handleResize = () => {
