@@ -20,7 +20,7 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
@@ -36,6 +36,8 @@ app.use(
       "https://commentsfusion-ekr7.vercel.app",
       "https://www.commentsfusion.com",
       "https://commentsfusion-production.up.railway.app",
+      /^chrome-extension:\/\/.*$/,
+      /^moz-extension:\/\/.*$/
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
