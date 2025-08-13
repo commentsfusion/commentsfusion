@@ -1,6 +1,9 @@
 // utils/api.js
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+export const DEFAULT_PAGE = 1;
+export const DEFAULT_LIMIT = 5;
+export const MAX_LIMIT = 100;
 
 export async function sendCode(data) {
   const res = await fetch(`${API_BASE}/api/auth/send-code`, {
@@ -116,42 +119,92 @@ export async function getDashboardMetrics(period = "7d") {
   return await res.json();
 }
 
-// export async function sendContactMessage(data) {
-//   const res = await fetch(`${API_BASE}/api/contact-us`, {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(data),
-//   });
 
-//   const body = await res.json();
-//   if (!res.ok) throw new Error(body.message || "Failed to send contact message");
-//   return body;
-// }
-export async function fetchComments() {
-  const res = await fetch("/api/comment/list-comments");
-  if (!res.ok) throw new Error("Failed to load comments");
-  return res.json();
+function buildParams(params = {}) {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v === undefined || v === null || v === "") continue;
+    p.set(k, String(v));
+  }
+  return p.toString();
+}
+
+function clampLimit(limit) {
+  const l = Number(limit) || DEFAULT_LIMIT;
+  if (l <= 0) return DEFAULT_LIMIT;
+  return Math.min(l, MAX_LIMIT);
+}
+
+async function handleResponse(res) {
+  if (res.ok) {
+    return res.json().catch(() => null);
+  }
+  let body = null;
+  try { body = await res.json(); } catch (e) { /* ignore */ }
+  const message = (body && (body.message || body.error)) || `Request failed with status ${res.status}`;
+  const error = new Error(message);
+  error.status = res.status;
+  error.body = body;
+  throw error;
+}
+
+export async function fetchComments(options = {}) {
+  const {
+    page = DEFAULT_PAGE,
+    limit = DEFAULT_LIMIT,
+    status,
+    account,
+    from,
+    to,
+    sort,
+    signal,
+    credentials = "include",
+  } = options;
+
+  const safeLimit = clampLimit(limit);
+
+  const params = {
+    page: Number(page) || DEFAULT_PAGE,
+    limit: safeLimit,
+    status,
+    account,
+    from,
+    to,
+    search,
+    sort,
+  };
+
+  const query = buildParams(params);
+  const url = `${API_BASE}/api/comment/list-comments${query ? `?${query}` : ""}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    credentials,
+    signal,
+  });
+
+  return handleResponse(res);
 }
 
 export const sendContactMessage = async (data) => {
   try {
-    const res = await fetch(`${API_BASE}/api/contact-us`, { 
-      method: 'POST',
+    const res = await fetch(`${API_BASE}/api/contact-us`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
 
     if (!res.ok) {
       const errorBody = await res.json();
-      throw new Error(errorBody.message || 'Failed to send message');
+      throw new Error(errorBody.message || "Failed to send message");
     }
 
     const responseBody = await res.json();
     return responseBody;
   } catch (error) {
-    console.error('Error in sending message:', error);
+    console.error("Error in sending message:", error);
     alert(`Error: ${error.message}`);
     throw error;
   }

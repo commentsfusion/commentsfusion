@@ -21,6 +21,37 @@ exports.createComment = async (req, res, next) => {
 };
 
 exports.listComments = async (req, res, next) => {
-  const comments = await commentService.listComments(req.user._id);
-  res.json(comments);
+  try {
+    const {
+      page = "1",
+      limit = "5",
+      status,
+      account,
+      from,
+      to,
+      sort = "-createdAt",
+    } = req.query;
+
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    const commenterId = String(req.user._id);
+
+    const options = {
+      commenterId,
+      page: parseInt(page, 10) || 1,
+      limit: parseInt(limit, 10) || 10,
+      status,
+      from,
+      to,
+      sort,
+    };
+
+    const result = await commentService.listComments(options);
+    return res.json(result);
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
 };
