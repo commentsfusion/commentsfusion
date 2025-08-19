@@ -12,12 +12,15 @@ exports.protect = (req, res, next) => {
     }
   }
 
+
   if (!token) {
+    console.log('Auth middleware - No token provided');
     return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Not authenticated' });
   }
 
   try {
     const payload = verifyToken(token);
+  
     req.user = { _id: payload.userId, role: payload.role };
     next();
   } catch (err) {

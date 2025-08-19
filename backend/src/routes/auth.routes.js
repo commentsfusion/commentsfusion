@@ -16,7 +16,7 @@ const { signToken } = require("../utils/auth");
 const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
 const recaptchaFallback = require("../middleware/recaptchaFallback");
-const { getUserDetails } = require('../controllers/auth.controller');  
+const { getUserDetails, getGoogleUserDetails } = require('../controllers/auth.controller');  
 const { protect } = require("../middleware/auth");
 
 
@@ -105,5 +105,7 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/user', protect, getUserDetails);
+
+router.get('/google-user', getGoogleUserDetails);
 
 module.exports = router;

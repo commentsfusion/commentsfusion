@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchUserDetails } from "../utils/api";
+import { fetchUserDetails, fetchGoogleUserDetails } from "../utils/api";
 
 export default function Topbar() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -18,7 +18,18 @@ export default function Topbar() {
 useEffect(() => {
   const getUserData = async () => {
     try {
-      const userData = await fetchUserDetails(); 
+      // First try to get Google user details (works with session)
+      let userData;
+      try {
+        userData = await fetchGoogleUserDetails();
+        console.log('Fetched Google user data:', userData);
+      } catch (googleError) {
+        console.log('Google user fetch failed, trying regular user fetch:', googleError.message);
+        // Fallback to regular user details (works with JWT token)
+        userData = await fetchUserDetails(); 
+        console.log('Fetched regular user data:', userData);
+      }
+      
       setUser(userData);  
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -27,6 +38,26 @@ useEffect(() => {
   };
 
   getUserData();
+
+  // Also listen for storage changes (when authToken is updated)
+  const handleStorageChange = (e) => {
+    if (e.key === 'authToken' && e.newValue) {
+      console.log('Auth token updated, refetching user data');
+      getUserData();
+    }
+  };
+
+  window.addEventListener('storage', handleStorageChange);
+  
+  // Check if we just came from OAuth (token in URL or localStorage was recently updated)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('from') === 'oauth' || localStorage.getItem('authToken')) {
+    setTimeout(() => getUserData(), 100); // Small delay to ensure token is set
+  }
+
+  return () => {
+    window.removeEventListener('storage', handleStorageChange);
+  };
 }, []);
 
 
