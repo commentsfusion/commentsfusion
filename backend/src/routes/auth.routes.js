@@ -71,7 +71,7 @@ router.get(
   }),
   (req, res) => {
     const token = signToken({ userId: req.user._id, role: req.user.role });
-    res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}`);
+    res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}&isGoogle=true`);
   }
 );
 

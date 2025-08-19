@@ -18,14 +18,19 @@ export default function Topbar() {
 useEffect(() => {
   const getUserData = async () => {
     try {
-      // First try to get Google user details (works with session)
+      // Check login method to determine which API to use
+      const urlParams = new URLSearchParams(window.location.search);
+      const isGoogleLogin = urlParams.get('from') === 'oauth' || localStorage.getItem('isGoogleUser') === 'true';
+      
       let userData;
-      try {
+      if (isGoogleLogin) {
+        // User logged in with Google - use session-based API
+        console.log('Detected Google login, fetching Google user details');
         userData = await fetchGoogleUserDetails();
         console.log('Fetched Google user data:', userData);
-      } catch (googleError) {
-        console.log('Google user fetch failed, trying regular user fetch:', googleError.message);
-        // Fallback to regular user details (works with JWT token)
+      } else {
+        // User logged in with email/password - use JWT token API
+        console.log('Detected regular login, fetching user details with token');
         userData = await fetchUserDetails(); 
         console.log('Fetched regular user data:', userData);
       }
@@ -49,10 +54,10 @@ useEffect(() => {
 
   window.addEventListener('storage', handleStorageChange);
   
-  // Check if we just came from OAuth (token in URL or localStorage was recently updated)
+  // Check if we just came from OAuth and refresh user data
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('from') === 'oauth' || localStorage.getItem('authToken')) {
-    setTimeout(() => getUserData(), 100); // Small delay to ensure token is set
+  if (urlParams.get('from') === 'oauth') {
+    setTimeout(() => getUserData(), 100); // Small delay to ensure session is set
   }
 
   return () => {
