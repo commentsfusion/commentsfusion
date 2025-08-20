@@ -16,7 +16,7 @@ const { signToken } = require("../utils/auth");
 const rateLimit = require("express-rate-limit");
 const { asyncHandler } = require("../middleware/errorHandler");
 const recaptchaFallback = require("../middleware/recaptchaFallback");
-const { getUserDetails } = require('../controllers/auth.controller');  
+const { getUserDetails, getGoogleUserDetails } = require('../controllers/auth.controller');  
 const { protect } = require("../middleware/auth");
 
 
@@ -71,7 +71,7 @@ router.get(
   }),
   (req, res) => {
     const token = signToken({ userId: req.user._id, role: req.user.role });
-    res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}`);
+    res.redirect(`${process.env.FRONTEND_URL}/oauth_success?token=${token}&isGoogle=true`);
   }
 );
 
@@ -105,5 +105,7 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/user', protect, getUserDetails);
+
+router.get('/google-user', getGoogleUserDetails);
 
 module.exports = router;

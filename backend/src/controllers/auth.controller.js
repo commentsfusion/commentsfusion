@@ -179,4 +179,30 @@ exports.getUserDetails = async (req, res, next) => {
   }
 };
 
+exports.getGoogleUserDetails = async (req, res, next) => {
+  try {
+    // Get user ID from session or token
+    const userId = req.user?._id || req.session?.passport?.user;
+    
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    const user = await User.findById(userId).select('name email googleId');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      isGoogleUser: !!user.googleId,
+      plan: "Free" // You can add plan logic here
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 

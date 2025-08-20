@@ -12,8 +12,26 @@ function OAuthContent() {
 
   useEffect(() => {
     if (token) {
+      // Clear any existing auth cookies to prevent conflicts
+      document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      
       localStorage.setItem("authToken", token);
-      router.replace("/main_dashboard");
+      
+      // Check if this is a Google login and set the flag
+      const isGoogle = params.get("isGoogle");
+      if (isGoogle === "true") {
+        localStorage.setItem("isGoogleUser", "true");
+        console.log('OAuth success: Google user detected, setting Google flag');
+      } else {
+        localStorage.removeItem("isGoogleUser");
+      }
+      
+      console.log('OAuth success: stored new token and cleared old cookies');
+      
+      // Add a small delay and then redirect with a flag to indicate OAuth success
+      setTimeout(() => {
+        router.replace("/main_dashboard?from=oauth");
+      }, 100);
     }
   }, [token, router]);
 

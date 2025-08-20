@@ -9,69 +9,58 @@ const PERIOD_MS = {
 };
 
 async function getMetrics(userId, period) {
-  const lookback = PERIOD_MS[period];
-  const since = new Date(Date.now() - lookback - 24 * 3600 * 1000);
-
-  const profile = await Profile.findOne({ user: userId });
-
-  if (!profile) {
-    throw new Error("Profile not found");
-  }
+  const lookback = PERIOD_MS[period] || PERIOD_MS["7d"];
+  const since = new Date(Date.now() - lookback);
 
   // 1) Followers time series
-  let followersSeries = [];
-  if (profile.followerSnapshots && profile.followerSnapshots.length > 0) {
-    followersSeries = profile.followerSnapshots
-      .filter((s) => s.timestamp >= since)
-      .map((s) => ({
-        x: s.timestamp.toISOString(),
-        y: s.count,
-      }))
-      .sort((a, b) => new Date(a.x) - new Date(b.x));
+  const profile = await Profile.findOne({ user: userId });
+  
+  // Handle case where profile doesn't exist
+  if (!profile) {
+    // Return default empty metrics if no profile exists
+    const comments = await Comment.find({
+      commenter: userId,
+      createdAt: { $gte: since },
+    });
+    
+    const totalComments = comments.length;
+    
+    // Build daily count for comments
+    const dayBuckets = {};
+    for (let i = 0; i <= lookback / (24 * 3600 * 1000); i++) {
+      const day = new Date(Date.now() - i * 24 * 3600 * 1000)
+        .toISOString()
+        .slice(0, 10);
+      dayBuckets[day] = 0;
+    }
+    comments.forEach((c) => {
+      const day = c.createdAt.toISOString().slice(0, 10);
+      if (day in dayBuckets) dayBuckets[day]++;
+    });
+    const commentsSeries = Object.entries(dayBuckets)
+      .map(([day, count]) => ({ x: day, y: count }))
+      .sort((a, b) => a.x.localeCompare(b.x));
+    
+    return {
+      followersCount: 0,
+      followersSeries: [],
+      connectionsCount: 0,
+      connectionsSeries: [],
+      totalComments,
+      commentsSeries,
+    };
   }
 
-  // If no data in period, include the latest snapshot
-  if (followersSeries.length === 0 && profile.followerSnapshots?.length > 0) {
-    const latest = profile.followerSnapshots.sort(
-      (a, b) => b.timestamp - a.timestamp
-    )[0];
-    followersSeries = [
-      {
-        x: latest.timestamp.toISOString(),
-        y: latest.count,
-      },
-    ];
-  }
+  const followersSeries = profile.followerSnapshots
+    .filter((s) => s.timestamp >= since)
+    .map((s) => ({ x: s.timestamp, y: s.count }));
 
   // 2) Connections time series
-  let connectionsSeries = [];
-  if (profile.connectionSnapshots && profile.connectionSnapshots.length > 0) {
-    connectionsSeries = profile.connectionSnapshots
-      .filter((s) => s.timestamp >= since)
-      .map((s) => ({
-        x: s.timestamp.toISOString(),
-        y: s.count,
-      }))
-      .sort((a, b) => new Date(a.x) - new Date(b.x));
-  }
+  const connectionsSeries = profile.connectionSnapshots
+    .filter((s) => s.timestamp >= since)
+    .map((s) => ({ x: s.timestamp, y: s.count }));
 
-  // If no data in period, include the latest snapshot
-  if (
-    connectionsSeries.length === 0 &&
-    profile.connectionSnapshots?.length > 0
-  ) {
-    const latest = profile.connectionSnapshots.sort(
-      (a, b) => b.timestamp - a.timestamp
-    )[0];
-    connectionsSeries = [
-      {
-        x: latest.timestamp.toISOString(),
-        y: latest.count,
-      },
-    ];
-  }
-
-  // 3) Comments
+  // 3) Comments count total in that window + per-day series
   const comments = await Comment.find({
     commenter: userId,
     createdAt: { $gte: since },
@@ -79,29 +68,26 @@ async function getMetrics(userId, period) {
 
   const totalComments = comments.length;
 
+  // Build daily count
   const dayBuckets = {};
-  const periodDays = Math.ceil(lookback / (24 * 3600 * 1000));
-
-  for (let i = 0; i <= periodDays; i++) {
+  for (let i = 0; i <= lookback / (24 * 3600 * 1000); i++) {
     const day = new Date(Date.now() - i * 24 * 3600 * 1000)
       .toISOString()
       .slice(0, 10);
     dayBuckets[day] = 0;
   }
-
   comments.forEach((c) => {
     const day = c.createdAt.toISOString().slice(0, 10);
     if (day in dayBuckets) dayBuckets[day]++;
   });
-
   const commentsSeries = Object.entries(dayBuckets)
     .map(([day, count]) => ({ x: day, y: count }))
     .sort((a, b) => a.x.localeCompare(b.x));
 
   return {
-    followersCount: profile.followers || 0,
+    followersCount: profile?.followers || 0,
     followersSeries,
-    connectionsCount: profile.connections || 0,
+    connectionsCount: profile?.connections || 0,
     connectionsSeries,
     totalComments,
     commentsSeries,

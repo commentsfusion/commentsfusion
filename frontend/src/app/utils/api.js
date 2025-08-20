@@ -88,28 +88,74 @@ export async function resetPassword(
 
 export async function fetchUserDetails() {
   try {
+    const token = localStorage.getItem("authToken");
+    console.log('Token from localStorage:', token ? 'Token exists' : 'No token found');
+    console.log('Token preview:', token ? token.substring(0, 20) + '...' : 'N/A');
+    
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const res = await fetch(`${API_BASE}/api/auth/user`, {
+      method: "GET",
+      credentials: "include",
+      headers: headers,
+    });
+
+    if (!res.ok) {
+      console.error('Response status:', res.status);
+      console.error('Response headers:', res.headers);
+      throw new Error("Failed to fetch user details");
+    }
+
+    const data = await res.json();
+    console.log('Successfully fetched user data:', data);
+    return data;
+  } catch (error) {
+    console.error('Full error details:', error);
+    throw new Error(`Error fetching user details: ${error.message}`);
+  }
+}
+
+export async function fetchGoogleUserDetails() {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/google-user`, {
       method: "GET",
       credentials: "include",
     });
 
     if (!res.ok) {
-      throw new Error("Failed to fetch user details");
+      throw new Error("Failed to fetch Google user details");
     }
 
     const data = await res.json();
+    console.log('Successfully fetched Google user data:', data);
     return data;
   } catch (error) {
-    throw new Error(`Error fetching user details: ${error.message}`);
+    console.error('Error fetching Google user details:', error);
+    throw new Error(`Error fetching Google user details: ${error.message}`);
   }
 }
 
-export async function getDashboardMetrics(period = "15d") {
+export async function getDashboardMetrics(period = "7d") {
+  const token = localStorage.getItem("authToken");
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const res = await fetch(
     `${API_BASE}/api/dashboard/metrics?period=${period}`,
     {
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
     }
   );
   if (!res.ok) {
@@ -203,6 +249,13 @@ export async function fetchComments(options = {}) {
     sort,
   };
 
+  const token = localStorage.getItem("authToken");
+  const headers = {};
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const query = buildParams(params);
   const url = `${API_BASE}/api/comment/list-comments${
     query ? `?${query}` : ""
@@ -211,6 +264,7 @@ export async function fetchComments(options = {}) {
   const res = await fetch(url, {
     method: "GET",
     credentials,
+    headers,
     signal,
   });
 

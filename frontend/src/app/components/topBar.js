@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchUserDetails } from "../utils/api";
+import { fetchUserDetails, fetchGoogleUserDetails } from "../utils/api";
 
 export default function Topbar() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -18,15 +18,71 @@ export default function Topbar() {
 useEffect(() => {
   const getUserData = async () => {
     try {
-      const userData = await fetchUserDetails(); 
+      // Check login method to determine which API to use
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromOAuth = urlParams.get('from') === 'oauth';
+      const isGoogleUser = localStorage.getItem('isGoogleUser') === 'true';
+      
+      let userData;
+      if (fromOAuth || isGoogleUser) {
+        // User logged in with Google - use session-based API
+        console.log('Detected Google login, fetching Google user details');
+        try {
+          userData = await fetchGoogleUserDetails();
+          console.log('Fetched Google user data:', userData);
+          // Confirm Google user status
+          localStorage.setItem('isGoogleUser', 'true');
+        } catch (googleError) {
+          console.log('Google user fetch failed, trying regular user fetch:', googleError.message);
+          // If Google API fails, clear the Google flag and try regular API
+          localStorage.removeItem('isGoogleUser');
+          userData = await fetchUserDetails();
+          console.log('Fetched regular user data after Google failure:', userData);
+        }
+      } else {
+        // User logged in with email/password - use JWT token API
+        console.log('Detected regular login, fetching user details with token');
+        // Clear any existing Google user flag
+        localStorage.removeItem('isGoogleUser');
+        userData = await fetchUserDetails(); 
+        console.log('Fetched regular user data:', userData);
+      }
+      
       setUser(userData);  
     } catch (error) {
       console.error("Error fetching user data:", error);
+      // Clear potentially invalid flags on error
+      localStorage.removeItem('isGoogleUser');
       setUser({ name: "Anonymous", plan: "Free" });  
     }
   };
 
   getUserData();
+
+  // Also listen for storage changes (when authToken is updated)
+  const handleStorageChange = (e) => {
+    if (e.key === 'authToken' && e.newValue) {
+      console.log('Auth token updated, refetching user data');
+      getUserData();
+    }
+    // Also listen for changes to Google user flag
+    if (e.key === 'isGoogleUser') {
+      console.log('Google user status changed, refetching user data');
+      getUserData();
+    }
+  };
+
+  window.addEventListener('storage', handleStorageChange);
+  
+  // Check if we just came from OAuth and refresh user data
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('from') === 'oauth') {
+    setTimeout(() => getUserData(), 100); // Small delay to ensure session is set
+  }
+
+  return () => {
+    window.removeEventListener('storage', handleStorageChange);
+  };
 }, []);
 
 

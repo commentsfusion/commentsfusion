@@ -218,7 +218,9 @@ export default function AuthPage() {
         throw new Error("No token returned from login API");
       }*/
 
-      localStorage.setItem("token", result.token);
+      localStorage.setItem("authToken", result.token);
+      // Clear any existing Google user flag for regular login
+      localStorage.removeItem("isGoogleUser");
       toast.success("Logged in!");
       router.push("/main_dashboard");
     } catch (err) {
@@ -320,7 +322,9 @@ export default function AuthPage() {
             email: signupData.email,
             code,
           });
-          window.localStorage.setItem("token", token);
+          window.localStorage.setItem("authToken", token);
+          // Clear any existing Google user flag for regular signup
+          localStorage.removeItem("isGoogleUser");
           toast.success("Signup successful! Login Now...");
 
           setSignupData({
@@ -405,7 +409,9 @@ export default function AuthPage() {
         recaptchaV2Token: v2Token,
       });
 
-      localStorage.setItem("token", result.token);
+      localStorage.setItem("authToken", result.token);
+      // Clear any existing Google user flag for regular login
+      localStorage.removeItem("isGoogleUser");
       toast.success("Logged in!");
       setCaptchaRequired(false);
       router.push("/main_dashboard");
