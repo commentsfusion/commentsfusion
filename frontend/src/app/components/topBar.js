@@ -20,17 +20,30 @@ useEffect(() => {
     try {
       // Check login method to determine which API to use
       const urlParams = new URLSearchParams(window.location.search);
-      const isGoogleLogin = urlParams.get('from') === 'oauth' || localStorage.getItem('isGoogleUser') === 'true';
+      const fromOAuth = urlParams.get('from') === 'oauth';
+      const isGoogleUser = localStorage.getItem('isGoogleUser') === 'true';
       
       let userData;
-      if (isGoogleLogin) {
+      if (fromOAuth || isGoogleUser) {
         // User logged in with Google - use session-based API
         console.log('Detected Google login, fetching Google user details');
-        userData = await fetchGoogleUserDetails();
-        console.log('Fetched Google user data:', userData);
+        try {
+          userData = await fetchGoogleUserDetails();
+          console.log('Fetched Google user data:', userData);
+          // Confirm Google user status
+          localStorage.setItem('isGoogleUser', 'true');
+        } catch (googleError) {
+          console.log('Google user fetch failed, trying regular user fetch:', googleError.message);
+          // If Google API fails, clear the Google flag and try regular API
+          localStorage.removeItem('isGoogleUser');
+          userData = await fetchUserDetails();
+          console.log('Fetched regular user data after Google failure:', userData);
+        }
       } else {
         // User logged in with email/password - use JWT token API
         console.log('Detected regular login, fetching user details with token');
+        // Clear any existing Google user flag
+        localStorage.removeItem('isGoogleUser');
         userData = await fetchUserDetails(); 
         console.log('Fetched regular user data:', userData);
       }
@@ -38,6 +51,8 @@ useEffect(() => {
       setUser(userData);  
     } catch (error) {
       console.error("Error fetching user data:", error);
+      // Clear potentially invalid flags on error
+      localStorage.removeItem('isGoogleUser');
       setUser({ name: "Anonymous", plan: "Free" });  
     }
   };
@@ -48,6 +63,11 @@ useEffect(() => {
   const handleStorageChange = (e) => {
     if (e.key === 'authToken' && e.newValue) {
       console.log('Auth token updated, refetching user data');
+      getUserData();
+    }
+    // Also listen for changes to Google user flag
+    if (e.key === 'isGoogleUser') {
+      console.log('Google user status changed, refetching user data');
       getUserData();
     }
   };
