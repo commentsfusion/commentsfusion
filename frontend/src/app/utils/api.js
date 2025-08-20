@@ -104,7 +104,7 @@ export async function fetchUserDetails() {
   }
 }
 
-export async function getDashboardMetrics(period = "7d") {
+export async function getDashboardMetrics(period = "15d") {
   const res = await fetch(
     `${API_BASE}/api/dashboard/metrics?period=${period}`,
     {
@@ -119,6 +119,29 @@ export async function getDashboardMetrics(period = "7d") {
   return await res.json();
 }
 
+export async function getDashboardTargets(
+  period = "15d",
+  { page = 1, limit = 10 } = {}
+) {
+  const params = new URLSearchParams({
+    period,
+    page: String(page),
+    limit: String(limit),
+  });
+  const res = await fetch(
+    `${API_BASE}/api/dashboard/targets?${params.toString()}`,
+    {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  console.log("Response", res)
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Failed to fetch targets: ${res.status} ${err}`);
+  }
+  return res.json();
+}
 
 function buildParams(params = {}) {
   const p = new URLSearchParams();
@@ -140,8 +163,14 @@ async function handleResponse(res) {
     return res.json().catch(() => null);
   }
   let body = null;
-  try { body = await res.json(); } catch (e) { /* ignore */ }
-  const message = (body && (body.message || body.error)) || `Request failed with status ${res.status}`;
+  try {
+    body = await res.json();
+  } catch (e) {
+    /* ignore */
+  }
+  const message =
+    (body && (body.message || body.error)) ||
+    `Request failed with status ${res.status}`;
   const error = new Error(message);
   error.status = res.status;
   error.body = body;
@@ -175,7 +204,9 @@ export async function fetchComments(options = {}) {
   };
 
   const query = buildParams(params);
-  const url = `${API_BASE}/api/comment/list-comments${query ? `?${query}` : ""}`;
+  const url = `${API_BASE}/api/comment/list-comments${
+    query ? `?${query}` : ""
+  }`;
 
   const res = await fetch(url, {
     method: "GET",
