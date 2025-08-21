@@ -176,6 +176,32 @@ export default function AuthPage() {
     }
   };
 
+  const handlePaste = (e, index) => {
+    e.preventDefault();
+
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pasted = (clipboardData.getData?.("text") ?? "").trim();
+    const digits = pasted.replace(/\D/g, "").split("");
+    if (digits.length === 0) return;
+
+    setOtpCode((prev) => {
+      const next = [...prev];
+      for (let i = 0; i < digits.length && index + i < next.length; i++) {
+        next[index + i] = digits[i];
+      }
+      return next;
+    });
+
+    const focusIndex = Math.min(
+      index + digits.length,
+      otpInputRefs.current.length - 1
+    );
+    requestAnimationFrame(() => {
+      if (otpInputRefs.current[focusIndex])
+        otpInputRefs.current[focusIndex].focus();
+    });
+  };
+
   function getRecaptchaToken(action) {
     return new Promise((resolve, reject) => {
       window.grecaptcha.ready(() => {
@@ -609,6 +635,7 @@ export default function AuthPage() {
                   resending={resending}
                   onOtpChange={handleOTPChange}
                   onKeyDown={handleKeyDown}
+                  onPaste={handlePaste}
                   onVerifySubmit={handleVerifySubmit}
                   onResend={handleResendCode}
                 />

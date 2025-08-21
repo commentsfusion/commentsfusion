@@ -11,6 +11,7 @@ export default function VerificationCodeForm({
   resending,
   onOtpChange,
   onKeyDown,
+  onPaste,
   onVerifySubmit,
   onResend,
 }) {
@@ -42,6 +43,7 @@ export default function VerificationCodeForm({
             value={value}
             onChange={(e) => onOtpChange(e, i)}
             onKeyDown={(e) => onKeyDown(e, i)}
+            onPaste={(e) =>  onPaste(e, i)}
             className="w-10 h-10 text-center rounded-md border border-white/70 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
             autoComplete="one-time-code"
           />
@@ -113,6 +115,7 @@ VerificationCodeForm.propTypes = {
   resending: PropTypes.bool.isRequired,
   onOtpChange: PropTypes.func.isRequired,
   onKeyDown: PropTypes.func.isRequired,
+  onpaste: PropTypes.func.isRequired,
   onVerifySubmit: PropTypes.func.isRequired,
   onResend: PropTypes.func.isRequired,
 };
