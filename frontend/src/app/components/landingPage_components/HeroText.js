@@ -23,7 +23,7 @@ export default function HeroText() {
         />
         Download Free Chrome Extension
       </button>
-      <p className="mt-3 text-sm text-gray-200 max-md:text-[14px]">No credit card required</p>
+      <p className="mt-3 text-sm text-white font-bold max-md:text-[14px] bg-black/50 inline-block px-4 py-1 rounded-full shadow-sm border border-white/20">✓ No credit card required</p>
     </motion.div>
   );
 }

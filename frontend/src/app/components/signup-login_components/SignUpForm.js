@@ -192,18 +192,18 @@ export default function SignupForm({
         </div>
         <motion.button
           type="submit"
+          disabled={loading}
           className={`
-          w-full py-3 mt-4 rounded-full
-          ${
-            loading
-              ? "bg-gray-600 cursor-not-allowed"
-              : "bg-black hover:opacity-90"
-          }
-          text-white font-medium flex justify-center items-center transition
-        `}
+              w-full py-3 mt-4 rounded-full
+              ${
+                loading
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-black hover:opacity-90"
+              }
+              text-white font-medium flex justify-center items-center transition
+            `}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.95 }}
-          disabled={loading}
           transition={{
             type: "spring",
             stiffness: 300,

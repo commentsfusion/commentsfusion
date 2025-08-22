@@ -33,16 +33,19 @@ function NewfeaturesSection() {
 
   return (
     <>
-      <div>
+      <div className="forced-white-text" style={{ color: 'white' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-center text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-2xl max-lg:mt-[-200px] max-md:mt-[-150px]">
+          <h2 
+            className="text-center text-5xl font-bold mb-4 max-lg:text-4xl max-md:text-2xl max-lg:mt-[-200px] max-md:mt-[-150px] text-white forced-white-text"
+            style={{ color: 'white !important' }}
+          >
             Powerful Features to Supercharge Your <br />
-            <span className="text-[#33C6F4]">Client Acquisition</span>
+            <span className="text-[#33C6F4] forced-cyan-text" style={{ color: '#33C6F4 !important' }}>Client Acquisition</span>
           </h2>
         </motion.div>
 
@@ -71,10 +74,16 @@ function NewfeaturesSection() {
                   alt="Client Acquisition"
                   className="w-11 max-md:w-9"
                 />
-                <h1 className="text-center text-2xl max-lg:text-[21px] mt-7 max-md:mt-4">
+                <h1 
+                  className="text-center text-2xl max-lg:text-[21px] mt-7 max-md:mt-4 text-white forced-white-text" 
+                  style={{ color: 'white !important' }}
+                >
                   {item.title}
                 </h1>
-                <p className="text-center text-[14px] max-lg:text-[13px] max-md:text-[12px] mt-5 max-md:mt-3">
+                <p 
+                  className="text-center text-[14px] max-lg:text-[13px] max-md:text-[12px] mt-5 max-md:mt-3 text-white forced-white-text"
+                  style={{ color: 'white !important' }}
+                >
                   {item.description}
                 </p>
               </motion.div>

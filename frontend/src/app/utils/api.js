@@ -34,12 +34,13 @@ export async function loginUser({
   password,
   recaptchaToken,
   recaptchaV2Token,
+  linkedinUsername,
 }) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token }),
+    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token, linkedinUsername }),
   });
   const body = await res.json();
   if (!res.ok) {

@@ -153,9 +153,11 @@ ${highlight ? "border-sky-400 bg-[#33C6F4] z-20 shadow-xl lg:-translate-y-10 md:
 
         {title !== "AGENCY" && (
           <p
-            className={`text-sm text-center max-lg:text-[13px] max-md:text-[11px] ${noteClass}`}
+            className={`text-sm font-medium text-center max-lg:text-[13px] max-md:text-[11px] ${
+              title.toLowerCase() === "premium" ? "text-gray-800" : "text-white"
+            } ${noteClass}`}
           >
-            No credit card required
+           No credit card required
           </p>
         )}
       </div>
