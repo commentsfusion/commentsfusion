@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import MobileLayout from "../components/mobileLayout";
 import { getDashboardMetrics, getDashboardTargets } from "../utils/api";
+import { useRouter } from "next/navigation";
 
 const FollowersChart = dynamic(
   () => import("../components/charts/FollowersChart"),
@@ -21,6 +22,7 @@ const CommentsDotPlot = dynamic(
 );
 
 export default function Home() {
+  const router = useRouter();
   const filters = [
     { label: "7d", value: "7d" },
     { label: "15d", value: "15d" },
@@ -49,6 +51,14 @@ export default function Home() {
       .then(setMetrics)
       .catch((err) => console.error("Dashboard load error:", err));
   }, [selectedFilter]);
+
+  // Check if user needs to connect LinkedIn account (for new signups)
+  useEffect(() => {
+    const needsLinkedInConnection = localStorage.getItem("needsLinkedInConnection");
+    if (needsLinkedInConnection === "true") {
+      router.push("/connect-linkedin");
+    }
+  }, [router]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -392,9 +402,11 @@ export default function Home() {
 
                   {/* 2) Name — avatar + text centered */}
                   <div className="flex items-center justify-start space-x-3">
-                    <img
+                    <Image
                       src="/images/topbar/userIcon.svg"
                       alt={`${user.name} Icon`}
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full"
                     />
                     <div className="text-sm text-left">

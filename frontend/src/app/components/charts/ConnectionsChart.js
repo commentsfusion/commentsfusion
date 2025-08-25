@@ -17,12 +17,26 @@ ChartJS.register(
 );
 
 export default function ConnectionsChart({ data = [] }) {
+  // Format the data for Chart.js
+  // Backend sends {x: timestamp, y: count} format, but Chart.js needs separate labels and data arrays
+  const formattedData = data.map(item => {
+    // Try to format the timestamp as a readable date
+    const date = item.x instanceof Date ? item.x : new Date(item.x);
+    return {
+      label: date.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      value: item.y
+    };
+  });
+  
+  // Sort by date ascending
+  formattedData.sort((a, b) => new Date(a.label) - new Date(b.label));
+  
   const chartData = {
-    labels: data.map((item, index) => item.label || `Day ${index + 1}`),
+    labels: formattedData.map(item => item.label),
     datasets: [
       {
         label: "Connections",
-        data: data.map((item) => item.value || item.count || item),
+        data: formattedData.map(item => item.value),
         borderColor: "#10B981",
         backgroundColor: "rgba(16, 185, 129, 0.1)",
         borderWidth: 2,
@@ -90,8 +104,8 @@ export default function ConnectionsChart({ data = [] }) {
           },
 
           label: (item) => {
-            // default label: "Followers: 586"
-            return `Followers: ${item.parsed.y}`;
+            // default label: "Connections: 586"
+            return `Connections: ${item.parsed.y}`;
           },
         },
       },
