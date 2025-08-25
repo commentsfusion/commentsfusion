@@ -245,9 +245,17 @@ export default function AuthPage() {
       }*/
 
       localStorage.setItem("authToken", result.token);
+      // Store user information
+      localStorage.setItem("userInfo", JSON.stringify({
+        email: loginData.email,
+        isLinkedInConnected: false // We'll assume false until we verify with backend
+      }));
       // Clear any existing Google user flag for regular login
       localStorage.removeItem("isGoogleUser");
       toast.success("Logged in!");
+      
+      // Check if this account has LinkedIn connected
+      // For now, redirect to dashboard but we'll implement the check later
       router.push("/main_dashboard");
     } catch (err) {
       if (err.message) {
@@ -349,9 +357,18 @@ export default function AuthPage() {
             code,
           });
           window.localStorage.setItem("authToken", token);
+          // Store user information
+          localStorage.setItem("userInfo", JSON.stringify({
+            email: signupData.email,
+            username: signupData.username,
+            isLinkedInConnected: false
+          }));
           // Clear any existing Google user flag for regular signup
           localStorage.removeItem("isGoogleUser");
-          toast.success("Signup successful! Login Now...");
+          toast.success("Signup successful!");
+          
+          // Redirect to LinkedIn connection page
+          router.push("/connect-linkedin");
 
           setSignupData({
             username: "",
@@ -436,10 +453,18 @@ export default function AuthPage() {
       });
 
       localStorage.setItem("authToken", result.token);
+      // Store user information
+      localStorage.setItem("userInfo", JSON.stringify({
+        email: loginData.email,
+        isLinkedInConnected: false // We'll assume false until we verify with backend
+      }));
       // Clear any existing Google user flag for regular login
       localStorage.removeItem("isGoogleUser");
       toast.success("Logged in!");
       setCaptchaRequired(false);
+      
+      // Check if this account has LinkedIn connected
+      // For now, redirect to dashboard but we'll implement the check later
       router.push("/main_dashboard");
     } catch (err) {
       if (recaptchaV2Ref.current) recaptchaV2Ref.current.reset();

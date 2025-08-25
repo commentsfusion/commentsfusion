@@ -1,0 +1,91 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import Layout from "../components/layout";
+import MobileLayout from "../components/mobileLayout";
+
+export default function ConnectLinkedIn() {
+  const router = useRouter();
+  const [screenType, setScreenType] = useState("desktop");
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) setScreenType("mobile");
+      else if (width < 1024) setScreenType("tablet");
+      else setScreenType("desktop");
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleGoToDashboard = () => {
+    // Clear the LinkedIn connection flag when user proceeds to dashboard
+    localStorage.removeItem("needsLinkedInConnection");
+    router.push("/main_dashboard");
+  };
+
+  const content = (
+    <div className="h-full w-full flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md bg-black/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold mb-2">Connect LinkedIn</h1>
+          <p className="text-white/80 text-sm">
+            Link your LinkedIn account to access all features
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <div className="mb-6 flex items-center justify-center">
+            <Image 
+              src="/images/linkedin_connection.svg" 
+              alt="LinkedIn"
+              width={80}
+              height={80}
+            />
+          </div>
+          
+          <div className="w-full mb-6 space-y-2 text-center">
+            <p className="text-sm text-white/80">
+              1. Go to LinkedIn and sign in
+            </p>
+            <p className="text-sm text-white/80">
+              2. Use our extension to connect your account
+            </p>
+          </div>
+          
+          <div className="flex flex-col gap-3 w-full">
+            <button 
+              onClick={() => {
+                window.open("https://www.linkedin.com/", "_blank");
+                
+                // Use setTimeout to ensure the navigation happens after the new tab is opened
+                setTimeout(() => {
+                  // Use window.location for more direct navigation to the home page
+                  window.location.href = "/";
+                }, 100);
+              }}
+              className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-center"
+            >
+              Go to LinkedIn
+            </button>
+            {/* <button 
+              onClick={handleGoToDashboard}
+              className="w-full px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 border border-white/20 text-center"
+            >
+              Skip for Now
+            </button> */}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (screenType === "desktop") return <Layout>{content}</Layout>;
+  if (screenType === "tablet") return <MobileLayout>{content}</MobileLayout>;
+  return <MobileLayout>{content}</MobileLayout>;
+}

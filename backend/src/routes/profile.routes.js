@@ -23,4 +23,10 @@ router.get(
   asyncHandler(profileController.checkProfileExists)
 );
 
+router.get(
+  '/check-linkedin',
+  protect,
+  asyncHandler(profileController.checkLinkedInConnection)
+);
+
 module.exports = router;

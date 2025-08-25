@@ -4,8 +4,9 @@ import Layout from "../components/layout";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import MobileLayout from "../components/mobileLayout";
-import { getDashboardMetrics, getDashboardTargets } from "../utils/api";
+import { getDashboardMetrics, getDashboardTargets, checkLinkedInConnection } from "../utils/api";
 
 const FollowersChart = dynamic(
   () => import("../components/charts/FollowersChart"),
@@ -21,6 +22,7 @@ const CommentsDotPlot = dynamic(
 );
 
 export default function Home() {
+  const router = useRouter();
   const filters = [
     { label: "7d", value: "7d" },
     { label: "15d", value: "15d" },
@@ -49,6 +51,25 @@ export default function Home() {
       .then(setMetrics)
       .catch((err) => console.error("Dashboard load error:", err));
   }, [selectedFilter]);
+  
+  // Check if user needs to connect LinkedIn
+  useEffect(() => {
+    async function checkConnection() {
+      try {
+        // Check with backend if the user's account is connected to LinkedIn
+        const { isConnected } = await checkLinkedInConnection();
+        
+        if (!isConnected) {
+          // If not connected to LinkedIn, redirect to connect page
+          router.push("/connect-linkedin");
+        }
+      } catch (err) {
+        console.error("Error checking LinkedIn connection:", err);
+      }
+    }
+    
+    checkConnection();
+  }, [router]);
 
   useEffect(() => {
     const controller = new AbortController();

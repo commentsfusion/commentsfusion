@@ -34,13 +34,12 @@ export async function loginUser({
   password,
   recaptchaToken,
   recaptchaV2Token,
-  linkedinUsername,
 }) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token, linkedinUsername }),
+    body: JSON.stringify({ email, password, recaptchaToken, recaptchaV2Token }),
   });
   const body = await res.json();
   if (!res.ok) {
@@ -85,6 +84,50 @@ export async function resetPassword(
   const body = await res.json();
   if (!res.ok) throw new Error(body.message);
   return body;
+}
+
+export async function checkLinkedInConnection() {
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      return { isConnected: false };
+    }
+    
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    };
+    
+    const res = await fetch(`${API_BASE}/api/profile/check-linkedin`, {
+      method: "GET",
+      credentials: "include",
+      headers: headers,
+    });
+    
+    if (!res.ok) {
+      // If API doesn't exist yet, we'll assume not connected
+      return { isConnected: false };
+    }
+    
+    const data = await res.json();
+    
+    // Update local storage with the latest connection status
+    const userInfoStr = localStorage.getItem("userInfo");
+    if (userInfoStr) {
+      try {
+        const userInfo = JSON.parse(userInfoStr);
+        userInfo.isLinkedInConnected = data.isConnected;
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      } catch (err) {
+        console.error("Error updating user info:", err);
+      }
+    }
+    
+    return data;
+  } catch (err) {
+    console.error("Error checking LinkedIn connection:", err);
+    return { isConnected: false };
+  }
 }
 
 export async function fetchUserDetails() {

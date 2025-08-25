@@ -4,6 +4,25 @@ const Profile = require("../models/profile");
 
 const { profileService, SEVEN_DAYS } = require("../services");
 
+exports.checkLinkedInConnection = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    
+    // Check if this user has a LinkedIn profile
+    const profile = await Profile.findOne({ user: userId });
+    
+    // User has LinkedIn connected if they have a profile with linkedinUsername
+    const isConnected = Boolean(profile && profile.linkedinUsername);
+    
+    res.json({ 
+      isConnected,
+      message: isConnected ? "LinkedIn is connected" : "LinkedIn is not connected"
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.checkProfileExists = async (req, res, next) => {
   try {
     const userId = req.user._id;
