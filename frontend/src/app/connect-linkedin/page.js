@@ -33,17 +33,17 @@ export default function ConnectLinkedIn() {
     <div className="h-full w-full flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-black/60 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold mb-2">Connect LinkedIn</h1>
+          <h1 className="text-2xl font-bold mb-2">Install Comments Fusion Extension</h1>
           <p className="text-white/80 text-sm">
-            Link your LinkedIn account to access all features
+            Add our Chrome extension to connect with LinkedIn and access all features
           </p>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="mb-6 flex items-center justify-center">
             <Image 
-              src="/images/linkedin_connection.svg" 
-              alt="LinkedIn"
+              src="/images/customise_AI/faq-bot.svg" 
+              alt="Chrome Extension"
               width={80}
               height={80}
             />
@@ -51,27 +51,28 @@ export default function ConnectLinkedIn() {
           
           <div className="w-full mb-6 space-y-2 text-center">
             <p className="text-sm text-white/80">
-              1. Go to LinkedIn and sign in
+              1. Install our Chrome extension
             </p>
             <p className="text-sm text-white/80">
-              2. Use our extension to connect your account
+              2. Use it to connect your LinkedIn account
             </p>
           </div>
           
           <div className="flex flex-col gap-3 w-full">
             <button 
               onClick={() => {
-                window.open("https://www.linkedin.com/", "_blank");
+                // Replace with your actual Chrome Web Store extension URL
+                window.open("https://chromewebstore.google.com/detail/oionfjkjcpfenmbeldmfdhcdfghohakn?utm_source=item-share-cb", "_blank");
                 
                 // Use setTimeout to ensure the navigation happens after the new tab is opened
                 setTimeout(() => {
-                  // Use window.location for more direct navigation to the home page
-                  window.location.href = "/";
+                  // Redirect to main dashboard after opening extension page
+                  window.location.href = "/main_dashboard";
                 }, 100);
               }}
               className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-center"
             >
-              Go to LinkedIn
+              Get Extension
             </button>
             {/* <button 
               onClick={handleGoToDashboard}
