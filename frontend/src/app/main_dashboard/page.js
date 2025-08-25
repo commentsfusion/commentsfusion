@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import MobileLayout from "../components/mobileLayout";
 import { getDashboardMetrics, getDashboardTargets } from "../utils/api";
-import { useRouter } from "next/navigation";
 
 const FollowersChart = dynamic(
   () => import("../components/charts/FollowersChart"),
@@ -22,7 +21,6 @@ const CommentsDotPlot = dynamic(
 );
 
 export default function Home() {
-  const router = useRouter();
   const filters = [
     { label: "7d", value: "7d" },
     { label: "15d", value: "15d" },
@@ -51,14 +49,6 @@ export default function Home() {
       .then(setMetrics)
       .catch((err) => console.error("Dashboard load error:", err));
   }, [selectedFilter]);
-
-  // Check if user needs to connect LinkedIn account (for new signups)
-  useEffect(() => {
-    const needsLinkedInConnection = localStorage.getItem("needsLinkedInConnection");
-    if (needsLinkedInConnection === "true") {
-      router.push("/connect-linkedin");
-    }
-  }, [router]);
 
   useEffect(() => {
     const controller = new AbortController();

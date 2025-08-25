@@ -351,13 +351,17 @@ export default function AuthPage() {
           window.localStorage.setItem("authToken", token);
           // Clear any existing Google user flag for regular signup
           localStorage.removeItem("isGoogleUser");
-          toast.success("Signup successful!");
+          toast.success("Signup successful! Login Now...");
 
-          // Set a flag to indicate this is a new user who hasn't connected LinkedIn
-          localStorage.setItem("needsLinkedInConnection", "true");
-          
-          // Redirect to the LinkedIn connection guidance page
-          router.push("/connect-linkedin");
+          setSignupData({
+            username: "",
+            email: "",
+            phone: "",
+            password: "",
+            confirmPassword: "",
+          });
+
+          changeMode("login");
         } catch (err) {
           setSignupErrors({ general: err.message });
           const msg = err.message || "Something went wrong";
